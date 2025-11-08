@@ -351,8 +351,9 @@
                 {% endif %}
             </ul>
             <div class="language-selector">
-                <form action="{% url 'set_language' %}" method="post" style="display: inline;">
+                <form action="{% url 'set_language_custom' %}" method="post" style="display: inline;">
                     {% csrf_token %}
+                    <input type="hidden" name="next" value="{{ request.get_full_path }}">
                     <label for="language-select" class="sr-only">{% trans 'Select language' %}</label>
                     <select name="language" id="language-select" onchange="this.form.submit()">
                         {% get_current_language as CURRENT_LANGUAGE %}

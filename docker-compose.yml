@@ -12,9 +12,9 @@ services:
       # Persist SQLite database
       - ./data:/app/src/data
       # Persist media files
-      - ./media:/app/src/media
+      - ./src/media:/app/src/media
       # Persist static files
-      - ./staticfiles:/app/src/staticfiles
+      - ./src/staticfiles:/app/src/staticfiles
     environment:
       - DJANGO_SETTINGS_MODULE=marketplace.settings
       - PYTHONUNBUFFERED=1
