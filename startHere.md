@@ -36,6 +36,7 @@ Interledger-powered Django marketplace where funders post Native-language jobs a
 - Public landing page with live tally of funded work and total ILP payouts.
 - GNAP possibly
 
+
 ## Build Flow (24h)
 1. **Hour 0–4:** Scaffold Django + DRF, set up Postgres, create models for users, briefs, submissions, escrow transactions.
 2. **Hour 4–12:** Implement funder brief CRUD, submission upload pipeline for text/video/audio/image files (S3 bucket or local storage), Interledger testnet escrow stubs.
