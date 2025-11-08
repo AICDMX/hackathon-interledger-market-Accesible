@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-{% load i18n %}
+{% load i18n static %}
 
 {% block title %}{% trans 'Dashboard' %}{% endblock %}
 
@@ -54,12 +54,23 @@
         line-height: 1;
     }
 
-    .dashboard-label {
-        font-size: 1rem;
-        font-weight: 600;
-        color: #2c3e50;
-        margin: 0;
-    }
+        .dashboard-label {
+            font-size: 1rem;
+            font-weight: 600;
+            color: #2c3e50;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        .dashboard-audio-wrapper {
+            display: inline-flex;
+            align-items: center;
+            margin-left: 0.25rem;
+        }
 
     /* Tablet and up: 3 columns */
     @media (min-width: 600px) {
@@ -119,6 +130,51 @@
             font-size: 3.5rem;
         }
     }
+
+    .audio-info-banner {
+        position: fixed;
+        bottom: 1.5rem;
+        left: 50%;
+        transform: translate(-50%, 20px);
+        background: rgba(44, 62, 80, 0.95);
+        color: #fff;
+        padding: 0.5rem 1.25rem;
+        border-radius: 999px;
+        font-size: 0.9rem;
+        box-shadow: 0 4px 14px rgba(0, 0, 0, 0.2);
+        opacity: 0;
+        pointer-events: auto;
+        transition: opacity 0.25s ease, transform 0.25s ease;
+        z-index: 1000;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+
+    .audio-info-banner.show {
+        opacity: 1;
+        transform: translate(-50%, 0);
+    }
+
+    .audio-info-action {
+        background: #f1c40f;
+        color: #2c3e50;
+        border: none;
+        border-radius: 20px;
+        padding: 0.3rem 0.9rem;
+        font-size: 0.85rem;
+        font-weight: 600;
+        text-decoration: none;
+        cursor: pointer;
+        transition: background 0.2s ease;
+        white-space: nowrap;
+    }
+
+    .audio-info-action:hover,
+    .audio-info-action:focus {
+        background: #f39c12;
+        color: #fff;
+    }
 </style>
 {% endblock %}
 
@@ -129,35 +185,249 @@
     <div class="dashboard-grid" role="grid" aria-label="{% trans 'Main navigation' %}">
         <a href="{% url 'jobs:create' %}" class="dashboard-icon-card" role="gridcell" aria-label="{% trans 'Post Job' %}">
             <div class="dashboard-icon" aria-hidden="true">??</div>
-            <p class="dashboard-label">{% trans 'Job Post' %}</p>
+            <p class="dashboard-label">
+                {% trans 'Job Post' %}
+                <span class="dashboard-audio-wrapper" 
+                      data-audio-target="label"
+                      data-content-type="dashboard"
+                      data-object-id="job_post"
+                      data-language="{{ LANGUAGE_CODE }}">
+                </span>
+            </p>
         </a>
 
         <a href="{% url 'jobs:my_products' %}" class="dashboard-icon-card" role="gridcell" aria-label="{% trans 'My Products' %}">
-            <div class="dashboard-icon" aria-hidden="true">
-                <img src="/media/my%20products.png" alt="{% trans 'My Products' %}" style="max-width: 80%; height: auto; display: block; margin: 0 auto;">
-            </div>
-            <p class="dashboard-label">{% trans 'My Products' %}</p>
+            <div class="dashboard-icon" aria-hidden="true">??</div>
+            <p class="dashboard-label">
+                {% trans 'My Products' %}
+                <span class="dashboard-audio-wrapper" 
+                      data-audio-target="label"
+                      data-content-type="dashboard"
+                      data-object-id="my_products"
+                      data-language="{{ LANGUAGE_CODE }}">
+                </span>
+            </p>
         </a>
 
         <a href="{% url 'jobs:my_money' %}" class="dashboard-icon-card" role="gridcell" aria-label="{% trans 'My Money' %}">
             <div class="dashboard-icon" aria-hidden="true">??</div>
-            <p class="dashboard-label">{% trans 'My Money' %}</p>
+            <p class="dashboard-label">
+                {% trans 'My Money' %}
+                <span class="dashboard-audio-wrapper" 
+                      data-audio-target="label"
+                      data-content-type="dashboard"
+                      data-object-id="my_money"
+                      data-language="{{ LANGUAGE_CODE }}">
+                </span>
+            </p>
         </a>
 
         <a href="{% url 'jobs:pending_jobs' %}" class="dashboard-icon-card" role="gridcell" aria-label="{% trans 'Pending Jobs' %}">
             <div class="dashboard-icon" aria-hidden="true">?</div>
-            <p class="dashboard-label">{% trans 'My Pending to Finish Jobs' %}</p>
+            <p class="dashboard-label">
+                {% trans 'My Pending to Finish Jobs' %}
+                <span class="dashboard-audio-wrapper" 
+                      data-audio-target="label"
+                      data-content-type="dashboard"
+                      data-object-id="pending_jobs"
+                      data-language="{{ LANGUAGE_CODE }}">
+                </span>
+            </p>
         </a>
 
         <a href="{% url 'jobs:filler_1' %}" class="dashboard-icon-card" role="gridcell" aria-label="{% trans 'Page 1' %}">
             <div class="dashboard-icon" aria-hidden="true">??</div>
-            <p class="dashboard-label">{% trans 'Page 1' %}</p>
+            <p class="dashboard-label">
+                {% trans 'Page 1' %}
+                <span class="dashboard-audio-wrapper" 
+                      data-audio-target="label"
+                      data-content-type="dashboard"
+                      data-object-id="page_1"
+                      data-language="{{ LANGUAGE_CODE }}">
+                </span>
+            </p>
         </a>
 
         <a href="{% url 'jobs:filler_2' %}" class="dashboard-icon-card" role="gridcell" aria-label="{% trans 'Page 2' %}">
             <div class="dashboard-icon" aria-hidden="true">??</div>
-            <p class="dashboard-label">{% trans 'Page 2' %}</p>
+            <p class="dashboard-label">
+                {% trans 'Page 2' %}
+                <span class="dashboard-audio-wrapper" 
+                      data-audio-target="label"
+                      data-content-type="dashboard"
+                      data-object-id="page_2"
+                      data-language="{{ LANGUAGE_CODE }}">
+                </span>
+            </p>
         </a>
     </div>
 </div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'audio/audio-player.js' %}"></script>
+<script>
+// Initialize audio players for dashboard items
+// Note: To use audio for dashboard items, create AudioSnippet entries in Django admin
+// You'll need a ContentType for dashboard items (or use an existing model)
+document.addEventListener('DOMContentLoaded', function() {
+    const audioMessages = {
+        error: '{% trans "Error loading audio. Please try again." %}',
+        notAvailable: '{% trans "Audio not yet available. You can add audio for this item via Django admin." %}',
+        readyDetailed: '{% trans "Audio functionality is ready! To add audio, create AudioSnippet entries in Django admin with the appropriate ContentType and object_id." %}',
+        readySimple: '{% trans "Audio functionality is ready! To add audio, create AudioSnippet entries in Django admin." %}'
+    };
+    const audioSnippetAdminUrl = "{% url 'admin:audio_audiosnippet_add' %}";
+    const fallbackAudioUrl = '{% static "audio/fallback.mp3" %}';
+    const audioActions = {
+        createSnippet: audioSnippetAdminUrl ? {
+            label: '{% trans "Create audio snippet" %}',
+            url: audioSnippetAdminUrl,
+            target: '_blank'
+        } : null
+    };
+
+    const audioInfoBanner = document.createElement('div');
+    audioInfoBanner.className = 'audio-info-banner';
+    audioInfoBanner.setAttribute('role', 'status');
+    audioInfoBanner.setAttribute('aria-live', 'polite');
+    audioInfoBanner.setAttribute('aria-atomic', 'true');
+    document.body.appendChild(audioInfoBanner);
+
+    let audioInfoTimeoutId = null;
+    let fallbackAudioInstance = null;
+    function showAudioMessage(message, options = {}) {
+        const { action, playFallback } = options;
+        audioInfoBanner.innerHTML = '';
+        const textSpan = document.createElement('span');
+        textSpan.textContent = message;
+        audioInfoBanner.appendChild(textSpan);
+
+        if (action && action.url) {
+            const actionLink = document.createElement('a');
+            actionLink.className = 'audio-info-action';
+            actionLink.href = action.url;
+            actionLink.textContent = action.label || '{% trans "Open" %}';
+            actionLink.setAttribute('role', 'button');
+            if (action.target) {
+                actionLink.target = action.target;
+                if (action.target === '_blank') {
+                    actionLink.rel = 'noopener noreferrer';
+                }
+            }
+            audioInfoBanner.appendChild(actionLink);
+        }
+
+        audioInfoBanner.classList.add('show');
+        if (audioInfoTimeoutId) {
+            clearTimeout(audioInfoTimeoutId);
+        }
+        audioInfoTimeoutId = setTimeout(function() {
+            audioInfoBanner.classList.remove('show');
+        }, 3500);
+
+        if (playFallback) {
+            playFallbackAudio();
+        }
+    }
+
+    function playFallbackAudio() {
+        if (!fallbackAudioUrl) {
+            return;
+        }
+        if (!fallbackAudioInstance) {
+            fallbackAudioInstance = new Audio(fallbackAudioUrl);
+        }
+        fallbackAudioInstance.currentTime = 0;
+        fallbackAudioInstance.play().catch(() => {});
+    }
+
+    // These will be populated once you set up ContentType IDs
+    // You can find ContentType IDs in Django admin under Content Types
+    // For now, we'll create buttons that will work once audio is set up
+    
+    document.querySelectorAll('.dashboard-audio-wrapper').forEach(function(wrapper) {
+        const objectIdStr = wrapper.dataset.objectId;
+        const targetField = wrapper.dataset.audioTarget;
+        const languageCode = wrapper.dataset.language || '{{ LANGUAGE_CODE }}';
+        
+        // Create audio player button
+        const audioBtn = document.createElement('button');
+        audioBtn.className = 'audio-play-btn';
+        audioBtn.style.cssText = 'display: inline-flex; align-items: center; gap: 0.25rem; padding: 0.25rem 0.5rem; background-color: #3498db; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 0.875rem; transition: background-color 0.2s;';
+        audioBtn.innerHTML = '<span aria-hidden="true">🔊</span><span class="audio-label">{% trans "Listen" %}</span>';
+        audioBtn.setAttribute('aria-label', '{% trans "Play audio" %}');
+        
+        // Store data attributes for API calls
+        wrapper.dataset.contentTypeId = ''; // Will be set when ContentType is created
+        wrapper.dataset.objectIdNum = objectIdStr;
+        
+        audioBtn.onclick = function(e) {
+            e.stopPropagation(); // Prevent link navigation
+            e.preventDefault();
+            
+            // Try to use the audio player module if available
+            if (window.audioPlayerModule) {
+                // The audio player module will handle loading audio via API
+                // For now, show that audio can be added via admin
+                const contentTypeId = wrapper.dataset.contentTypeId;
+                if (contentTypeId) {
+                    // Try to load audio via API
+                    const apiUrl = `/api/audio/snippets/get/${contentTypeId}/${objectIdStr}/${targetField}/${languageCode}/`;
+                    fetch(apiUrl)
+                        .then(response => {
+                            if (response.ok) {
+                                return response.json();
+                            }
+                            return null;
+                        })
+                        .then(data => {
+                            if (data && data.audio_url) {
+                                // Audio exists - play it
+                                const audio = new Audio(data.audio_url);
+                                audio.play().catch(() => {
+                                    // If main audio fails, try fallback
+                                    if (data.fallback_audio_url) {
+                                        const fallbackAudio = new Audio(data.fallback_audio_url);
+                                        fallbackAudio.play().catch(() => {
+                                            showAudioMessage(audioMessages.error, { playFallback: true });
+                                        });
+                                    } else {
+                                        showAudioMessage(audioMessages.error, { playFallback: true });
+                                    }
+                                });
+                            } else if (data && data.fallback_audio_url) {
+                                // Use fallback audio
+                                const fallbackAudio = new Audio(data.fallback_audio_url);
+                                fallbackAudio.play().catch(() => {
+                                    showAudioMessage(audioMessages.notAvailable, { action: audioActions.createSnippet, playFallback: true });
+                                });
+                            } else {
+                                // No audio - show request option
+                                showAudioMessage(audioMessages.notAvailable, { action: audioActions.createSnippet, playFallback: true });
+                            }
+                        })
+                        .catch(() => {
+                            // Try fallback on network error
+                            if (fallbackAudioUrl) {
+                                const fallbackAudio = new Audio(fallbackAudioUrl);
+                                fallbackAudio.play().catch(() => {
+                                    showAudioMessage(audioMessages.notAvailable, { action: audioActions.createSnippet, playFallback: true });
+                                });
+                            } else {
+                                showAudioMessage(audioMessages.notAvailable, { action: audioActions.createSnippet, playFallback: true });
+                            }
+                        });
+                } else {
+                    showAudioMessage(audioMessages.readyDetailed, { action: audioActions.createSnippet, playFallback: true });
+                }
+            } else {
+                showAudioMessage(audioMessages.readySimple, { action: audioActions.createSnippet, playFallback: true });
+            }
+        };
+        
+        wrapper.appendChild(audioBtn);
+    });
+});
+</script>
 {% endblock %}

@@ -21,6 +21,7 @@
 - [ ] Alt text for all images
 - [ ] Form labels and error messages accessibility
 - [ ] Audio/video transcripts for accessibility
+- [ ] Add audio description buttons to common places (navigation, forms, key UI elements, images, videos)
 - [ ] Spoken language audio translations:
   - Spanish audio translations
   - Native language audio with transcriptions

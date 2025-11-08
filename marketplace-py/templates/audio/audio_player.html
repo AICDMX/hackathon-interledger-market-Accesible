@@ -1,0 +1,280 @@
+{% load i18n static %}
+{% comment %}
+Audio player template component.
+Usage: {% audio_player content_object "title" "en" %}
+{% endcomment %}
+
+<div class="audio-player-wrapper" 
+     data-audio-target="{{ target_field }}"
+     data-content-type="{{ content_type_id }}"
+     data-object-id="{{ object_id }}"
+     data-language="{{ language_code }}">
+    
+    {% if audio_snippet and audio_snippet.file %}
+        {# Audio available - show player #}
+        <button class="audio-play-btn" 
+                aria-label="{% blocktrans with field=target_field lang=language_code %}Play audio for {{ field }} in {{ lang }}{% endblocktrans %}"
+                onclick="playAudio(this)">
+            <span class="audio-icon" aria-hidden="true">??</span>
+            <span class="audio-label">{% trans "Listen" %}</span>
+        </button>
+        
+        <div class="audio-player-container" style="display: none;">
+            <audio controls 
+                   preload="none"
+                   aria-label="{% blocktrans with field=target_field lang=language_code %}Audio player for {{ field }} in {{ lang }}{% endblocktrans %}">
+                <source src="{{ audio_snippet.file.url }}" type="audio/mpeg">
+                <source src="{{ audio_snippet.file.url }}" type="audio/ogg">
+                {% trans "Your browser does not support the audio element." %}
+            </audio>
+            <button class="audio-close-btn" onclick="closeAudioPlayer(this)" aria-label="{% trans 'Close audio player' %}">?</button>
+        </div>
+    {% else %}
+        {# Audio not available - try fallback #}
+        {% if fallback_audio_url %}
+            <button class="audio-play-btn audio-fallback-btn" 
+                    aria-label="{% blocktrans with field=target_field lang=language_code %}Play fallback audio for {{ field }} in {{ lang }}{% endblocktrans %}"
+                    onclick="playAudio(this)">
+                <span class="audio-icon" aria-hidden="true">??</span>
+                <span class="audio-label">{% trans "Listen (Fallback)" %}</span>
+            </button>
+            
+            <div class="audio-player-container" style="display: none;">
+                <audio controls 
+                       preload="none"
+                       data-fallback="true"
+                       aria-label="{% blocktrans with field=target_field lang=language_code %}Fallback audio player for {{ field }} in {{ lang }}{% endblocktrans %}">
+                    <source src="{{ fallback_audio_url }}" type="audio/mpeg">
+                    <source src="{{ fallback_audio_url }}" type="audio/ogg">
+                    {% trans "Your browser does not support the audio element." %}
+                </audio>
+                <button class="audio-close-btn" onclick="closeAudioPlayer(this)" aria-label="{% trans 'Close audio player' %}">?</button>
+            </div>
+        {% else %}
+            {# No fallback - show request button #}
+            <button class="audio-request-btn" 
+                    aria-label="{% blocktrans with field=target_field lang=language_code %}Request audio for {{ field }} in {{ lang }}{% endblocktrans %}"
+                    onclick="requestAudio(this)">
+                <span class="audio-icon" aria-hidden="true">??</span>
+                <span class="audio-label">{% trans "Request audio" %}</span>
+            </button>
+            
+            <div class="audio-request-message" style="display: none;" role="alert"></div>
+        {% endif %}
+    {% endif %}
+</div>
+
+<script>
+// Audio player functionality
+function playAudio(button) {
+    const wrapper = button.closest('.audio-player-wrapper');
+    const playerContainer = wrapper.querySelector('.audio-player-container');
+    const audio = playerContainer.querySelector('audio');
+    
+    // Hide button, show player
+    button.style.display = 'none';
+    playerContainer.style.display = 'block';
+    
+    // Play audio
+    audio.play().catch(err => {
+        console.error('Error playing audio:', err);
+        // Show error message
+        const errorMsg = document.createElement('div');
+        errorMsg.className = 'audio-error';
+        errorMsg.textContent = '{% trans "Error loading audio. Please try again." %}';
+        playerContainer.appendChild(errorMsg);
+    });
+}
+
+function closeAudioPlayer(button) {
+    const container = button.closest('.audio-player-container');
+    const wrapper = container.closest('.audio-player-wrapper');
+    const playBtn = wrapper.querySelector('.audio-play-btn');
+    const audio = container.querySelector('audio');
+    
+    // Stop audio
+    audio.pause();
+    audio.currentTime = 0;
+    
+    // Hide player, show button
+    container.style.display = 'none';
+    playBtn.style.display = 'inline-flex';
+}
+
+function requestAudio(button) {
+    const wrapper = button.closest('.audio-player-wrapper');
+    const contentTypeId = wrapper.dataset.contentType;
+    const objectId = wrapper.dataset.objectId;
+    const targetField = wrapper.dataset.audioTarget;
+    const languageCode = wrapper.dataset.language;
+    const messageDiv = wrapper.querySelector('.audio-request-message');
+    
+    // Disable button
+    button.disabled = true;
+    button.querySelector('.audio-label').textContent = '{% trans "Requesting..." %}';
+    
+    // Make API request
+    fetch('/api/audio/requests/request_audio/', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': getCookie('csrftoken')
+        },
+        body: JSON.stringify({
+            content_type_id: contentTypeId,
+            object_id: objectId,
+            target_field: targetField,
+            language_code: languageCode
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (response.ok) {
+            messageDiv.textContent = '{% trans "Thank you! Your request has been submitted." %}';
+            messageDiv.className = 'audio-request-message success';
+            messageDiv.style.display = 'block';
+            button.style.display = 'none';
+        } else {
+            throw new Error(data.error || 'Request failed');
+        }
+    })
+    .catch(error => {
+        messageDiv.textContent = '{% trans "Sorry, there was an error submitting your request. Please try again." %}';
+        messageDiv.className = 'audio-request-message error';
+        messageDiv.style.display = 'block';
+        button.disabled = false;
+        button.querySelector('.audio-label').textContent = '{% trans "Request audio" %}';
+    });
+}
+
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+</script>
+
+<style>
+.audio-player-wrapper {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-left: 0.5rem;
+}
+
+.audio-play-btn,
+.audio-request-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    padding: 0.25rem 0.5rem;
+    background-color: #3498db;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.875rem;
+    transition: background-color 0.2s;
+}
+
+.audio-play-btn:hover,
+.audio-play-btn:focus,
+.audio-request-btn:hover,
+.audio-request-btn:focus {
+    background-color: #2980b9;
+    outline: 2px solid #2980b9;
+    outline-offset: 2px;
+}
+
+.audio-play-btn:disabled,
+.audio-request-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.audio-fallback-btn {
+    background-color: #95a5a6;
+    border-left: 3px solid #7f8c8d;
+}
+
+.audio-fallback-btn:hover,
+.audio-fallback-btn:focus {
+    background-color: #7f8c8d;
+    outline: 2px solid #7f8c8d;
+    outline-offset: 2px;
+}
+
+.audio-icon {
+    font-size: 1rem;
+}
+
+.audio-player-container {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem;
+    background-color: #f5f5f5;
+    border-radius: 4px;
+}
+
+.audio-player-container audio {
+    max-width: 300px;
+}
+
+.audio-close-btn {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+    color: #666;
+    padding: 0;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: background-color 0.2s;
+}
+
+.audio-close-btn:hover,
+.audio-close-btn:focus {
+    background-color: #ddd;
+    outline: 2px solid #666;
+    outline-offset: 2px;
+}
+
+.audio-request-message {
+    padding: 0.5rem;
+    border-radius: 4px;
+    font-size: 0.875rem;
+    margin-top: 0.5rem;
+}
+
+.audio-request-message.success {
+    background-color: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+}
+
+.audio-request-message.error {
+    background-color: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+}
+
+.audio-error {
+    color: #e74c3c;
+    font-size: 0.875rem;
+    margin-top: 0.5rem;
+}
+</style>

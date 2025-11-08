@@ -14,6 +14,7 @@ urlpatterns = [
     path('i18n/setlang/', views.set_language_custom, name='set_language_custom'),
     path('i18n/', include('django.conf.urls.i18n')),
     path('rosetta/', include('rosetta.urls')),
+    path('api/audio/', include('audio.urls')),
 ]
 
 # Add language prefix to URLs

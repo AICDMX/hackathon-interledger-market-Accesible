@@ -9,6 +9,8 @@ class JobAdmin(admin.ModelAdmin):
     list_filter = ['status', 'target_language', 'created_at']
     search_fields = ['title', 'description']
     readonly_fields = ['created_at', 'updated_at']
+    # Note: Audio snippets and requests use GenericForeignKey, so they can't be used as standard inlines
+    # Use the audio admin directly or create custom admin views if needed
 
 
 @admin.register(JobSubmission)
