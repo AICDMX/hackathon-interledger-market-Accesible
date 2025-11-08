@@ -1,7 +1,7 @@
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 from django.urls import reverse
-from src.users.models import User
+from users.models import User
 
 
 class Job(models.Model):
