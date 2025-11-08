@@ -19,6 +19,7 @@ FROM base AS runner
 ENV NODE_ENV=production
 COPY --from=deps /app/node_modules ./node_modules
 COPY --from=build /app/dist ./dist
+COPY --from=build /app/private.key ./private.key
 USER node
 ENV PORT=3000
 EXPOSE 3000
