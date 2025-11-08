@@ -4,34 +4,34 @@
 Deliver a reusable Django subsystem that lets any piece of content expose spoken-audio. Users should see a speaker icon; clicking it streams the attached language track. If no audio exists, we surface a polite fallback and invite users (or staff) to request/record the missing translation.
 
 ## Phase 1 ? Data + Storage
-- [ ] Add an `AudioSnippet` model keyed by `content_type`, `object_id`, `target_field`, `language_code`, `transcript`, `status`, and `file` (stored via `FileField` to S3/Cloudflare R2/local per settings).
-- [ ] `target_field` is a short slug (`title`, `description`, etc.) that tells us which UI element or model field the audio is narrating, so one object can expose multiple snippets without collisions.
-- [ ] Create a lightweight `AudioRequest` model to log "needs translation/audio" so we can track gaps separately from finished snippets.
-- [ ] Provide signals/helpers (e.g., `AudioMixin`) so any model can declare it supports spoken audio.
+- [x] Add an `AudioSnippet` model keyed by `content_type`, `object_id`, `target_field`, `language_code`, `transcript`, `status`, and `file` (stored via `FileField` to S3/Cloudflare R2/local per settings).
+- [x] `target_field` is a short slug (`title`, `description`, etc.) that tells us which UI element or model field the audio is narrating, so one object can expose multiple snippets without collisions.
+- [x] Create a lightweight `AudioRequest` model to log "needs translation/audio" so we can track gaps separately from finished snippets.
+- [x] Provide signals/helpers (e.g., `AudioMixin`) so any model can declare it supports spoken audio.
 
-**Current Status:** Not started
+**Current Status:** ? Completed
 
 ## Phase 2 ? Admin + Workflow
-- [ ] Build Django admin inlines/forms so staff can upload MP3/OGG files, preview them, and mark status (`draft`, `ready`, `needs_review`).
-- [ ] Allow staff to create `AudioRequest` entries directly from missing languages; auto-close when an `AudioSnippet` for that target exists.
+- [x] Build Django admin inlines/forms so staff can upload MP3/OGG files, preview them, and mark status (`draft`, `ready`, `needs_review`).
+- [x] Allow staff to create `AudioRequest` entries directly from missing languages; auto-close when an `AudioSnippet` for that target exists.
 - [ ] Optional Celery task: when a request is logged, trigger notifications or TTS generation to seed a draft file.
 
-**Current Status:** Not started
+**Current Status:** ? Mostly completed (Celery task optional, skipped for now)
 
 ## Phase 3 ? API + Serving
-- [ ] Expose a REST endpoint (DRF) that, given `content_type/object_id/language`, returns the audio URL, metadata, and fallback text.
-- [ ] Secure URLs via signed storage links or proxy view to avoid leaking private buckets.
-- [ ] Cache per-object language lookups (Redis) to minimize DB hits when rendering pages.
+- [x] Expose a REST endpoint (DRF) that, given `content_type/object_id/language`, returns the audio URL, metadata, and fallback text.
+- [x] Secure URLs via signed storage links or proxy view to avoid leaking private buckets.
+- [x] Cache per-object language lookups (Redis) to minimize DB hits when rendering pages.
 
-**Current Status:** Not started
+**Current Status:** ? Completed
 
 ## Phase 4 ? Front-End Experience
-- [ ] Component injects a speaker icon next to any field flagged as having audio and includes `data-audio-target="title"` (or similar) so the API can request the correct snippet.
-- [ ] On click, load the audio via HTML `<audio>` tag or custom player; handle streaming + loading state.
-- [ ] If snippet missing, show toast/banner: "Sorry, not recorded yet. Want to help?" with CTA to open the request form.
-- [ ] Include graceful fallback for screen readers and offline mode.
+- [x] Component injects a speaker icon next to any field flagged as having audio and includes `data-audio-target="title"` (or similar) so the API can request the correct snippet.
+- [x] On click, load the audio via HTML `<audio>` tag or custom player; handle streaming + loading state.
+- [x] If snippet missing, show toast/banner: "Sorry, not recorded yet. Want to help?" with CTA to open the request form.
+- [x] Include graceful fallback for screen readers and offline mode.
 
-**Current Status:** Not started
+**Current Status:** ? Completed
 
 ## Monitoring + QA
 - [ ] Nightly job to verify audio files still exist in storage; flag broken links.
@@ -51,5 +51,16 @@ Deliver a reusable Django subsystem that lets any piece of content expose spoken
 ---
 
 ## Notes
-- Last updated: [Date will be updated as we progress]
-- Currently working on: [Will be updated]
+- Last updated: All phases completed!
+- Currently working on: Ready for testing and deployment
+- Created `audio` Django app with:
+  - `AudioSnippet` model with generic foreign key support
+  - `AudioRequest` model for tracking missing audio
+  - `AudioMixin` helper class for models
+  - Django admin integration with previews and inlines
+  - REST API endpoints (DRF)
+  - Caching support for performance
+  - Template tags for easy integration
+  - Front-end JavaScript module for audio playback
+  - Accessible UI components with ARIA labels
+  - Signals to auto-close requests when snippets are created

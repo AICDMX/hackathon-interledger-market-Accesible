@@ -8,4 +8,6 @@ dependencies = [
     "django-modeltranslation>=0.18.12",
     "django-rosetta>=0.9.8",
     "Pillow>=10.0.0",
+    "djangorestframework>=3.14.0",
+    "gunicorn>=21.2.0",
 ]

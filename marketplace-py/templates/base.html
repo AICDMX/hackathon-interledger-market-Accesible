@@ -103,7 +103,6 @@
             max-width: 1200px;
             margin: 2rem auto;
             padding: 0 1rem;
-            padding-bottom: 80px; /* Space for bottom navigation on mobile */
         }
         
         /* Messages */
@@ -231,95 +230,120 @@
             margin-top: 4rem;
         }
         
-        /* Bottom Navigation Bar - Mobile First */
-        .bottom-nav {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            background-color: #fff;
-            border-top: 1px solid #ddd;
-            box-shadow: 0 -2px 8px rgba(0,0,0,0.1);
-            z-index: 1000;
-            display: flex;
-            justify-content: space-around;
-            align-items: center;
-            padding: 0.5rem 0;
-            min-height: 60px;
-        }
-        
-        .bottom-nav-item {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            text-decoration: none;
-            color: #666;
-            flex: 1;
-            padding: 0.5rem;
-            transition: all 0.2s;
-            min-width: 0;
-            border: none;
+        /* Hamburger Menu */
+        .hamburger {
+            display: none;
             background: none;
-            cursor: pointer;
-        }
-        
-        .bottom-nav-item:hover,
-        .bottom-nav-item:focus {
-            color: #3498db;
-            outline: none;
-        }
-        
-        .bottom-nav-item.active {
-            color: #3498db;
-        }
-        
-        .bottom-nav-icon {
+            border: none;
+            color: #fff;
             font-size: 1.5rem;
-            margin-bottom: 0.25rem;
+            cursor: pointer;
+            padding: 0.5rem;
             line-height: 1;
+            transition: background-color 0.2s;
         }
         
-        .bottom-nav-label {
-            font-size: 0.7rem;
-            text-align: center;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            max-width: 100%;
+        .hamburger:hover,
+        .hamburger:focus {
+            background-color: #34495e;
+            outline: 2px solid #fff;
+            outline-offset: 2px;
         }
         
-        /* Hide bottom nav on desktop by default, show on mobile */
-        @media (min-width: 769px) {
-            .bottom-nav {
-                display: none;
-            }
-            
-            main {
-                padding-bottom: 2rem;
-            }
+        .hamburger-icon {
+            display: block;
+            width: 24px;
+            height: 24px;
+            position: relative;
+        }
+        
+        .hamburger-icon span {
+            display: block;
+            position: absolute;
+            height: 3px;
+            width: 100%;
+            background: #fff;
+            border-radius: 3px;
+            opacity: 1;
+            left: 0;
+            transform: rotate(0deg);
+            transition: 0.25s ease-in-out;
+        }
+        
+        .hamburger-icon span:nth-child(1) {
+            top: 0px;
+        }
+        
+        .hamburger-icon span:nth-child(2) {
+            top: 10px;
+        }
+        
+        .hamburger-icon span:nth-child(3) {
+            top: 20px;
+        }
+        
+        .hamburger.active .hamburger-icon span:nth-child(1) {
+            top: 10px;
+            transform: rotate(135deg);
+        }
+        
+        .hamburger.active .hamburger-icon span:nth-child(2) {
+            opacity: 0;
+            left: -60px;
+        }
+        
+        .hamburger.active .hamburger-icon span:nth-child(3) {
+            top: 10px;
+            transform: rotate(-135deg);
         }
         
         /* Responsive */
         @media (max-width: 768px) {
             nav {
-                flex-direction: column;
-                align-items: flex-start;
+                flex-wrap: nowrap;
             }
             
-            .nav-links {
-                flex-direction: column;
-                width: 100%;
-                gap: 0.5rem;
+            .hamburger {
+                display: block;
             }
             
-            /* Hide desktop nav links on mobile when bottom nav is present */
             .nav-links {
                 display: none;
+                position: absolute;
+                top: 100%;
+                left: 0;
+                right: 0;
+                background-color: #2c3e50;
+                flex-direction: column;
+                width: 100%;
+                gap: 0;
+                padding: 0;
+                box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+                z-index: 1000;
+            }
+            
+            .nav-links.active {
+                display: flex;
+            }
+            
+            .nav-links li {
+                width: 100%;
+                border-bottom: 1px solid #34495e;
+            }
+            
+            .nav-links a {
+                display: block;
+                padding: 1rem;
+                width: 100%;
             }
             
             header {
                 padding: 0.5rem 0;
+                position: relative;
+            }
+            
+            .language-selector {
+                margin-left: auto;
             }
         }
     </style>
@@ -337,7 +361,14 @@
                     <h1 style="margin: 0; display: inline;">{% trans 'Marketplace' %}</h1>
                 </a>
             </div>
-            <ul class="nav-links">
+            <button class="hamburger" aria-label="{% trans 'Toggle menu' %}" aria-expanded="false" onclick="toggleMenu()">
+                <span class="hamburger-icon">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </span>
+            </button>
+            <ul class="nav-links" id="nav-links">
                 <li><a href="{% url 'jobs:list' %}">{% trans 'Browse Jobs' %}</a></li>
                 {% if user.is_authenticated %}
                     <li><a href="{% url 'jobs:create' %}">{% trans 'Create Job' %}</a></li>
@@ -385,35 +416,51 @@
         <p>{% trans 'Interledger Marketplace - Supporting Native Languages' %}</p>
     </footer>
     
-    <!-- Bottom Navigation Bar - Mobile First -->
-    {% if user.is_authenticated %}
-    <nav class="bottom-nav" role="navigation" aria-label="{% trans 'Bottom navigation' %}">
-        <a href="{% url 'jobs:create' %}" class="bottom-nav-item {% if request.resolver_match.url_name == 'create' %}active{% endif %}" aria-label="{% trans 'Post Job' %}">
-            <span class="bottom-nav-icon" aria-hidden="true">??</span>
-            <span class="bottom-nav-label">{% trans 'Job Post' %}</span>
-        </a>
-        <a href="{% url 'jobs:my_products' %}" class="bottom-nav-item {% if request.resolver_match.url_name == 'my_products' %}active{% endif %}" aria-label="{% trans 'My Products' %}">
-            <span class="bottom-nav-icon" aria-hidden="true">??</span>
-            <span class="bottom-nav-label">{% trans 'My Products' %}</span>
-        </a>
-        <a href="{% url 'jobs:my_money' %}" class="bottom-nav-item {% if request.resolver_match.url_name == 'my_money' %}active{% endif %}" aria-label="{% trans 'My Money' %}">
-            <span class="bottom-nav-icon" aria-hidden="true">??</span>
-            <span class="bottom-nav-label">{% trans 'My Money' %}</span>
-        </a>
-        <a href="{% url 'jobs:pending_jobs' %}" class="bottom-nav-item {% if request.resolver_match.url_name == 'pending_jobs' %}active{% endif %}" aria-label="{% trans 'Pending Jobs' %}">
-            <span class="bottom-nav-icon" aria-hidden="true">?</span>
-            <span class="bottom-nav-label">{% trans 'Pending' %}</span>
-        </a>
-        <a href="{% url 'jobs:filler_1' %}" class="bottom-nav-item {% if request.resolver_match.url_name == 'filler_1' %}active{% endif %}" aria-label="{% trans 'Page 1' %}">
-            <span class="bottom-nav-icon" aria-hidden="true">?</span>
-            <span class="bottom-nav-label">{% trans 'Page 1' %}</span>
-        </a>
-        <a href="{% url 'jobs:filler_2' %}" class="bottom-nav-item {% if request.resolver_match.url_name == 'filler_2' %}active{% endif %}" aria-label="{% trans 'Page 2' %}">
-            <span class="bottom-nav-icon" aria-hidden="true">??</span>
-            <span class="bottom-nav-label">{% trans 'Page 2' %}</span>
-        </a>
-    </nav>
-    {% endif %}
+    <script>
+        function toggleMenu() {
+            const navLinks = document.getElementById('nav-links');
+            const hamburger = document.querySelector('.hamburger');
+            const isActive = navLinks.classList.contains('active');
+            
+            if (isActive) {
+                navLinks.classList.remove('active');
+                hamburger.classList.remove('active');
+                hamburger.setAttribute('aria-expanded', 'false');
+            } else {
+                navLinks.classList.add('active');
+                hamburger.classList.add('active');
+                hamburger.setAttribute('aria-expanded', 'true');
+            }
+        }
+        
+        // Close menu when clicking outside
+        document.addEventListener('click', function(event) {
+            const nav = document.querySelector('nav');
+            const hamburger = document.querySelector('.hamburger');
+            const navLinks = document.getElementById('nav-links');
+            
+            if (window.innerWidth <= 768 && 
+                navLinks.classList.contains('active') &&
+                !nav.contains(event.target)) {
+                navLinks.classList.remove('active');
+                hamburger.classList.remove('active');
+                hamburger.setAttribute('aria-expanded', 'false');
+            }
+        });
+        
+        // Close menu when clicking on a link
+        document.querySelectorAll('.nav-links a').forEach(link => {
+            link.addEventListener('click', function() {
+                if (window.innerWidth <= 768) {
+                    const navLinks = document.getElementById('nav-links');
+                    const hamburger = document.querySelector('.hamburger');
+                    navLinks.classList.remove('active');
+                    hamburger.classList.remove('active');
+                    hamburger.setAttribute('aria-expanded', 'false');
+                }
+            });
+        });
+    </script>
     
     {% block extra_js %}{% endblock %}
 </body>
