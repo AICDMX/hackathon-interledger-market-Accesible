@@ -6,7 +6,7 @@ from pathlib import Path
 import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
-# Since settings.py is in src/marketplace/, parent.parent gives us src/
+# Since settings.py is in marketplace-py/marketplace/, parent.parent gives us marketplace-py/
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 
