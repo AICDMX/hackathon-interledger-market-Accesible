@@ -3,7 +3,7 @@ from django.utils.translation import gettext_lazy as _
 from django.utils.html import format_html
 from django.urls import reverse
 from django.conf import settings
-from .models import AudioSnippet, AudioRequest
+from .models import AudioSnippet, AudioRequest, AudioContribution
 
 
 class AudioSnippetInline(admin.TabularInline):
@@ -143,3 +143,26 @@ class AudioRequestAdmin(admin.ModelAdmin):
         if not change:  # Creating new object
             obj.requested_by = request.user
         super().save_model(request, obj, form, change)
+
+
+@admin.register(AudioContribution)
+class AudioContributionAdmin(admin.ModelAdmin):
+    list_display = ['target_label', 'language_code', 'status', 'contributed_by', 'created_at']
+    list_filter = ['status', 'language_code', 'created_at']
+    search_fields = ['target_slug', 'target_label', 'language_code', 'notes']
+    readonly_fields = ['created_at', 'updated_at']
+    fieldsets = (
+        (_('Meta'), {
+            'fields': ('target_slug', 'target_label', 'language_code', 'notes')
+        }),
+        (_('Archivo'), {
+            'fields': ('file', 'status')
+        }),
+        (_('Relaciones'), {
+            'fields': ('contributed_by', 'audio_request', 'content_type', 'object_id')
+        }),
+        (_('Seguimiento'), {
+            'fields': ('created_at', 'updated_at')
+        }),
+    )
+    raw_id_fields = ['contributed_by', 'audio_request']

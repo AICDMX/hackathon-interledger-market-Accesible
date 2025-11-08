@@ -60,3 +60,40 @@
 - [ ] Budget validation (numeric, positive)
 - [ ] Language code validation
 - [ ] File type and size validation
+
+## Development & Deployment Infrastructure
+- [ ] Create Makefile with the following targets:
+  - **Development Setup:**
+    - `make setup` - Initial project setup (install dependencies for all services)
+    - `make setup-django` - Setup Django marketplace-py (install uv dependencies, run migrations, create superuser)
+    - `make setup-payments` - Setup payments service (npm install)
+    - `make setup-wallet` - Setup wallet-nodejs service (npm install)
+    - `make setup-all` - Setup all services
+  - **Development Commands:**
+    - `make dev` - Run all services locally (without Docker)
+    - `make dev-django` - Run Django dev server
+    - `make dev-payments` - Run payments service in dev mode
+    - `make dev-wallet` - Run wallet service in dev mode
+    - `make migrate` - Run Django migrations
+    - `make makemigrations` - Create Django migrations
+    - `make collectstatic` - Collect Django static files
+    - `make createsuperuser` - Create Django superuser
+  - **Docker Commands:**
+    - `make docker-build` - Build all Docker images
+    - `make docker-up` - Start all services with docker-compose
+    - `make docker-down` - Stop all Docker services
+    - `make docker-logs` - View Docker logs
+    - `make docker-restart` - Restart Docker services
+    - `make docker-clean` - Stop and remove containers, volumes, and images
+  - **Database Commands:**
+    - `make db-reset` - Reset Django database (drop and recreate)
+    - `make db-migrate` - Run Django migrations
+    - `make db-shell` - Open Django database shell
+  - **Testing & Quality:**
+    - `make test` - Run all tests
+    - `make test-django` - Run Django tests
+    - `make lint` - Run linters
+    - `make format` - Format code
+  - **Utilities:**
+    - `make clean` - Clean temporary files and caches
+    - `make help` - Show available Makefile targets

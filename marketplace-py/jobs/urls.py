@@ -17,4 +17,5 @@ urlpatterns = [
     path('pending/', views.pending_jobs, name='pending_jobs'),
     path('filler-1/', views.filler_page_1, name='filler_1'),
     path('filler-2/', views.filler_page_2, name='filler_2'),
+    path('audio-support/<slug:slug>/', views.audio_support, name='audio_support'),
 ]

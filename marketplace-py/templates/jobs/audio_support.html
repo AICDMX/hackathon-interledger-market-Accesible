@@ -1,0 +1,67 @@
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% block title %}{{ opportunity.title }} - {{ block.super }}{% endblock %}
+
+{% block content %}
+<section class="card" style="margin-bottom: 1.5rem;">
+    <h1 style="margin-bottom: 0.5rem;">{{ opportunity.title }}</h1>
+    <p style="margin-bottom: 1rem;">{{ opportunity.description_es }}</p>
+    <p class="muted-text">
+        {% blocktrans %}Idioma sugerido: {{ opportunity.language_code }}{% endblocktrans %}
+    </p>
+</section>
+
+<section class="card" id="funding" style="margin-bottom: 1.5rem;">
+    <h2 style="margin-bottom: 0.5rem;">{% trans 'Fondear esta grabación' %}</h2>
+    {% if opportunity.needs_funding %}
+        <p>{% blocktrans with amount=community_fund_amount %}Puedes comprometer  {{ amount }} pesos para que grabemos este audio.{% endblocktrans %}</p>
+        <form method="post">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="pledge_funds">
+            <button type="submit" class="btn btn-primary">
+                {% blocktrans with amount=community_fund_amount %}Fondear con {{ amount }} pesos{% endblocktrans %}
+            </button>
+            <p class="muted-text" style="margin-top: 0.5rem;">
+                {% trans 'Aún estamos conectando los pagos. Guardaremos tu intención para avisarte cuando esté listo.' %}
+            </p>
+        </form>
+    {% else %}
+        <p class="muted-text">
+            {% trans 'Esta sección ya está financiada. Puedes ayudar subiendo audio.' %}
+        </p>
+    {% endif %}
+</section>
+
+<section class="card" id="upload-audio">
+    <h2 style="margin-bottom: 0.5rem;">{% trans 'Subir audio comunitario' %}</h2>
+    <p>{% trans 'Graba un mensaje corto (menos de 30 segundos) explicando el botón y súbelo aquí. Aceptamos MP3, WAV o cualquier audio estándar.' %}</p>
+
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <input type="hidden" name="action" value="upload_audio">
+        <div class="form-group">
+            <label for="{{ contribution_form.language_code.id_for_label }}">{{ contribution_form.language_code.label }}</label>
+            {{ contribution_form.language_code }}
+            {% if contribution_form.language_code.errors %}
+                <div class="form-error">{{ contribution_form.language_code.errors }}</div>
+            {% endif %}
+        </div>
+        <div class="form-group">
+            <label for="{{ contribution_form.file.id_for_label }}">{{ contribution_form.file.label }}</label>
+            {{ contribution_form.file }}
+            {% if contribution_form.file.errors %}
+                <div class="form-error">{{ contribution_form.file.errors }}</div>
+            {% endif %}
+        </div>
+        <div class="form-group">
+            <label for="{{ contribution_form.notes.id_for_label }}">{{ contribution_form.notes.label }}</label>
+            {{ contribution_form.notes }}
+            {% if contribution_form.notes.errors %}
+                <div class="form-error">{{ contribution_form.notes.errors }}</div>
+            {% endif %}
+        </div>
+        <button type="submit" class="btn btn-primary">{% trans 'Enviar audio' %}</button>
+    </form>
+</section>
+{% endblock %}

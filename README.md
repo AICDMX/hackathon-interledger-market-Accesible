@@ -1,113 +1,73 @@
-# Django Marketplace Setup
+# Native Language Market
 
-This is a Django-based marketplace system with accessibility and multi-language support for an Interledger-powered exchange.
+Interledger-powered marketplace focused on accessible, native-language work. Funders post briefs, creators deliver multilingual media, and escrowed payouts flow through Interledger wallets.
 
-**Note**: All project code is located in the `src/` directory.
+## Repository Layout
 
-## Features
+| Path | Description |
+| --- | --- |
+| `marketplace-py/` | Django full-stack app (HTMX UI, DRF APIs, media uploads, custom user roles). See `marketplace-py/README.md` for framework-specific docs. |
+| `services/payments/` | Node.js/TypeScript microservice that talks to Rafiki/Open Payments for wallet orchestration. Containerized via Dockerfile. |
+| `wallet-nodejs/` | Lightweight Node.js script for manual wallet + incoming payment tests against Interledger testnet. |
+| `docs/`, `startHere.md` | Product notes, feature checklists, and research artifacts. |
+| `docker-compose.yml` | Defines the Django `web` app and the `payments` microservice. |
 
-- **Multi-language Support**: Supports English, Spanish, Nahuatl, Otomi, Mazahua, and Quechua
-- **Accessibility**: WCAG-compliant templates with proper ARIA labels and semantic HTML
-- **User Management**: Custom user model with roles (funder, creator, or both)
-- **Job System**: 
-  - Funders can create jobs with budgets
-  - Creators can submit work for jobs
-  - Funders can accept/reject submissions
-- **Views**:
-  - Job listings (browse available jobs)
-  - My jobs (jobs posted by user)
-  - Accepted jobs (jobs where user's submissions were accepted)
+## Prerequisites
 
-## Setup Instructions
+- Docker & Docker Compose v2+
+- GNU Make (recommended for upcoming workflow automation)
+- Optional local toolchains:
+  - Python 3.11 + `uv` if you need to run Django without containers
+  - Node 20.x + npm if you want to run the payments or wallet microservices directly
 
-1. **Install uv** (if not already installed):
-   ```bash
-   curl -LsSf https://astral.sh/uv/install.sh | sh
-   ```
+## Quick Start (Docker + Make)
 
-2. **Install dependencies**:
-   ```bash
-   uv sync
-   ```
+We are standardizing on Make targets (to be added alongside the Docker workflows). When the Makefile lands you will be able to run:
 
-3. **Run migrations**:
-   ```bash
-   cd marketplace-py
-   uv run python manage.py makemigrations
-   uv run python manage.py migrate
-   ```
-
-4. **Create a superuser** (optional, for admin access):
-   ```bash
-   uv run python manage.py createsuperuser
-   ```
-
-5. **Collect static files**:
-   ```bash
-   uv run python manage.py collectstatic --noinput
-   ```
-
-6. **Run the development server**:
-   ```bash
-   uv run python manage.py runserver
-   ```
-
-7. **Access the application**:
-   - Main site: http://127.0.0.1:8000/
-   - Admin panel: http://127.0.0.1:8000/admin/
-   - Translation admin: http://127.0.0.1:8000/rosetta/
-
-## Project Structure
-
-```
-.
-??? src/                    # All project code is located here
-?   ??? marketplace/        # Main project settings
-?   ??? users/              # User app (authentication, profiles)
-?   ??? jobs/               # Jobs app (job listings, submissions)
-?   ??? templates/          # HTML templates
-?   ??? static/             # Static files (CSS, JS, images)
-?   ??? media/              # User-uploaded files
-?   ??? manage.py           # Django management script
-??? pyproject.toml          # Project dependencies (uv)
-??? requirements.txt        # Legacy requirements file
+```bash
+make up        # builds and starts docker-compose stack
+make down      # stops containers
+make logs web  # streams logs from the Django service
 ```
 
-## Usage
+Until the Makefile exists, run the equivalent Docker Compose commands manually:
 
-1. **Register/Login**: Create an account or login
-2. **Create a Job**: As a funder, post a job with description, language, and budget
-3. **Browse Jobs**: View available jobs and filter by language
-4. **Submit Work**: As a creator, submit work for open jobs
-5. **Accept Submissions**: As a funder, review and accept submissions
-6. **View Accepted Jobs**: See jobs where your submissions were accepted
+```bash
+docker compose up --build
+docker compose down
+docker compose logs -f web
+```
 
-## Language Support
+The stack exposes:
 
-The system supports multiple languages:
-- English (en)
-- Spanish (es)
-- Nahuatl (nah)
-- Otomi (oto)
-- Mazahua (maz)
-- Quechua (que)
+- Django marketplace: http://localhost:8000 (serves UI + API, runs migrations & collectstatic on boot)
+- Payments microservice: http://localhost:4001 (Express API that mediates wallet grants/incoming payments)
 
-Users can switch languages using the language selector in the header.
+## Service Details
 
-## Accessibility Features
+- **Django (marketplace-py)**  
+  - Ships jobs + submissions workflows, multilingual templates, and accessibility-focused UI.  
+  - Uses SQLite for hackathon speed; media/static folders are volume-mounted for persistence.
 
-- Semantic HTML5 elements
-- ARIA labels and roles
-- Keyboard navigation support
-- High contrast colors
-- Skip to main content link
-- Focus indicators
-- Screen reader friendly
+- **Node payments microservice (`services/payments`)**  
+  - Wraps the `@interledger/open-payments` SDK inside an Express server.  
+  - Configure Rafiki/Open Payments credentials via environment variables (see forthcoming `.env.example`).  
+  - `npm run dev` for local TS development, `npm run build && npm start` for production, or rely on the Dockerfile baked into `docker-compose.yml`.
+
+- **Wallet CLI helper (`wallet-nodejs`)**  
+  - Standalone script (`node index.js`) that requests grants and creates incoming payments against a configured wallet address.  
+  - Requires `private.key`/`KEY_ID` pairs exported from Rafiki. Keep these secrets outside of version control.
+
+## Developing Without Docker
+
+- **Django**: `uv sync` then `uv run python manage.py runserver 0.0.0.0:8000`. See the app-level README for migrations, superuser creation, and localization tips.
+- **Payments Service**: `npm install`, export your env vars, then `npm run dev`. Make sure port `4001` stays in sync with `docker-compose.yml`.
+- **Wallet CLI**: `cd wallet-nodejs && npm install && node index.js` after setting your wallet parameters.
 
 ## Next Steps
 
-- Integrate Interledger escrow system
-- Add file upload handling for submissions
-- Implement payment processing
-- Add email notifications
-- Enhance UI/UX
+1. Add the shared Makefile (`make up/down/logs/test`) so contributors have a single entry point.  
+2. Document the payments service API surface (routes, payloads, event flow) under `docs/`.  
+3. Wire Django job lifecycle events to the payments microservice once endpoints solidify.
+
+For product context, roadmap, and localization targets, start with `startHere.md` and the artifacts in `docs/`.
