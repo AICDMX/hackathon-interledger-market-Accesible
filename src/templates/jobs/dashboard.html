@@ -1,0 +1,161 @@
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% block title %}{% trans 'Dashboard' %}{% endblock %}
+
+{% block extra_css %}
+<style>
+    .dashboard-container {
+        max-width: 100%;
+        margin: 0;
+        padding: 1rem;
+        min-height: calc(100vh - 200px);
+    }
+
+    .dashboard-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1rem;
+        padding: 0;
+    }
+
+    .dashboard-icon-card {
+        background-color: #fff;
+        border-radius: 16px;
+        padding: 2rem 1rem;
+        text-align: center;
+        text-decoration: none;
+        color: #333;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        transition: all 0.3s ease;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        min-height: 160px;
+        border: 2px solid transparent;
+    }
+
+    .dashboard-icon-card:hover,
+    .dashboard-icon-card:focus {
+        transform: translateY(-4px);
+        box-shadow: 0 8px 12px rgba(0, 0, 0, 0.15);
+        border-color: #3498db;
+        outline: none;
+    }
+
+    .dashboard-icon-card:active {
+        transform: translateY(-2px);
+    }
+
+    .dashboard-icon {
+        font-size: 4rem;
+        margin-bottom: 0.75rem;
+        line-height: 1;
+    }
+
+    .dashboard-label {
+        font-size: 1rem;
+        font-weight: 600;
+        color: #2c3e50;
+        margin: 0;
+    }
+
+    /* Tablet and up: 3 columns */
+    @media (min-width: 600px) {
+        .dashboard-grid {
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.5rem;
+        }
+
+        .dashboard-icon-card {
+            min-height: 180px;
+            padding: 2.5rem 1rem;
+        }
+
+        .dashboard-icon {
+            font-size: 5rem;
+        }
+
+        .dashboard-label {
+            font-size: 1.1rem;
+        }
+    }
+
+    /* Desktop: 3 columns with more spacing */
+    @media (min-width: 1024px) {
+        .dashboard-container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 2rem;
+        }
+
+        .dashboard-grid {
+            gap: 2rem;
+        }
+
+        .dashboard-icon-card {
+            min-height: 200px;
+            padding: 3rem 1.5rem;
+        }
+
+        .dashboard-icon {
+            font-size: 6rem;
+        }
+
+        .dashboard-label {
+            font-size: 1.25rem;
+        }
+    }
+
+    /* Ensure proper touch targets on mobile */
+    @media (max-width: 599px) {
+        .dashboard-icon-card {
+            min-height: 140px;
+            padding: 1.5rem 1rem;
+        }
+
+        .dashboard-icon {
+            font-size: 3.5rem;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="dashboard-container">
+    <h1 style="text-align: center; margin-bottom: 2rem; color: #2c3e50;">{% trans 'Dashboard' %}</h1>
+    
+    <div class="dashboard-grid" role="grid" aria-label="{% trans 'Main navigation' %}">
+        <a href="{% url 'jobs:create' %}" class="dashboard-icon-card" role="gridcell" aria-label="{% trans 'Post Job' %}">
+            <div class="dashboard-icon" aria-hidden="true">??</div>
+            <p class="dashboard-label">{% trans 'Job Post' %}</p>
+        </a>
+
+        <a href="{% url 'jobs:my_products' %}" class="dashboard-icon-card" role="gridcell" aria-label="{% trans 'My Products' %}">
+            <div class="dashboard-icon" aria-hidden="true">??</div>
+            <p class="dashboard-label">{% trans 'My Products' %}</p>
+        </a>
+
+        <a href="{% url 'jobs:my_money' %}" class="dashboard-icon-card" role="gridcell" aria-label="{% trans 'My Money' %}">
+            <div class="dashboard-icon" aria-hidden="true">??</div>
+            <p class="dashboard-label">{% trans 'My Money' %}</p>
+        </a>
+
+        <a href="{% url 'jobs:pending_jobs' %}" class="dashboard-icon-card" role="gridcell" aria-label="{% trans 'Pending Jobs' %}">
+            <div class="dashboard-icon" aria-hidden="true">?</div>
+            <p class="dashboard-label">{% trans 'My Pending to Finish Jobs' %}</p>
+        </a>
+
+        <a href="{% url 'jobs:filler_1' %}" class="dashboard-icon-card" role="gridcell" aria-label="{% trans 'Page 1' %}">
+            <div class="dashboard-icon" aria-hidden="true">??</div>
+            <p class="dashboard-label">{% trans 'Page 1' %}</p>
+        </a>
+
+        <a href="{% url 'jobs:filler_2' %}" class="dashboard-icon-card" role="gridcell" aria-label="{% trans 'Page 2' %}">
+            <div class="dashboard-icon" aria-hidden="true">??</div>
+            <p class="dashboard-label">{% trans 'Page 2' %}</p>
+        </a>
+    </div>
+</div>
+{% endblock %}

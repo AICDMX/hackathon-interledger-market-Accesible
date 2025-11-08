@@ -161,7 +161,7 @@ SITE_ID = 1
 
 # Login URLs
 LOGIN_URL = '/users/login/'
-LOGIN_REDIRECT_URL = '/'
+LOGIN_REDIRECT_URL = '/dashboard/'
 LOGOUT_REDIRECT_URL = '/'
 
 # Accessibility: Ensure proper ARIA labels and semantic HTML

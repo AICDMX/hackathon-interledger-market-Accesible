@@ -30,7 +30,7 @@ def register(request):
         )
         login(request, user)
         messages.success(request, _('Registration successful!'))
-        return redirect('jobs:list')
+        return redirect('jobs:dashboard')
     
     return render(request, 'users/register.html')
 
