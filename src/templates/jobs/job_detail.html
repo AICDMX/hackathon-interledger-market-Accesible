@@ -1,0 +1,74 @@
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% block title %}{{ job.title }} - {{ block.super }}{% endblock %}
+
+{% block content %}
+<article class="card">
+    <h1>{{ job.title }}</h1>
+    
+    <div>
+        <p><strong>{% trans 'Funder' %}:</strong> {{ job.funder.username }}</p>
+        <p><strong>{% trans 'Status' %}:</strong> {{ job.get_status_display }}</p>
+        <p><strong>{% trans 'Target Language' %}:</strong> {{ job.target_language }}</p>
+        {% if job.target_dialect %}
+            <p><strong>{% trans 'Dialect' %}:</strong> {{ job.target_dialect }}</p>
+        {% endif %}
+        <p><strong>{% trans 'Budget' %}:</strong> {{ job.budget }} ILP</p>
+        <p><strong>{% trans 'Deliverable Types' %}:</strong> {{ job.deliverable_types }}</p>
+        <p><strong>{% trans 'Created' %}:</strong> {{ job.created_at|date:"F d, Y" }}</p>
+    </div>
+    
+    <div>
+        <h2>{% trans 'Description' %}</h2>
+        <p>{{ job.description|linebreaks }}</p>
+    </div>
+    
+    {% if user.is_authenticated %}
+        {% if user == job.funder %}
+            <div>
+                <h2>{% trans 'Submissions' %}</h2>
+                {% if job.submissions.all %}
+                    <ul>
+                        {% for submission in job.submissions.all %}
+                            <li>
+                                <strong>{{ submission.creator.username }}</strong> - 
+                                {{ submission.get_status_display }}
+                                {% if submission.status == 'pending' %}
+                                    <a href="{% url 'jobs:accept_submission' job.pk submission.pk %}" class="btn btn-success">{% trans 'Accept' %}</a>
+                                {% endif %}
+                                {% if submission.note %}
+                                    <p>{{ submission.note }}</p>
+                                {% endif %}
+                            </li>
+                        {% endfor %}
+                    </ul>
+                {% else %}
+                    <p>{% trans 'No submissions yet.' %}</p>
+                {% endif %}
+            </div>
+        {% else %}
+            {% if job.status == 'open' %}
+                <div>
+                    <a href="{% url 'jobs:submit' job.pk %}" class="btn btn-primary">{% trans 'Submit Work' %}</a>
+                </div>
+            {% endif %}
+            
+            {% if user_submissions %}
+                <div>
+                    <h2>{% trans 'Your Submissions' %}</h2>
+                    <ul>
+                        {% for submission in user_submissions %}
+                            <li>
+                                {{ submission.get_status_display }} - {{ submission.created_at|date:"F d, Y" }}
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            {% endif %}
+        {% endif %}
+    {% else %}
+        <p><a href="{% url 'users:login' %}">{% trans 'Login' %}</a> {% trans 'to submit work for this job.' %}</p>
+    {% endif %}
+</article>
+{% endblock %}

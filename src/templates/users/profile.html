@@ -1,0 +1,55 @@
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% block title %}{% trans 'Profile' %} - {{ block.super }}{% endblock %}
+
+{% block content %}
+<h1>{% trans 'My Profile' %}</h1>
+
+<div class="card">
+    <form method="post">
+        {% csrf_token %}
+        
+        <div class="form-group">
+            <label for="username">{% trans 'Username' %}</label>
+            <input type="text" id="username" value="{{ user.username }}" disabled>
+            <small>{% trans 'Username cannot be changed' %}</small>
+        </div>
+        
+        <div class="form-group">
+            <label for="email">{% trans 'Email' %}</label>
+            <input type="email" id="email" value="{{ user.email }}" disabled>
+        </div>
+        
+        <div class="form-group">
+            <label for="role">{% trans 'Role' %}</label>
+            <input type="text" id="role" value="{{ user.get_role_display }}" disabled>
+        </div>
+        
+        <div class="form-group">
+            <label for="wallet_endpoint">{% trans 'Wallet Endpoint' %}</label>
+            <input type="text" id="wallet_endpoint" name="wallet_endpoint" value="{{ user.wallet_endpoint }}" placeholder="{% trans 'Interledger wallet endpoint' %}">
+        </div>
+        
+        <div class="form-group">
+            <label for="preferred_language">{% trans 'Preferred Language' %}</label>
+            <select id="preferred_language" name="preferred_language">
+                <option value="en" {% if user.preferred_language == 'en' %}selected{% endif %}>English</option>
+                <option value="es" {% if user.preferred_language == 'es' %}selected{% endif %}>Spanish</option>
+                <option value="nah" {% if user.preferred_language == 'nah' %}selected{% endif %}>Nahuatl</option>
+                <option value="oto" {% if user.preferred_language == 'oto' %}selected{% endif %}>Otomi</option>
+                <option value="maz" {% if user.preferred_language == 'maz' %}selected{% endif %}>Mazahua</option>
+                <option value="que" {% if user.preferred_language == 'que' %}selected{% endif %}>Quechua</option>
+            </select>
+        </div>
+        
+        <div class="form-group">
+            <label for="native_languages">{% trans 'Native Languages' %}</label>
+            <input type="text" id="native_languages" name="native_languages" value="{{ user.native_languages }}" placeholder="{% trans 'Comma-separated: nahuatl, otomi' %}">
+            <small>{% trans 'List languages you can work in' %}</small>
+        </div>
+        
+        <button type="submit" class="btn btn-primary">{% trans 'Update Profile' %}</button>
+    </form>
+</div>
+{% endblock %}

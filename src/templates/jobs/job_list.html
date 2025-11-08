@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% block title %}{% trans 'Browse Jobs' %} - {{ block.super }}{% endblock %}
+
+{% block content %}
+<h1>{% trans 'Available Jobs' %}</h1>
+
+<div class="card">
+    <form method="get" action="{% url 'jobs:list' %}" role="search">
+        <div class="form-group">
+            <label for="search">{% trans 'Search Jobs' %}</label>
+            <input type="text" id="search" name="search" value="{{ search_query }}" placeholder="{% trans 'Search by title or description...' %}">
+        </div>
+        <div class="form-group">
+            <label for="language">{% trans 'Filter by Language' %}</label>
+            <select id="language" name="language">
+                <option value="">{% trans 'All Languages' %}</option>
+                <option value="en" {% if language_filter == 'en' %}selected{% endif %}>English</option>
+                <option value="es" {% if language_filter == 'es' %}selected{% endif %}>Spanish</option>
+                <option value="nah" {% if language_filter == 'nah' %}selected{% endif %}>Nahuatl</option>
+                <option value="oto" {% if language_filter == 'oto' %}selected{% endif %}>Otomi</option>
+                <option value="maz" {% if language_filter == 'maz' %}selected{% endif %}>Mazahua</option>
+                <option value="que" {% if language_filter == 'que' %}selected{% endif %}>Quechua</option>
+            </select>
+        </div>
+        <button type="submit" class="btn btn-primary">{% trans 'Filter' %}</button>
+    </form>
+</div>
+
+{% if jobs %}
+    <div role="list" aria-label="{% trans 'Job listings' %}">
+        {% for job in jobs %}
+            <article class="card" role="listitem">
+                <h2><a href="{% url 'jobs:detail' job.pk %}">{{ job.title }}</a></h2>
+                <p><strong>{% trans 'Language' %}:</strong> {{ job.target_language }}</p>
+                {% if job.target_dialect %}
+                    <p><strong>{% trans 'Dialect' %}:</strong> {{ job.target_dialect }}</p>
+                {% endif %}
+                <p><strong>{% trans 'Budget' %}:</strong> {{ job.budget }} ILP</p>
+                <p><strong>{% trans 'Deliverables' %}:</strong> {{ job.deliverable_types }}</p>
+                <p>{{ job.description|truncatewords:30 }}</p>
+                <a href="{% url 'jobs:detail' job.pk %}" class="btn btn-primary">{% trans 'View Details' %}</a>
+            </article>
+        {% endfor %}
+    </div>
+{% else %}
+    <div class="card">
+        <p>{% trans 'No jobs available at the moment.' %}</p>
+    </div>
+{% endif %}
+{% endblock %}

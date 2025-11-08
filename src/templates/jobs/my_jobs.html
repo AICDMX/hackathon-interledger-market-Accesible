@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% block title %}{% trans 'My Jobs' %} - {{ block.super }}{% endblock %}
+
+{% block content %}
+<h1>{% trans 'My Posted Jobs' %}</h1>
+
+<div class="card">
+    <form method="get" action="{% url 'jobs:my_jobs' %}">
+        <div class="form-group">
+            <label for="status">{% trans 'Filter by Status' %}</label>
+            <select id="status" name="status">
+                <option value="">{% trans 'All Statuses' %}</option>
+                <option value="open" {% if status_filter == 'open' %}selected{% endif %}>{% trans 'Open' %}</option>
+                <option value="in_review" {% if status_filter == 'in_review' %}selected{% endif %}>{% trans 'In Review' %}</option>
+                <option value="funded" {% if status_filter == 'funded' %}selected{% endif %}>{% trans 'Funded' %}</option>
+                <option value="rejected" {% if status_filter == 'rejected' %}selected{% endif %}>{% trans 'Rejected' %}</option>
+                <option value="completed" {% if status_filter == 'completed' %}selected{% endif %}>{% trans 'Completed' %}</option>
+            </select>
+        </div>
+        <button type="submit" class="btn btn-primary">{% trans 'Filter' %}</button>
+    </form>
+</div>
+
+{% if jobs %}
+    <div role="list" aria-label="{% trans 'My job listings' %}">
+        {% for job in jobs %}
+            <article class="card" role="listitem">
+                <h2><a href="{% url 'jobs:detail' job.pk %}">{{ job.title }}</a></h2>
+                <p><strong>{% trans 'Status' %}:</strong> {{ job.get_status_display }}</p>
+                <p><strong>{% trans 'Budget' %}:</strong> {{ job.budget }} ILP</p>
+                <p><strong>{% trans 'Submissions' %}:</strong> {{ job.submissions.count }}</p>
+                <a href="{% url 'jobs:detail' job.pk %}" class="btn btn-primary">{% trans 'View Details' %}</a>
+            </article>
+        {% endfor %}
+    </div>
+{% else %}
+    <div class="card">
+        <p>{% trans 'You have not posted any jobs yet.' %}</p>
+        <a href="{% url 'jobs:create' %}" class="btn btn-primary">{% trans 'Create Your First Job' %}</a>
+    </div>
+{% endif %}
+{% endblock %}

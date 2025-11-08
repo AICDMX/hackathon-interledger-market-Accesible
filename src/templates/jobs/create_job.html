@@ -1,0 +1,53 @@
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% block title %}{% trans 'Create Job' %} - {{ block.super }}{% endblock %}
+
+{% block content %}
+<h1>{% trans 'Create New Job' %}</h1>
+
+<div class="card">
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        
+        <div class="form-group">
+            <label for="title">{% trans 'Title' %} *</label>
+            <input type="text" id="title" name="title" required aria-required="true">
+        </div>
+        
+        <div class="form-group">
+            <label for="description">{% trans 'Description' %} *</label>
+            <textarea id="description" name="description" rows="5" required aria-required="true"></textarea>
+        </div>
+        
+        <div class="form-group">
+            <label for="target_language">{% trans 'Target Language' %} *</label>
+            <select id="target_language" name="target_language" required aria-required="true">
+                <option value="en">English</option>
+                <option value="es">Spanish</option>
+                <option value="nah">Nahuatl</option>
+                <option value="oto">Otomi</option>
+                <option value="maz">Mazahua</option>
+                <option value="que">Quechua</option>
+            </select>
+        </div>
+        
+        <div class="form-group">
+            <label for="target_dialect">{% trans 'Target Dialect' %}</label>
+            <input type="text" id="target_dialect" name="target_dialect">
+        </div>
+        
+        <div class="form-group">
+            <label for="deliverable_types">{% trans 'Deliverable Types' %} * ({% trans 'comma-separated: text,video,audio,image' %})</label>
+            <input type="text" id="deliverable_types" name="deliverable_types" required aria-required="true" placeholder="text,audio">
+        </div>
+        
+        <div class="form-group">
+            <label for="budget">{% trans 'Budget (ILP)' %} *</label>
+            <input type="number" id="budget" name="budget" step="0.01" min="0" required aria-required="true">
+        </div>
+        
+        <button type="submit" class="btn btn-primary">{% trans 'Create Job' %}</button>
+    </form>
+</div>
+{% endblock %}

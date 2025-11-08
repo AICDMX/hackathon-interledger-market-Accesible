@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% block title %}{% trans 'Accepted Jobs' %} - {{ block.super }}{% endblock %}
+
+{% block content %}
+<h1>{% trans 'My Accepted Jobs' %}</h1>
+
+{% if accepted_submissions %}
+    <div role="list" aria-label="{% trans 'Accepted job submissions' %}">
+        {% for submission in accepted_submissions %}
+            <article class="card" role="listitem">
+                <h2><a href="{% url 'jobs:detail' submission.job.pk %}">{{ submission.job.title }}</a></h2>
+                <p><strong>{% trans 'Funder' %}:</strong> {{ submission.job.funder.username }}</p>
+                <p><strong>{% trans 'Budget' %}:</strong> {{ submission.job.budget }} ILP</p>
+                <p><strong>{% trans 'Accepted' %}:</strong> {{ submission.created_at|date:"F d, Y" }}</p>
+                {% if submission.note %}
+                    <p><strong>{% trans 'Your Note' %}:</strong> {{ submission.note }}</p>
+                {% endif %}
+                <a href="{% url 'jobs:detail' submission.job.pk %}" class="btn btn-primary">{% trans 'View Job' %}</a>
+            </article>
+        {% endfor %}
+    </div>
+{% else %}
+    <div class="card">
+        <p>{% trans 'You have no accepted jobs yet.' %}</p>
+        <a href="{% url 'jobs:list' %}" class="btn btn-primary">{% trans 'Browse Available Jobs' %}</a>
+    </div>
+{% endif %}
+{% endblock %}
