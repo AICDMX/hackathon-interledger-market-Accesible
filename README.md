@@ -32,7 +32,7 @@ This is a Django-based marketplace system with accessibility and multi-language 
 
 3. **Run migrations**:
    ```bash
-   cd src
+   cd marketplace-py
    uv run python manage.py makemigrations
    uv run python manage.py migrate
    ```

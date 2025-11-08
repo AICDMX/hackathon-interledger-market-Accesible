@@ -2,25 +2,26 @@ version: '3.8'
 
 services:
   web:
-    build: .
+    build:
+      context: marketplace-py
+      dockerfile: Dockerfile
     container_name: hackathon-interledger-market
     ports:
       - "8000:8000"
     volumes:
       # Mount source code for development (optional - remove for production)
       # Note: This also persists db.sqlite3, media, and staticfiles
-      - ./src:/app/src
+      - ./marketplace-py:/app
       # Persist media files (redundant but explicit)
-      - ./src/media:/app/src/media
+      - ./marketplace-py/media:/app/media
       # Persist static files (redundant but explicit)
-      - ./src/staticfiles:/app/src/staticfiles
+      - ./marketplace-py/staticfiles:/app/staticfiles
     environment:
       - DJANGO_SETTINGS_MODULE=marketplace.settings
       - PYTHONUNBUFFERED=1
       - ALLOWED_HOSTS=*
     command: >
       sh -c "
-        cd src &&
         python manage.py migrate --noinput &&
         python manage.py collectstatic --noinput &&
         python manage.py runserver 0.0.0.0:8000

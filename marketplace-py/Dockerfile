@@ -18,13 +18,14 @@ COPY pyproject.toml uv.lock ./
 RUN uv sync --frozen --no-install-project
 
 # Create directories for media and static files (checkpoint 3: static directories)
-RUN mkdir -p /app/src/media /app/src/staticfiles /app/src/locale
+RUN mkdir -p /app/media /app/staticfiles /app/locale
 
-# Copy project code last (checkpoint 4: only this layer rebuilds when src changes)
-COPY src/ ./src/
+# Copy project code last (checkpoint 4: only this layer rebuilds when marketplace-py changes)
+# Since Dockerfile is now in marketplace-py/, copy all contents from build context
+COPY . ./
 
 # Expose port
 EXPOSE 8000
 
 # Run migrations and start server
-CMD ["sh", "-c", "cd src && python manage.py migrate --noinput && python manage.py collectstatic --noinput && python manage.py runserver 0.0.0.0:8000"]
+CMD ["sh", "-c", "python manage.py migrate --noinput && python manage.py collectstatic --noinput && python manage.py runserver 0.0.0.0:8000"]
