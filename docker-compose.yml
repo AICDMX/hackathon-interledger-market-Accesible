@@ -1,5 +1,8 @@
 version: '3.8'
 
+# Note: wallet-nodejs is excluded from this docker-compose configuration
+# and will not be started when running docker-compose up
+
 services:
   web:
     build:
@@ -22,7 +25,18 @@ services:
       - ALLOWED_HOSTS=*
     command: >
       sh -c "
-        python manage.py migrate --noinput &&
-        python manage.py collectstatic --noinput &&
-        python manage.py runserver 0.0.0.0:8000
+        uv run python manage.py migrate --noinput &&
+        uv run python manage.py collectstatic --noinput &&
+        uv run python manage.py runserver 0.0.0.0:8000
       "
+  payments:
+    build: ./services/payments
+    container_name: payments-service
+    ports:
+      - "4001:3000"
+    environment:
+      - PORT=3000
+    # For development with hot reload, uncomment below and adjust command:
+    # volumes:
+    #   - ./services/payments:/app
+    # command: npm run dev

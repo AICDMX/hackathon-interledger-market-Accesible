@@ -133,7 +133,9 @@
         </a>
 
         <a href="{% url 'jobs:my_products' %}" class="dashboard-icon-card" role="gridcell" aria-label="{% trans 'My Products' %}">
-            <div class="dashboard-icon" aria-hidden="true">??</div>
+            <div class="dashboard-icon" aria-hidden="true">
+                <img src="/media/my%20products.png" alt="{% trans 'My Products' %}" style="max-width: 80%; height: auto; display: block; margin: 0 auto;">
+            </div>
             <p class="dashboard-label">{% trans 'My Products' %}</p>
         </a>
 
