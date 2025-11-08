@@ -8,16 +8,16 @@ services:
       - "8000:8000"
     volumes:
       # Mount source code for development (optional - remove for production)
+      # Note: This also persists db.sqlite3, media, and staticfiles
       - ./src:/app/src
-      # Persist SQLite database
-      - ./data:/app/src/data
-      # Persist media files
+      # Persist media files (redundant but explicit)
       - ./src/media:/app/src/media
-      # Persist static files
+      # Persist static files (redundant but explicit)
       - ./src/staticfiles:/app/src/staticfiles
     environment:
       - DJANGO_SETTINGS_MODULE=marketplace.settings
       - PYTHONUNBUFFERED=1
+      - ALLOWED_HOSTS=*
     command: >
       sh -c "
         cd src &&
