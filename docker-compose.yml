@@ -1,0 +1,27 @@
+version: '3.8'
+
+services:
+  web:
+    build: .
+    container_name: hackathon-interledger-market
+    ports:
+      - "8000:8000"
+    volumes:
+      # Mount source code for development (optional - remove for production)
+      - ./src:/app/src
+      # Persist SQLite database
+      - ./data:/app/src/data
+      # Persist media files
+      - ./media:/app/src/media
+      # Persist static files
+      - ./staticfiles:/app/src/staticfiles
+    environment:
+      - DJANGO_SETTINGS_MODULE=marketplace.settings
+      - PYTHONUNBUFFERED=1
+    command: >
+      sh -c "
+        cd src &&
+        python manage.py migrate --noinput &&
+        python manage.py collectstatic --noinput &&
+        python manage.py runserver 0.0.0.0:8000
+      "

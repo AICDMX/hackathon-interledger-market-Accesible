@@ -9,7 +9,3 @@ dependencies = [
     "django-rosetta>=0.9.8",
     "Pillow>=10.0.0",
 ]
-
-[build-system]
-requires = ["hatchling"]
-build-backend = "hatchling.build"
