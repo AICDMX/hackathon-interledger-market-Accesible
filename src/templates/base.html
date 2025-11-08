@@ -103,6 +103,7 @@
             max-width: 1200px;
             margin: 2rem auto;
             padding: 0 1rem;
+            padding-bottom: 80px; /* Space for bottom navigation on mobile */
         }
         
         /* Messages */
@@ -230,6 +231,75 @@
             margin-top: 4rem;
         }
         
+        /* Bottom Navigation Bar - Mobile First */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background-color: #fff;
+            border-top: 1px solid #ddd;
+            box-shadow: 0 -2px 8px rgba(0,0,0,0.1);
+            z-index: 1000;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            padding: 0.5rem 0;
+            min-height: 60px;
+        }
+        
+        .bottom-nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            color: #666;
+            flex: 1;
+            padding: 0.5rem;
+            transition: all 0.2s;
+            min-width: 0;
+            border: none;
+            background: none;
+            cursor: pointer;
+        }
+        
+        .bottom-nav-item:hover,
+        .bottom-nav-item:focus {
+            color: #3498db;
+            outline: none;
+        }
+        
+        .bottom-nav-item.active {
+            color: #3498db;
+        }
+        
+        .bottom-nav-icon {
+            font-size: 1.5rem;
+            margin-bottom: 0.25rem;
+            line-height: 1;
+        }
+        
+        .bottom-nav-label {
+            font-size: 0.7rem;
+            text-align: center;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 100%;
+        }
+        
+        /* Hide bottom nav on desktop by default, show on mobile */
+        @media (min-width: 769px) {
+            .bottom-nav {
+                display: none;
+            }
+            
+            main {
+                padding-bottom: 2rem;
+            }
+        }
+        
         /* Responsive */
         @media (max-width: 768px) {
             nav {
@@ -241,6 +311,15 @@
                 flex-direction: column;
                 width: 100%;
                 gap: 0.5rem;
+            }
+            
+            /* Hide desktop nav links on mobile when bottom nav is present */
+            .nav-links {
+                display: none;
+            }
+            
+            header {
+                padding: 0.5rem 0;
             }
         }
     </style>
@@ -304,6 +383,36 @@
     <footer role="contentinfo">
         <p>{% trans 'Interledger Marketplace - Supporting Native Languages' %}</p>
     </footer>
+    
+    <!-- Bottom Navigation Bar - Mobile First -->
+    {% if user.is_authenticated %}
+    <nav class="bottom-nav" role="navigation" aria-label="{% trans 'Bottom navigation' %}">
+        <a href="{% url 'jobs:create' %}" class="bottom-nav-item {% if request.resolver_match.url_name == 'create' %}active{% endif %}" aria-label="{% trans 'Post Job' %}">
+            <span class="bottom-nav-icon" aria-hidden="true">??</span>
+            <span class="bottom-nav-label">{% trans 'Job Post' %}</span>
+        </a>
+        <a href="{% url 'jobs:my_products' %}" class="bottom-nav-item {% if request.resolver_match.url_name == 'my_products' %}active{% endif %}" aria-label="{% trans 'My Products' %}">
+            <span class="bottom-nav-icon" aria-hidden="true">??</span>
+            <span class="bottom-nav-label">{% trans 'My Products' %}</span>
+        </a>
+        <a href="{% url 'jobs:my_money' %}" class="bottom-nav-item {% if request.resolver_match.url_name == 'my_money' %}active{% endif %}" aria-label="{% trans 'My Money' %}">
+            <span class="bottom-nav-icon" aria-hidden="true">??</span>
+            <span class="bottom-nav-label">{% trans 'My Money' %}</span>
+        </a>
+        <a href="{% url 'jobs:pending_jobs' %}" class="bottom-nav-item {% if request.resolver_match.url_name == 'pending_jobs' %}active{% endif %}" aria-label="{% trans 'Pending Jobs' %}">
+            <span class="bottom-nav-icon" aria-hidden="true">?</span>
+            <span class="bottom-nav-label">{% trans 'Pending' %}</span>
+        </a>
+        <a href="{% url 'jobs:filler_1' %}" class="bottom-nav-item {% if request.resolver_match.url_name == 'filler_1' %}active{% endif %}" aria-label="{% trans 'Page 1' %}">
+            <span class="bottom-nav-icon" aria-hidden="true">?</span>
+            <span class="bottom-nav-label">{% trans 'Page 1' %}</span>
+        </a>
+        <a href="{% url 'jobs:filler_2' %}" class="bottom-nav-item {% if request.resolver_match.url_name == 'filler_2' %}active{% endif %}" aria-label="{% trans 'Page 2' %}">
+            <span class="bottom-nav-icon" aria-hidden="true">??</span>
+            <span class="bottom-nav-label">{% trans 'Page 2' %}</span>
+        </a>
+    </nav>
+    {% endif %}
     
     {% block extra_js %}{% endblock %}
 </body>

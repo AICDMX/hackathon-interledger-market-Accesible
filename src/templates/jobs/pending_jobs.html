@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% block title %}{% trans 'Pending Jobs' %}{% endblock %}
+
+{% block content %}
+<div class="card">
+    <h2>{% trans 'My Pending to Finish Jobs' %}</h2>
+    
+    {% if pending_jobs %}
+    <ul>
+        {% for submission in pending_jobs %}
+        <li class="card" style="margin-bottom: 1rem;">
+            <h3><a href="{% url 'jobs:detail' pk=submission.job.pk %}">{{ submission.job.title }}</a></h3>
+            <p>{{ submission.job.description|truncatewords:30 }}</p>
+            <p><strong>{% trans 'Budget' %}:</strong> {{ submission.job.budget|floatformat:2 }} ILP</p>
+            <p><strong>{% trans 'Status' %}:</strong> {{ submission.job.get_status_display }}</p>
+            <p><strong>{% trans 'Target Language' %}:</strong> {{ submission.job.get_target_language_display|default:submission.job.target_language }}</p>
+        </li>
+        {% endfor %}
+    </ul>
+    {% else %}
+    <p>{% trans 'No pending jobs to finish.' %}</p>
+    {% endif %}
+</div>
+{% endblock %}

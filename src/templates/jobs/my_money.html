@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% block title %}{% trans 'My Money' %}{% endblock %}
+
+{% block content %}
+<div class="card">
+    <h2>{% trans 'My Money' %}</h2>
+    
+    {% if wallet_endpoint %}
+    <div class="form-group">
+        <label>{% trans 'Wallet Endpoint' %}:</label>
+        <p>{{ wallet_endpoint }}</p>
+    </div>
+    {% endif %}
+    
+    <div class="form-group">
+        <label>{% trans 'Total Earned' %}:</label>
+        <p style="font-size: 1.5rem; color: #27ae60; font-weight: bold;">{{ total_earned|floatformat:2 }} ILP</p>
+    </div>
+    
+    <div class="form-group">
+        <label>{% trans 'Total Spent' %}:</label>
+        <p style="font-size: 1.5rem; color: #e74c3c; font-weight: bold;">{{ total_spent|floatformat:2 }} ILP</p>
+    </div>
+    
+    <div class="form-group">
+        <label>{% trans 'Balance' %}:</label>
+        <p style="font-size: 1.5rem; font-weight: bold; color: {% if balance >= 0 %}#27ae60{% else %}#e74c3c{% endif %};">{{ balance|floatformat:2 }} ILP</p>
+    </div>
+    
+    {% if accepted_submissions %}
+    <h3>{% trans 'Accepted Jobs' %}</h3>
+    <ul>
+        {% for submission in accepted_submissions %}
+        <li>
+            <a href="{% url 'jobs:detail' pk=submission.job.pk %}">{{ submission.job.title }}</a>
+            - {{ submission.job.budget|floatformat:2 }} ILP
+        </li>
+        {% endfor %}
+    </ul>
+    {% endif %}
+</div>
+{% endblock %}

@@ -165,3 +165,70 @@ def accept_submission(request, job_pk, submission_pk):
     
     messages.success(request, _('Submission accepted! Funds will be released.'))
     return redirect('jobs:detail', pk=job.pk)
+
+
+@login_required
+def my_products(request):
+    """View user's products/services (placeholder)."""
+    # This is a placeholder for future products functionality
+    context = {}
+    return render(request, 'jobs/my_products.html', context)
+
+
+@login_required
+def my_money(request):
+    """View user's wallet and financial information."""
+    # Get user's accepted jobs and their budgets
+    accepted_submissions = JobSubmission.objects.filter(
+        creator=request.user,
+        status='accepted'
+    ).select_related('job')
+    
+    total_earned = sum(submission.job.budget for submission in accepted_submissions)
+    
+    # Get jobs posted by user (money spent)
+    posted_jobs = Job.objects.filter(funder=request.user)
+    total_spent = sum(job.budget for job in posted_jobs if job.status in ['funded', 'completed'])
+    
+    balance = total_earned - total_spent
+    
+    context = {
+        'accepted_submissions': accepted_submissions,
+        'total_earned': total_earned,
+        'total_spent': total_spent,
+        'balance': balance,
+        'wallet_endpoint': request.user.wallet_endpoint,
+    }
+    return render(request, 'jobs/my_money.html', context)
+
+
+@login_required
+def pending_jobs(request):
+    """View jobs that need to be finished (accepted submissions)."""
+    # Get jobs where user has accepted submissions that aren't completed
+    accepted_submissions = JobSubmission.objects.filter(
+        creator=request.user,
+        status='accepted'
+    ).select_related('job').order_by('-created_at')
+    
+    # Filter to only show jobs that aren't completed
+    pending = [sub for sub in accepted_submissions if sub.job.status != 'completed']
+    
+    context = {
+        'pending_jobs': pending,
+    }
+    return render(request, 'jobs/pending_jobs.html', context)
+
+
+@login_required
+def filler_page_1(request):
+    """Filler page 1 (placeholder)."""
+    context = {}
+    return render(request, 'jobs/filler_page_1.html', context)
+
+
+@login_required
+def filler_page_2(request):
+    """Filler page 2 (placeholder)."""
+    context = {}
+    return render(request, 'jobs/filler_page_2.html', context)
