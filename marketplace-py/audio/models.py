@@ -183,3 +183,92 @@ class AudioRequest(models.Model):
         self.status = 'fulfilled'
         self.fulfilled_at = timezone.now()
         self.save()
+
+
+class AudioContribution(models.Model):
+    """
+    Community-provided audio uploads that still need review/attachment.
+    """
+
+    STATUS_CHOICES = [
+        ('pending', _('Pending')),
+        ('in_review', _('In Review')),
+        ('approved', _('Approved')),
+        ('rejected', _('Rejected')),
+    ]
+
+    target_slug = models.CharField(
+        max_length=150,
+        verbose_name=_('Target Identifier'),
+        help_text=_('Slug that identifies the UI element or content that needs audio')
+    )
+    target_label = models.CharField(
+        max_length=255,
+        blank=True,
+        verbose_name=_('Target Label'),
+        help_text=_('Human readable name for the target that needs audio')
+    )
+    language_code = models.CharField(
+        max_length=10,
+        verbose_name=_('Language Code'),
+        help_text=_('Language provided by the contributor')
+    )
+    notes = models.TextField(
+        blank=True,
+        verbose_name=_('Notes'),
+        help_text=_('Optional message from the contributor')
+    )
+    file = models.FileField(
+        upload_to='audio/contributions/%Y/%m/%d/',
+        verbose_name=_('Audio File'),
+        help_text=_('Uploaded audio file (MP3, WAV, OGG)')
+    )
+    status = models.CharField(
+        max_length=20,
+        choices=STATUS_CHOICES,
+        default='pending',
+        verbose_name=_('Status')
+    )
+    contributed_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='audio_contributions',
+        verbose_name=_('Contributed By')
+    )
+    audio_request = models.ForeignKey(
+        AudioRequest,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='contributions',
+        verbose_name=_('Related Audio Request')
+    )
+    content_type = models.ForeignKey(
+        ContentType,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        verbose_name=_('Content Type')
+    )
+    object_id = models.PositiveIntegerField(
+        null=True,
+        blank=True,
+        verbose_name=_('Object ID')
+    )
+    content_object = GenericForeignKey('content_type', 'object_id')
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name = _('Audio Contribution')
+        verbose_name_plural = _('Audio Contributions')
+        ordering = ['-created_at']
+        indexes = [
+            models.Index(fields=['target_slug', 'language_code']),
+            models.Index(fields=['status', 'created_at']),
+        ]
+
+    def __str__(self):
+        return f"Contribution for {self.target_slug} ({self.language_code})"

@@ -40,20 +40,27 @@
 - [ ] Define analytics events for offer publish, wallet send/receive, and support taps before implementation.
 - [ ] Document safe-area behaviour, gesture affordances, and breakpoints in the design system site.
 - [ ] Produce lightweight prototypes (12 fps GIF or Lottie) for key micro-interactions to communicate intent without relying on lengthy specs.
+- [ ] Add lint rule (stylelint/eslint) that blocks inline styles to enforce token usage.
+- [ ] Publish Storybook (or equivalent) entries for tokens + shared components with copy/paste Tailwind snippets.
 
 ## Workstreams & Owners
 - **Design System (Avery)**: finalise tokens, iconography, and card/chip components; deliver inspected Figma frames by Friday.
 - **Navigation & Shell (Leo)**: spike on sticky tab bar + FAB wrapper in Django templates with Tailwind utilities; capture open issues.
 - **Wallet Experience (Imani)**: validate QR display flow, add state chart for QR expiry + offline view.
 - **Support & Accessibility (Mina)**: verify translation lengths with pseudo-loc, run screen-reader scripts, and feed defects into Jira.
+- **Instrumentation (Kai)**: wire analytics IDs into shared components, ensure events map to data contracts, and add CI schema checks.
 
 ## Research & Validation
 - Schedule 5 remote usability sessions on low-end Android to observe reachability of FAB + bottom tabs.
 - Capture latency metrics (LCP, TTI) on throttled 4G using Lighthouse mobile config; attach screenshots to design doc.
 - Confirm brand accent colour and typography license coverage with stakeholder steering committee.
 - Decide on push vs. SMS notifications by outlining backend + cost implications, then bring to next product review.
+- Pilot an unmoderated test focusing on card readability and chip discoverability using the shared typography tokens.
+- Run accessibility tooling (axe, Pa11y) nightly against Storybook examples to catch regressions early.
 
 ## Dependencies / Risks
 - Waiting on localisation strings for Tagalog + Swahili before shipping Support screen.
 - Security review needed for wallet QR share flow (prevents screenshots? auto-expire?).
 - Service worker approach must be aligned with engineering team; offline caching plan is currently unassigned.
+- Need agreement on analytics event schema ownership (product vs. data) before instrumentation lands.
+- If lint tooling cannot enforce inline-style bans across Django templates, we may need a custom pre-commit hook.

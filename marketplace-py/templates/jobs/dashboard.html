@@ -187,12 +187,18 @@
             <div class="dashboard-icon" aria-hidden="true">??</div>
             <p class="dashboard-label">
                 {% trans 'Job Post' %}
+                {% with audio_target=audio_targets.job_post %}
                 <span class="dashboard-audio-wrapper" 
                       data-audio-target="label"
                       data-content-type="dashboard"
                       data-object-id="job_post"
-                      data-language="{{ LANGUAGE_CODE }}">
+                      data-language="{{ LANGUAGE_CODE }}"
+                      data-support-url="{{ audio_target.support_url }}"
+                      data-support-message="{{ audio_target.description_es }}"
+                      data-support-needs-funding="{{ audio_target.needs_funding|yesno:'true,false' }}"
+                      data-support-language="{{ audio_target.language_code }}">
                 </span>
+                {% endwith %}
             </p>
         </a>
 
@@ -200,12 +206,18 @@
             <div class="dashboard-icon" aria-hidden="true">??</div>
             <p class="dashboard-label">
                 {% trans 'My Products' %}
+                {% with audio_target=audio_targets.my_products %}
                 <span class="dashboard-audio-wrapper" 
                       data-audio-target="label"
                       data-content-type="dashboard"
                       data-object-id="my_products"
-                      data-language="{{ LANGUAGE_CODE }}">
+                      data-language="{{ LANGUAGE_CODE }}"
+                      data-support-url="{{ audio_target.support_url }}"
+                      data-support-message="{{ audio_target.description_es }}"
+                      data-support-needs-funding="{{ audio_target.needs_funding|yesno:'true,false' }}"
+                      data-support-language="{{ audio_target.language_code }}">
                 </span>
+                {% endwith %}
             </p>
         </a>
 
@@ -213,12 +225,18 @@
             <div class="dashboard-icon" aria-hidden="true">??</div>
             <p class="dashboard-label">
                 {% trans 'My Money' %}
+                {% with audio_target=audio_targets.my_money %}
                 <span class="dashboard-audio-wrapper" 
                       data-audio-target="label"
                       data-content-type="dashboard"
                       data-object-id="my_money"
-                      data-language="{{ LANGUAGE_CODE }}">
+                      data-language="{{ LANGUAGE_CODE }}"
+                      data-support-url="{{ audio_target.support_url }}"
+                      data-support-message="{{ audio_target.description_es }}"
+                      data-support-needs-funding="{{ audio_target.needs_funding|yesno:'true,false' }}"
+                      data-support-language="{{ audio_target.language_code }}">
                 </span>
+                {% endwith %}
             </p>
         </a>
 
@@ -226,12 +244,18 @@
             <div class="dashboard-icon" aria-hidden="true">?</div>
             <p class="dashboard-label">
                 {% trans 'My Pending to Finish Jobs' %}
+                {% with audio_target=audio_targets.pending_jobs %}
                 <span class="dashboard-audio-wrapper" 
                       data-audio-target="label"
                       data-content-type="dashboard"
                       data-object-id="pending_jobs"
-                      data-language="{{ LANGUAGE_CODE }}">
+                      data-language="{{ LANGUAGE_CODE }}"
+                      data-support-url="{{ audio_target.support_url }}"
+                      data-support-message="{{ audio_target.description_es }}"
+                      data-support-needs-funding="{{ audio_target.needs_funding|yesno:'true,false' }}"
+                      data-support-language="{{ audio_target.language_code }}">
                 </span>
+                {% endwith %}
             </p>
         </a>
 
@@ -239,12 +263,18 @@
             <div class="dashboard-icon" aria-hidden="true">??</div>
             <p class="dashboard-label">
                 {% trans 'Page 1' %}
+                {% with audio_target=audio_targets.page_1 %}
                 <span class="dashboard-audio-wrapper" 
                       data-audio-target="label"
                       data-content-type="dashboard"
                       data-object-id="page_1"
-                      data-language="{{ LANGUAGE_CODE }}">
+                      data-language="{{ LANGUAGE_CODE }}"
+                      data-support-url="{{ audio_target.support_url }}"
+                      data-support-message="{{ audio_target.description_es }}"
+                      data-support-needs-funding="{{ audio_target.needs_funding|yesno:'true,false' }}"
+                      data-support-language="{{ audio_target.language_code }}">
                 </span>
+                {% endwith %}
             </p>
         </a>
 
@@ -252,12 +282,18 @@
             <div class="dashboard-icon" aria-hidden="true">??</div>
             <p class="dashboard-label">
                 {% trans 'Page 2' %}
+                {% with audio_target=audio_targets.page_2 %}
                 <span class="dashboard-audio-wrapper" 
                       data-audio-target="label"
                       data-content-type="dashboard"
                       data-object-id="page_2"
-                      data-language="{{ LANGUAGE_CODE }}">
+                      data-language="{{ LANGUAGE_CODE }}"
+                      data-support-url="{{ audio_target.support_url }}"
+                      data-support-message="{{ audio_target.description_es }}"
+                      data-support-needs-funding="{{ audio_target.needs_funding|yesno:'true,false' }}"
+                      data-support-language="{{ audio_target.language_code }}">
                 </span>
+                {% endwith %}
             </p>
         </a>
     </div>
@@ -272,20 +308,13 @@
 // You'll need a ContentType for dashboard items (or use an existing model)
 document.addEventListener('DOMContentLoaded', function() {
     const audioMessages = {
-        error: '{% trans "Error loading audio. Please try again." %}',
-        notAvailable: '{% trans "Audio not yet available. You can add audio for this item via Django admin." %}',
-        readyDetailed: '{% trans "Audio functionality is ready! To add audio, create AudioSnippet entries in Django admin with the appropriate ContentType and object_id." %}',
-        readySimple: '{% trans "Audio functionality is ready! To add audio, create AudioSnippet entries in Django admin." %}'
+        error: 'No pudimos reproducir el audio. Inténtalo de nuevo o sube uno nuevo.',
+        notAvailable: 'Aún no tenemos audio para este botón.',
+        moduleMissing: 'El reproductor todavía no está listo en este dispositivo.',
+        notConfigured: 'Conecta este botón con un contenido para habilitar el audio.'
     };
-    const audioSnippetAdminUrl = "{% url 'admin:audio_audiosnippet_add' %}";
     const fallbackAudioUrl = '{% static "audio/fallback.mp3" %}';
-    const audioActions = {
-        createSnippet: audioSnippetAdminUrl ? {
-            label: '{% trans "Create audio snippet" %}',
-            url: audioSnippetAdminUrl,
-            target: '_blank'
-        } : null
-    };
+    const defaultFundAmount = {{ community_fund_amount|default:10 }};
 
     const audioInfoBanner = document.createElement('div');
     audioInfoBanner.className = 'audio-info-banner';
@@ -297,17 +326,20 @@ document.addEventListener('DOMContentLoaded', function() {
     let audioInfoTimeoutId = null;
     let fallbackAudioInstance = null;
     function showAudioMessage(message, options = {}) {
-        const { action, playFallback } = options;
+        const { actions = [], playFallback } = options;
         audioInfoBanner.innerHTML = '';
         const textSpan = document.createElement('span');
         textSpan.textContent = message;
         audioInfoBanner.appendChild(textSpan);
 
-        if (action && action.url) {
+        actions.forEach(action => {
+            if (!action.url) {
+                return;
+            }
             const actionLink = document.createElement('a');
             actionLink.className = 'audio-info-action';
             actionLink.href = action.url;
-            actionLink.textContent = action.label || '{% trans "Open" %}';
+            actionLink.textContent = action.label || 'Ver';
             actionLink.setAttribute('role', 'button');
             if (action.target) {
                 actionLink.target = action.target;
@@ -316,7 +348,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             }
             audioInfoBanner.appendChild(actionLink);
-        }
+        });
 
         audioInfoBanner.classList.add('show');
         if (audioInfoTimeoutId) {
@@ -340,6 +372,38 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         fallbackAudioInstance.currentTime = 0;
         fallbackAudioInstance.play().catch(() => {});
+    }
+
+    function buildSupportActions(wrapper) {
+        if (!wrapper) {
+            return [];
+        }
+        const supportUrl = wrapper.dataset.supportUrl;
+        if (!supportUrl) {
+            return [];
+        }
+        const needsFunding = wrapper.dataset.supportNeedsFunding === 'true';
+        const actions = [{
+            label: 'Subir audio',
+            url: `${supportUrl}#upload-audio`,
+        }];
+        if (needsFunding) {
+            actions.unshift({
+                label: `Fondear (${defaultFundAmount} pesos)`,
+                url: `${supportUrl}#funding`,
+            });
+        }
+        return actions;
+    }
+
+    function showSupportBanner(wrapper, options = {}) {
+        const { message, playFallback = true } = options;
+        const finalMessage = message || (wrapper && wrapper.dataset.supportMessage) || audioMessages.notAvailable;
+        const actions = buildSupportActions(wrapper);
+        showAudioMessage(finalMessage, {
+            actions,
+            playFallback,
+        });
     }
 
     // These will be populated once you set up ContentType IDs
@@ -390,21 +454,21 @@ document.addEventListener('DOMContentLoaded', function() {
                                     if (data.fallback_audio_url) {
                                         const fallbackAudio = new Audio(data.fallback_audio_url);
                                         fallbackAudio.play().catch(() => {
-                                            showAudioMessage(audioMessages.error, { playFallback: true });
+                                            showSupportBanner(wrapper);
                                         });
                                     } else {
-                                        showAudioMessage(audioMessages.error, { playFallback: true });
+                                        showSupportBanner(wrapper);
                                     }
                                 });
                             } else if (data && data.fallback_audio_url) {
                                 // Use fallback audio
                                 const fallbackAudio = new Audio(data.fallback_audio_url);
                                 fallbackAudio.play().catch(() => {
-                                    showAudioMessage(audioMessages.notAvailable, { action: audioActions.createSnippet, playFallback: true });
+                                    showSupportBanner(wrapper);
                                 });
                             } else {
                                 // No audio - show request option
-                                showAudioMessage(audioMessages.notAvailable, { action: audioActions.createSnippet, playFallback: true });
+                                showSupportBanner(wrapper);
                             }
                         })
                         .catch(() => {
@@ -412,17 +476,17 @@ document.addEventListener('DOMContentLoaded', function() {
                             if (fallbackAudioUrl) {
                                 const fallbackAudio = new Audio(fallbackAudioUrl);
                                 fallbackAudio.play().catch(() => {
-                                    showAudioMessage(audioMessages.notAvailable, { action: audioActions.createSnippet, playFallback: true });
+                                    showSupportBanner(wrapper);
                                 });
                             } else {
-                                showAudioMessage(audioMessages.notAvailable, { action: audioActions.createSnippet, playFallback: true });
+                                showSupportBanner(wrapper);
                             }
                         });
                 } else {
-                    showAudioMessage(audioMessages.readyDetailed, { action: audioActions.createSnippet, playFallback: true });
+                    showSupportBanner(wrapper);
                 }
             } else {
-                showAudioMessage(audioMessages.readySimple, { action: audioActions.createSnippet, playFallback: true });
+                showSupportBanner(wrapper, { message: audioMessages.moduleMissing });
             }
         };
         
