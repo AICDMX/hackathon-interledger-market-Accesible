@@ -10,8 +10,9 @@ from . import views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('i18n/', include('django.conf.urls.i18n')),
+    # Ensure our custom language switcher overrides Django's default set_language view
     path('i18n/setlang/', views.set_language_custom, name='set_language_custom'),
+    path('i18n/', include('django.conf.urls.i18n')),
     path('rosetta/', include('rosetta.urls')),
 ]
 

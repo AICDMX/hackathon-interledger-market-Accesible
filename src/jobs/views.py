@@ -232,3 +232,10 @@ def filler_page_2(request):
     """Filler page 2 (placeholder)."""
     context = {}
     return render(request, 'jobs/filler_page_2.html', context)
+
+
+@login_required
+def dashboard(request):
+    """Dashboard with main navigation icons - mobile first design."""
+    context = {}
+    return render(request, 'jobs/dashboard.html', context)
