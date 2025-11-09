@@ -3,7 +3,7 @@ from django.utils.translation import gettext_lazy as _
 from django.utils.html import format_html
 from django.urls import reverse
 from django.conf import settings
-from .models import AudioSnippet, AudioRequest, AudioContribution
+from .models import AudioSnippet, AudioRequest, AudioContribution, StaticUIElement
 
 
 class AudioSnippetInline(admin.TabularInline):
@@ -166,3 +166,26 @@ class AudioContributionAdmin(admin.ModelAdmin):
         }),
     )
     raw_id_fields = ['contributed_by', 'audio_request']
+
+
+@admin.register(StaticUIElement)
+class StaticUIElementAdmin(admin.ModelAdmin):
+    list_display = ['slug', 'label_es', 'label_en', 'category', 'created_at']
+    list_filter = ['category', 'created_at']
+    search_fields = ['slug', 'label_es', 'label_en', 'description']
+    readonly_fields = ['created_at', 'updated_at']
+    fieldsets = (
+        (_('Identification'), {
+            'fields': ('slug', 'category')
+        }),
+        (_('Labels'), {
+            'fields': ('label_es', 'label_en', 'description')
+        }),
+        (_('Metadata'), {
+            'fields': ('created_at', 'updated_at')
+        }),
+    )
+    
+    def get_queryset(self, request):
+        qs = super().get_queryset(request)
+        return qs.prefetch_related('audiosnippet_set')

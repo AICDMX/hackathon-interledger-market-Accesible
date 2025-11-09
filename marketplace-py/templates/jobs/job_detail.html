@@ -5,7 +5,7 @@
 
 {% block content %}
 <article class="card">
-    <h1>{{ job.title }}</h1>
+    {% include 'components/title_with_audio.html' with title=job.title content_object=job field_name="title" heading_tag="h1" %}
     
     <div>
         <p><strong>{% trans 'Funder' %}:</strong> {{ job.funder.username }}</p>
@@ -109,7 +109,13 @@
             {% elif job.status == 'draft' or job.status == 'recruiting' or job.status == 'selecting' %}
                 {% if job.status == 'recruiting' and not user_application %}
                     <div class="card bg-success" style="margin-top: 1.5rem; padding: 1.5rem; text-align: center;">
-                        <h2 style="margin-top: 0;">{% trans 'Interested in This Job?' %}</h2>
+                        {% load audio_tags %}
+                        {% include 'components/static_title_with_audio.html' with title_text="Interested in This Job?" slug="section_interested_in_job" heading_tag="h2" %}
+                        <style>
+                            #section_interested_in_job {
+                                margin-top: 0;
+                            }
+                        </style>
                         <p style="margin-bottom: 1rem;">{% trans 'Submit your profile to apply for this job. The job owner will review applications and select workers.' %}</p>
                         <a href="{% url 'jobs:apply_to_job' job.pk %}" class="btn btn-primary" style="font-size: 1.25rem; padding: 0.75rem 2rem;">
                             {% trans 'Apply to This Job' %}

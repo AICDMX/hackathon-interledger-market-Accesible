@@ -8,7 +8,12 @@
 {% endblock %}
 
 {% block content %}
-<h1>{% trans 'Apply to Job' %}: {{ job.title }}</h1>
+{% load audio_tags %}
+<div class="title-with-audio" style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+    {% include 'components/static_title_with_audio.html' with title_text="Apply to Job" slug="page_apply_to_job" heading_tag="h1" %}
+    <div style="display: inline-block; margin-left: 0.5rem;">{{ job.title }}</div>
+    {% audio_player job "title" %}
+</div>
 
 <div class="card">
     <p><strong>{% trans 'Target Language' %}:</strong> {{ job.target_language }}</p>
@@ -19,7 +24,8 @@
 </div>
 
 <div class="card">
-    <h2>{% trans 'Submit Your Profile' %}</h2>
+    {% load audio_tags %}
+    {% include 'components/static_title_with_audio.html' with title_text="Submit Your Profile" slug="section_submit_profile" heading_tag="h2" %}
     <p class="muted-text">{% trans 'Tell the job owner about yourself and why you are interested in this job. You can include audio, video, or image files to introduce yourself.' %}</p>
     {% if user.profile_note or user.profile_audio or user.profile_video or user.profile_image %}
     <div class="info-box" style="background-color: #e3f2fd; padding: 1rem; border-radius: 4px; margin-bottom: 1rem;">

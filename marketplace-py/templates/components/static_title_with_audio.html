@@ -1,0 +1,35 @@
+{% load i18n audio_tags %}
+{% comment %}
+Reusable component for displaying a static title with an audio speaker button.
+This is for titles that don't have a content object (like page titles, section headings).
+
+Usage: {% include 'components/static_title_with_audio.html' with title_text="My Profile" slug="page_my_profile" heading_tag="h1" %}
+Or with link: {% include 'components/static_title_with_audio.html' with title_text="Browse Jobs" slug="nav_browse_jobs" heading_tag="h2" link_url_name="jobs:list" %}
+
+Parameters:
+- title_text: The text to display as the title (will be translated)
+- slug: The slug identifier for the StaticUIElement (e.g., "page_my_profile", "nav_browse_jobs")
+- heading_tag: HTML heading tag to use (h1, h2, h3, etc.) - default: "h1"
+- heading_id: Optional ID attribute for the heading tag (for aria-labelledby)
+- link_url: Optional direct URL string to make the title a link
+- link_url_name: Optional URL name (e.g., "jobs:detail") to generate the link
+- link_url_arg: Optional argument for link_url_name (e.g., job.pk)
+- language_code: Optional language code (if not provided, uses user's preferred audio language)
+{% endcomment %}
+
+{% with heading_tag=heading_tag|default:"h1" %}
+<div class="title-with-audio" style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+    <{{ heading_tag }}{% if heading_id %} id="{{ heading_id }}"{% endif %} style="margin: 0; flex: 1;">
+        {% if link_url %}
+            <a href="{{ link_url }}">{% trans title_text %}</a>
+        {% elif link_url_name %}
+            <a href="{% url link_url_name link_url_arg %}">{% trans title_text %}</a>
+        {% else %}
+            {% trans title_text %}
+        {% endif %}
+    </{{ heading_tag }}>
+    {% if slug %}
+        {% audio_player_static_ui slug "label" language_code %}
+    {% endif %}
+</div>
+{% endwith %}

@@ -77,16 +77,24 @@
 {% endblock %}
 
 {% block content %}
-<h1>{% trans 'Available Jobs' %}</h1>
+{% load audio_tags %}
+{% include 'components/static_title_with_audio.html' with title_text="Available Jobs" slug="page_available_jobs" heading_tag="h1" %}
 
 {% if user.is_authenticated and waiting_for_submission %}
     <div class="card" style="border-left: 4px solid #f59e0b; margin-bottom: 1.5rem;">
-        <h2 style="margin-top: 0; color: #b45309;">{% trans 'Jobs Waiting for Your Submission' %}</h2>
+        {% load audio_tags %}
+        {% include 'components/static_title_with_audio.html' with title_text="Jobs Waiting for Your Submission" slug="section_waiting_for_submission" heading_tag="h2" %}
+        <style>
+            #section_waiting_for_submission {
+                margin-top: 0;
+                color: #b45309;
+            }
+        </style>
         <p>{% trans 'You\'ve been selected for these jobs. Submit your work now!' %}</p>
         <div role="list" aria-label="{% trans 'Jobs waiting for submission' %}">
             {% for job in waiting_for_submission %}
                 <article class="card" role="listitem" style="margin-top: 1rem;">
-                    <h3><a href="{% url 'jobs:detail' job.pk %}">{{ job.title }}</a></h3>
+                    {% include 'components/title_with_audio.html' with title=job.title content_object=job field_name="title" heading_tag="h3" link_url_name="jobs:detail" link_url_arg=job.pk %}
                     <p><strong>{% trans 'Language' %}:</strong> {{ job.target_language }}</p>
                     <p><strong>{% trans 'Amount Per Person' %}:</strong> {{ job.amount_per_person }} ILP</p>
                     <p>{{ job.description|truncatewords:30 }}</p>
@@ -146,7 +154,7 @@
                     {% endif %}
                 </div>
                 
-                <h2><a href="{% url 'jobs:detail' job.pk %}">{{ job.title }}</a></h2>
+                {% include 'components/title_with_audio.html' with title=job.title content_object=job field_name="title" heading_tag="h2" link_url_name="jobs:detail" link_url_arg=job.pk %}
                 <p><strong>{% trans 'Language' %}:</strong> {{ job.target_language }}</p>
                 {% if job.target_dialect %}
                     <p><strong>{% trans 'Dialect' %}:</strong> {{ job.target_dialect }}</p>
@@ -157,11 +165,11 @@
                 
                 {% if job.status == 'recruiting' or job.status == 'open' %}
                     <div class="job-count-info">
-                        <strong>{% trans 'Applications' %}:</strong> {{ job.applications_count }} / {{ job.recruit_limit }}
+                        <strong>{% trans 'Applications' %}:</strong> {{ job.applications_count }} / {{ job.recruit_limit }} {% trans 'needed' %}
                     </div>
                 {% elif job.status == 'submitting' %}
                     <div class="job-count-info">
-                        <strong>{% trans 'Submissions' %}:</strong> {{ job.submissions_count }} / {{ job.max_responses }}
+                        <strong>{% trans 'Workers Submitted' %}:</strong> {{ job.submissions_count }} / {{ job.max_responses }} {% trans 'needed' %}
                     </div>
                 {% endif %}
                 

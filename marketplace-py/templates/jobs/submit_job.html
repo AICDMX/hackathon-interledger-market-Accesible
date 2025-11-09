@@ -8,7 +8,11 @@
 {% endblock %}
 
 {% block content %}
-<h1>{% trans 'Submit Work for' %}: {{ job.title }}</h1>
+<div class="title-with-audio" style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+    <h1 style="margin: 0; flex: 1;">{% trans 'Submit Work for' %}: {{ job.title }}</h1>
+    {% load audio_tags %}
+    {% audio_player job "title" %}
+</div>
 
 <div class="card">
     <p><strong>{% trans 'Target Language' %}:</strong> {{ job.target_language }}</p>
@@ -18,7 +22,8 @@
 
 {% if job.has_reference_media %}
     <div class="card">
-        <h2>{% trans 'Reference Media From Funder' %}</h2>
+        {% load audio_tags %}
+        {% include 'components/static_title_with_audio.html' with title_text="Reference Media From Funder" slug="section_reference_media_submit" heading_tag="h2" %}
         <p class="muted-text">{% trans 'Review these examples before submitting your work.' %}</p>
         {% if job.reference_audio %}
             <div style="margin-bottom: 1rem;">

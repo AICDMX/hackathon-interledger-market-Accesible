@@ -205,8 +205,16 @@
 {% endblock %}
 
 {% block content %}
+{% load audio_tags %}
 <div class="dashboard-container">
-    <h1 style="text-align: center; margin-bottom: 2rem; color: #2c3e50;">{% trans 'Dashboard' %}</h1>
+    {% include 'components/static_title_with_audio.html' with title_text="Dashboard" slug="page_dashboard" heading_tag="h1" heading_id="dashboard-title" %}
+    <style>
+        #dashboard-title {
+            text-align: center;
+            margin-bottom: 2rem;
+            color: #2c3e50;
+        }
+    </style>
     
     <div class="dashboard-grid" role="grid" aria-label="{% trans 'Main navigation' %}">
         {% if user.is_funder %}
@@ -487,8 +495,14 @@ document.addEventListener('DOMContentLoaded', function() {
         // Create audio player button
         const audioBtn = document.createElement('button');
         audioBtn.className = 'audio-play-btn';
-        audioBtn.style.cssText = 'display: inline-flex; align-items: center; gap: 0.25rem; padding: 0.25rem 0.5rem; background-color: #3498db; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 0.875rem; transition: background-color 0.2s;';
-        audioBtn.innerHTML = '<span aria-hidden="true">??</span><span class="audio-label">{% trans "Listen" %}</span>';
+        audioBtn.style.cssText = 'display: inline-flex; align-items: center; justify-content: center; padding: 0.25rem; background-color: transparent; border: none; cursor: pointer; transition: opacity 0.2s;';
+        const audioIcon = document.createElement('img');
+        audioIcon.src = '/media/listen.png';
+        audioIcon.alt = '{% trans "Listen" %}';
+        audioIcon.className = 'audio-icon';
+        audioIcon.style.cssText = 'width: 32px; height: 32px; object-fit: contain; display: block;';
+        audioIcon.setAttribute('aria-hidden', 'true');
+        audioBtn.appendChild(audioIcon);
         audioBtn.setAttribute('aria-label', '{% trans "Play audio" %}');
         
         // Store data attributes for API calls

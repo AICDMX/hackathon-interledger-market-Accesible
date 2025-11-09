@@ -112,7 +112,8 @@
 {% endblock %}
 
 {% block content %}
-<h1>{% trans 'Job Owner Dashboard' %}</h1>
+{% load audio_tags %}
+{% include 'components/static_title_with_audio.html' with title_text="Job Owner Dashboard" slug="page_job_owner_dashboard" heading_tag="h1" %}
 <p class="text-muted">{% trans 'Review progress, download deliverables, and mark jobs as complete once you are satisfied.' %}</p>
 
 {% if not has_jobs %}
@@ -122,13 +123,14 @@
     </div>
 {% else %}
     {% if drafts %}
-        <h2>{% trans 'Drafts' %}</h2>
+        {% load audio_tags %}
+        {% include 'components/static_title_with_audio.html' with title_text="Drafts" slug="section_drafts" heading_tag="h2" %}
         <div class="job-owner-wrapper">
             {% for job in drafts %}
                 <section class="card job-owner-card" aria-labelledby="job-{{ job.pk }}">
                     <div class="job-owner-header">
                         <div>
-                            <h2 id="job-{{ job.pk }}">{{ job.title }}</h2>
+                            {% include 'components/title_with_audio.html' with title=job.title content_object=job field_name="title" heading_tag="h2" %}
                             <p class="text-muted" style="margin: 0;">{% trans 'Created' %}: {{ job.created_at|date:"F d, Y" }}</p>
                         </div>
                         <span class="status-pill status-{{ job.status }}">
@@ -159,7 +161,7 @@
                 <section class="card job-owner-card" aria-labelledby="job-{{ job.pk }}">
                     <div class="job-owner-header">
                         <div>
-                            <h2 id="job-{{ job.pk }}"><a href="{% url 'jobs:detail' job.pk %}">{{ job.title }}</a></h2>
+                            {% include 'components/title_with_audio.html' with title=job.title content_object=job field_name="title" heading_tag="h2" heading_id="job-"|add:job.pk link_url_name="jobs:detail" link_url_arg=job.pk %}
                             <p class="text-muted" style="margin: 0;">{% trans 'Created' %}: {{ job.created_at|date:"F d, Y" }}</p>
                         </div>
                         <span class="status-pill status-{{ job.status }}">
@@ -195,7 +197,8 @@
                     </div>
 
                     <div class="submission-list">
-                        <h3>{% trans 'Submissions' %}</h3>
+                        {% load audio_tags %}
+                        {% include 'components/static_title_with_audio.html' with title_text="Submissions" slug="section_submissions_list" heading_tag="h3" %}
                         {% if job.submissions.all %}
                             {% for submission in job.submissions.all %}
                                 <div class="submission-card {{ submission.status }}">

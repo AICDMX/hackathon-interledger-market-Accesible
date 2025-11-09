@@ -1,0 +1,1954 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-11-09 06:29+0000\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=3; plural=n == 1 ? 0 : n != 0 && n % 1000000 == 0 ? "
+"1 : 2;\n"
+#: audio/admin.py:29 audio/admin.py:73
+msgid "Content"
+msgstr ""
+
+#: audio/admin.py:32 jobs/models.py:28 templates/jobs/create_job.html:99
+#: templates/jobs/edit_job.html:114 templates/jobs/edit_job.html:181
+#: templates/jobs/view_applications.html:75
+msgid "Audio"
+msgstr "Audio"
+
+#: audio/admin.py:35
+msgid "Metadata"
+msgstr ""
+
+#: audio/admin.py:56
+msgid "No audio file uploaded"
+msgstr ""
+
+#: audio/admin.py:57
+msgid "Audio Preview"
+msgstr ""
+
+#: audio/admin.py:76
+msgid "Request"
+msgstr ""
+
+#: audio/admin.py:79 audio/models.py:56 audio/models.py:140 audio/models.py:230
+#: jobs/models.py:103 jobs/models.py:381 jobs/models.py:465
+#: templates/jobs/job_detail.html:12 templates/jobs/job_list.html:156
+#: templates/jobs/my_jobs.html:33 templates/jobs/pending_jobs.html:17
+#: templates/jobs/view_applications.html:10
+#: templates/jobs/view_applications.html:28
+msgid "Status"
+msgstr "Estado"
+
+#: audio/admin.py:100
+msgid "Audio available"
+msgstr ""
+
+#: audio/admin.py:101
+msgid "No audio"
+msgstr ""
+
+#: audio/admin.py:102
+msgid "Audio Status"
+msgstr ""
+
+#: audio/admin.py:113
+msgid "Mark selected requests as fulfilled"
+msgstr ""
+
+#: audio/admin.py:139
+msgid "Create draft audio snippets for selected requests"
+msgstr ""
+
+#: audio/admin.py:155
+msgid "Meta"
+msgstr ""
+
+#: audio/admin.py:158
+msgid "Archivo"
+msgstr ""
+
+#: audio/admin.py:161
+msgid "Relaciones"
+msgstr ""
+
+#: audio/admin.py:164
+msgid "Seguimiento"
+msgstr ""
+
+#: audio/forms.py:15
+msgid "Ej. es, nah, oto"
+msgstr ""
+
+#: audio/forms.py:20
+msgid "Describe el contexto de tu audio (opcional)"
+msgstr ""
+
+#: audio/forms.py:24
+msgid "Idioma del audio"
+msgstr ""
+
+#: audio/forms.py:25 audio/forms.py:38
+msgid "Archivo de audio"
+msgstr ""
+
+#: audio/forms.py:26
+msgid "Notas para el equipo"
+msgstr ""
+
+#: audio/models.py:15 jobs/models.py:16 templates/jobs/edit_job.html:67
+#: templates/jobs/my_jobs.html:15
+msgid "Draft"
+msgstr "Borrador"
+
+#: audio/models.py:16
+msgid "Ready"
+msgstr ""
+
+#: audio/models.py:17
+msgid "Needs Review"
+msgstr ""
+
+#: audio/models.py:24 audio/models.py:116 audio/models.py:253
+msgid "Content Type"
+msgstr ""
+
+#: audio/models.py:26 audio/models.py:118 audio/models.py:258
+msgid "Object ID"
+msgstr ""
+
+#: audio/models.py:33 audio/models.py:124
+msgid "Target Field"
+msgstr ""
+
+#: audio/models.py:34
+msgid ""
+"Short slug identifying which field/UI element this audio narrates (e.g., "
+"title, description)"
+msgstr ""
+
+#: audio/models.py:40 audio/models.py:131 audio/models.py:213
+msgid "Language Code"
+msgstr ""
+
+#: audio/models.py:41
+msgid "Language code for this audio snippet"
+msgstr ""
+
+#: audio/models.py:47
+msgid "Transcript"
+msgstr ""
+
+#: audio/models.py:48
+msgid "Text transcription of the audio content"
+msgstr ""
+
+#: audio/models.py:62 audio/models.py:223 jobs/models.py:368
+#: templates/jobs/submit_job.html:69
+msgid "Audio File"
+msgstr ""
+
+#: audio/models.py:63
+msgid "Audio file (MP3, OGG, etc.)"
+msgstr ""
+
+#: audio/models.py:75
+msgid "Created By"
+msgstr ""
+
+#: audio/models.py:79
+msgid "Audio Snippet"
+msgstr ""
+
+#: audio/models.py:80
+msgid "Audio Snippets"
+msgstr ""
+
+#: audio/models.py:106
+msgid "Open"
+msgstr ""
+
+#: audio/models.py:107
+msgid "In Progress"
+msgstr ""
+
+#: audio/models.py:108
+msgid "Fulfilled"
+msgstr ""
+
+#: audio/models.py:109
+msgid "Closed"
+msgstr ""
+
+#: audio/models.py:125
+msgid "Field/UI element that needs audio (e.g., title, description)"
+msgstr ""
+
+#: audio/models.py:132
+msgid "Language code for the requested audio"
+msgstr ""
+
+#: audio/models.py:146 audio/models.py:218
+msgid "Notes"
+msgstr ""
+
+#: audio/models.py:147
+msgid "Additional notes about this audio request"
+msgstr ""
+
+#: audio/models.py:157
+msgid "Requested By"
+msgstr ""
+
+#: audio/models.py:163
+msgid "Fulfilled At"
+msgstr ""
+
+#: audio/models.py:166
+msgid "Audio Request"
+msgstr ""
+
+#: audio/models.py:167
+msgid "Audio Requests"
+msgstr ""
+
+#: audio/models.py:194 jobs/models.py:326 jobs/models.py:413
+msgid "Pending"
+msgstr "Pendiente"
+
+#: audio/models.py:195
+msgid "In Review"
+msgstr ""
+
+#: audio/models.py:196
+msgid "Approved"
+msgstr ""
+
+#: audio/models.py:197 jobs/models.py:328 jobs/models.py:415
+msgid "Rejected"
+msgstr "Rechazado"
+
+#: audio/models.py:202
+msgid "Target Identifier"
+msgstr ""
+
+#: audio/models.py:203
+msgid "Slug that identifies the UI element or content that needs audio"
+msgstr ""
+
+#: audio/models.py:208
+msgid "Target Label"
+msgstr ""
+
+#: audio/models.py:209
+msgid "Human readable name for the target that needs audio"
+msgstr ""
+
+#: audio/models.py:214
+msgid "Language provided by the contributor"
+msgstr ""
+
+#: audio/models.py:219
+msgid "Optional message from the contributor"
+msgstr ""
+
+#: audio/models.py:224
+msgid "Uploaded audio file (MP3, WAV, OGG)"
+msgstr ""
+
+#: audio/models.py:238
+msgid "Contributed By"
+msgstr ""
+
+#: audio/models.py:246
+msgid "Related Audio Request"
+msgstr ""
+
+#: audio/models.py:265
+msgid "Audio Contribution"
+msgstr ""
+
+#: audio/models.py:266
+msgid "Audio Contributions"
+msgstr ""
+
+#: jobs/forms.py:25
+msgid ""
+"Tell the job owner about yourself and why you are interested in this job..."
+msgstr "Cuéntale al propietario del trabajo sobre ti y por qué estás interesado en este trabajo..."
+
+#: jobs/models.py:17 templates/jobs/my_jobs.html:16
+msgid "Recruiting"
+msgstr "Reclutando"
+
+#: jobs/models.py:18 templates/jobs/my_jobs.html:17
+msgid "Selecting"
+msgstr "Seleccionando"
+
+#: jobs/models.py:19 templates/jobs/my_jobs.html:18
+msgid "Submitting"
+msgstr "Enviando"
+
+#: jobs/models.py:20 templates/jobs/my_jobs.html:19
+msgid "Reviewing"
+msgstr "Revisando"
+
+#: jobs/models.py:21 templates/jobs/my_jobs.html:20
+msgid "Expired"
+msgstr "Expirado"
+
+#: jobs/models.py:22 templates/jobs/job_detail.html:25
+#: templates/jobs/my_jobs.html:21
+msgid "Complete"
+msgstr "Completo"
+
+#: jobs/models.py:26 templates/jobs/create_job.html:91
+#: templates/jobs/edit_job.html:106
+msgid "Text"
+msgstr "Texto"
+
+#: jobs/models.py:27 templates/jobs/create_job.html:95
+#: templates/jobs/edit_job.html:110 templates/jobs/edit_job.html:184
+#: templates/jobs/view_applications.html:83
+msgid "Video"
+msgstr "Video"
+
+#: jobs/models.py:29 templates/jobs/create_job.html:103
+#: templates/jobs/edit_job.html:118 templates/jobs/edit_job.html:187
+#: templates/jobs/view_applications.html:91
+msgid "Image"
+msgstr "Imagen"
+
+#: jobs/models.py:32 templates/jobs/create_job.html:60
+#: templates/jobs/edit_job.html:75
+msgid "Title"
+msgstr "Título"
+
+#: jobs/models.py:33 templates/jobs/create_job.html:65
+#: templates/jobs/edit_job.html:80 templates/jobs/job_detail.html:63
+msgid "Description"
+msgstr "Descripción"
+
+#: jobs/models.py:38 templates/jobs/apply_to_job.html:14
+#: templates/jobs/audio_support.html:14 templates/jobs/create_job.html:70
+#: templates/jobs/edit_job.html:85 templates/jobs/job_detail.html:13
+#: templates/jobs/pending_jobs.html:18 templates/jobs/submit_job.html:14
+msgid "Target Language"
+msgstr "Idioma Objetivo"
+
+#: jobs/models.py:39
+msgid "Language code (e.g., nah, oto, es)"
+msgstr "C?digo de idioma (ej. nah, oto, es)"
+
+#: jobs/models.py:44 templates/jobs/create_job.html:82
+#: templates/jobs/edit_job.html:97
+msgid "Target Dialect"
+msgstr "Dialecto Objetivo"
+
+#: jobs/models.py:45
+msgid "Specific dialect if applicable"
+msgstr "Dialecto espec?fico si aplica"
+
+#: jobs/models.py:51 templates/jobs/create_job.html:87
+#: templates/jobs/edit_job.html:102 templates/jobs/job_detail.html:29
+msgid "Deliverable Types"
+msgstr "Tipos de Entregables"
+
+#: jobs/models.py:52
+msgid "Comma-separated: text,video,audio,image"
+msgstr "Separados por comas: texto,video,audio,imagen"
+
+#: jobs/models.py:58
+msgid "Reference Audio/Instructions"
+msgstr ""
+
+#: jobs/models.py:59
+msgid "Optional audio instructions uploaded or recorded by the funder"
+msgstr ""
+
+#: jobs/models.py:65
+msgid "Reference Video"
+msgstr ""
+
+#: jobs/models.py:66
+msgid "Optional video instructions or inspiration for the job"
+msgstr ""
+
+#: jobs/models.py:72
+msgid "Reference Image"
+msgstr ""
+
+#: jobs/models.py:73
+msgid "Optional image reference or mood board for the job"
+msgstr ""
+
+#: jobs/models.py:81 templates/jobs/apply_to_job.html:16
+#: templates/jobs/job_detail.html:17 templates/jobs/job_list.html:91
+#: templates/jobs/job_list.html:154 templates/jobs/job_owner_dashboard.html:142
+#: templates/jobs/job_owner_dashboard.html:173
+msgid "Amount Per Person"
+msgstr "Cantidad por Persona"
+
+#: jobs/models.py:82
+msgid "Amount in ILP to pay each person who completes this job"
+msgstr ""
+
+#: jobs/models.py:88 templates/jobs/accepted_jobs.html:15
+#: templates/jobs/apply_to_job.html:15
+#: templates/jobs/job_owner_dashboard.html:141
+#: templates/jobs/job_owner_dashboard.html:172 templates/jobs/my_jobs.html:34
+#: templates/jobs/pending_jobs.html:16 templates/jobs/submit_job.html:15
+msgid "Budget"
+msgstr "Presupuesto"
+
+#: jobs/models.py:89
+msgid "Total amount in ILP (calculated as amount_per_person ? max_responses)"
+msgstr ""
+
+#: jobs/models.py:96 templates/jobs/accepted_jobs.html:14
+#: templates/jobs/job_detail.html:11 templates/users/register.html:37
+#: users/models.py:10
+msgid "Funder"
+msgstr "Financiador"
+
+#: jobs/models.py:110
+msgid "Payment ID"
+msgstr ""
+
+#: jobs/models.py:111
+msgid "Interledger payment ID for contract/escrow"
+msgstr ""
+
+#: jobs/models.py:117
+msgid "Maximum Responses"
+msgstr ""
+
+#: jobs/models.py:118
+msgid ""
+"Number of responses/submissions needed for this job (e.g., if you want 20 "
+"people to do the same voice or picture set)"
+msgstr ""
+
+#: jobs/models.py:124 templates/jobs/create_job.html:130
+#: templates/jobs/edit_job.html:145
+msgid "Recruit Limit"
+msgstr "Límite de Reclutamiento"
+
+#: jobs/models.py:125 templates/jobs/create_job.html:132
+#: templates/jobs/edit_job.html:147
+msgid ""
+"Maximum number of applications to accept before automatically moving to "
+"selection phase"
+msgstr "Número máximo de solicitudes para aceptar antes de pasar automáticamente a la fase de selección"
+
+#: jobs/models.py:130
+msgid "Recruit Deadline"
+msgstr ""
+
+#: jobs/models.py:131
+msgid ""
+"Date and time when recruiting will automatically end and move to selection "
+"phase (default: 7 days from creation)"
+msgstr ""
+
+#: jobs/models.py:137 templates/jobs/create_job.html:142
+#: templates/jobs/edit_job.html:157
+msgid "Submit Limit"
+msgstr "Límite de Envío"
+
+#: jobs/models.py:138 templates/jobs/create_job.html:144
+#: templates/jobs/edit_job.html:159
+msgid ""
+"Maximum number of submissions to accept before automatically moving to "
+"review phase"
+msgstr "Número máximo de envíos para aceptar antes de pasar automáticamente a la fase de revisión"
+
+#: jobs/models.py:143
+msgid "Submit Deadline"
+msgstr ""
+
+#: jobs/models.py:144
+msgid ""
+"Date and time when submitting will automatically end and move to review "
+"phase (default: 7 days from when submitting phase starts)"
+msgstr ""
+
+#: jobs/models.py:148
+msgid "Submit Deadline Days"
+msgstr ""
+
+#: jobs/models.py:149
+msgid ""
+"Number of days from when submitting phase starts until deadline (used to "
+"calculate submit_deadline when job transitions to submitting state)"
+msgstr ""
+
+#: jobs/models.py:155
+msgid "Expired Date"
+msgstr ""
+
+#: jobs/models.py:156
+msgid ""
+"Date and time when the job will expire if no applications (in recruiting) or "
+"no submissions (in submitting) are received. Wallet contracts expire 7 days "
+"after this date."
+msgstr ""
+
+#: jobs/models.py:163 jobs/models.py:335 jobs/models.py:422
+msgid "Job"
+msgstr ""
+
+#: jobs/models.py:164
+msgid "Jobs"
+msgstr ""
+
+#: jobs/models.py:327 templates/jobs/accepted_jobs.html:16
+msgid "Accepted"
+msgstr "Aceptado"
+
+#: jobs/models.py:342 templates/users/register.html:38 users/models.py:11
+msgid "Creator"
+msgstr "Creador"
+
+#: jobs/models.py:347 templates/jobs/submit_job.html:53
+msgid "Note"
+msgstr ""
+
+#: jobs/models.py:348
+msgid "Additional notes about the submission"
+msgstr ""
+
+#: jobs/models.py:356 templates/jobs/submit_job.html:60
+msgid "Text File"
+msgstr ""
+
+#: jobs/models.py:362 templates/jobs/submit_job.html:63
+msgid "Video File"
+msgstr ""
+
+#: jobs/models.py:374 templates/jobs/submit_job.html:102
+msgid "Image File"
+msgstr ""
+
+#: jobs/models.py:388
+msgid "Job Submission"
+msgstr ""
+
+#: jobs/models.py:389
+msgid "Job Submissions"
+msgstr ""
+
+#: jobs/models.py:397
+msgid "Work Complete"
+msgstr ""
+
+#: jobs/models.py:398
+msgid "Whether the creator has marked their work as complete"
+msgstr ""
+
+#: jobs/models.py:404
+msgid "Completed At"
+msgstr ""
+
+#: jobs/models.py:405
+msgid "When the creator marked their work as complete"
+msgstr ""
+
+#: jobs/models.py:414
+msgid "Selected"
+msgstr "Seleccionado"
+
+#: jobs/models.py:429
+msgid "Applicant"
+msgstr ""
+
+#: jobs/models.py:434 templates/jobs/apply_to_job.html:34
+#: templates/jobs/view_applications.html:64 users/forms.py:62
+#: users/models.py:43
+msgid "Profile Note"
+msgstr "Nota de Perfil"
+
+#: jobs/models.py:435
+msgid "Tell the job owner about yourself and why you are interested"
+msgstr "Cu?ntale al due?o del trabajo sobre ti y por qu? est?s interesado"
+
+#: jobs/models.py:443 users/models.py:51
+msgid "Profile Audio"
+msgstr "Audio de Perfil"
+
+#: jobs/models.py:444 users/forms.py:79 users/models.py:52
+msgid "Optional audio introduction"
+msgstr "Introducción de audio opcional"
+
+#: jobs/models.py:450 users/models.py:59
+msgid "Profile Video"
+msgstr "Video de Perfil"
+
+#: jobs/models.py:451 users/forms.py:89 users/models.py:60
+msgid "Optional video introduction"
+msgstr "Introducción de video opcional"
+
+#: jobs/models.py:457 users/models.py:67
+msgid "Profile Image"
+msgstr "Imagen de Perfil"
+
+#: jobs/models.py:458 users/forms.py:99 users/models.py:68
+msgid "Optional profile image"
+msgstr "Imagen de perfil opcional"
+
+#: jobs/models.py:472
+msgid "Job Application"
+msgstr ""
+
+#: jobs/models.py:473
+msgid "Job Applications"
+msgstr ""
+
+#: jobs/views.py:167 jobs/views.py:879
+msgid "You do not have permission to view this page."
+msgstr "No tienes permiso para ver esta página."
+
+#: jobs/views.py:225
+msgid "You do not have permission to create jobs."
+msgstr "No tienes permiso para crear trabajos."
+
+#: jobs/views.py:254 jobs/views.py:460
+msgid "Please provide at least a title for the draft."
+msgstr "Por favor proporciona al menos un título para el borrador."
+
+#: jobs/views.py:328
+msgid "Draft saved successfully! You can edit and publish it later."
+msgstr "¡Borrador guardado exitosamente! Puedes editarlo y publicarlo más tarde."
+
+#: jobs/views.py:331 jobs/views.py:543
+#, python-brace-format
+msgid "Invalid numeric value: {error}"
+msgstr "Valor numérico inválido: {error}"
+
+#: jobs/views.py:333 jobs/views.py:545
+#, python-brace-format
+msgid "Error saving draft: {error}"
+msgstr "Error al guardar borrador: {error}"
+
+#: jobs/views.py:337 jobs/views.py:549
+msgid "Please select at least one deliverable type."
+msgstr "Por favor selecciona al menos un tipo de entregable."
+
+#: jobs/views.py:411
+msgid "Job created successfully! It will be published for recruiting."
+msgstr "¡Trabajo creado exitosamente! Se publicará para reclutamiento."
+
+#: jobs/views.py:414 jobs/views.py:632
+msgid "Invalid amount per person."
+msgstr "Cantidad por persona inválida."
+
+#: jobs/views.py:416
+#, python-brace-format
+msgid "Error creating job: {error}"
+msgstr "Error al crear trabajo: {error}"
+
+#: jobs/views.py:418
+msgid "Please fill in all required fields."
+msgstr "Por favor completa todos los campos requeridos."
+
+#: jobs/views.py:430
+msgid "This job cannot be edited in its current state."
+msgstr "Este trabajo no puede ser editado en su estado actual."
+
+#: jobs/views.py:540
+msgid "Draft saved successfully!"
+msgstr "¡Borrador guardado exitosamente!"
+
+#: jobs/views.py:629
+msgid "Job published successfully! It is now available for recruiting."
+msgstr "¡Trabajo publicado exitosamente! Ahora está disponible para reclutamiento."
+
+#: jobs/views.py:634
+#, python-brace-format
+msgid "Error publishing job: {error}"
+msgstr "Error al publicar trabajo: {error}"
+
+#: jobs/views.py:636
+msgid "Please fill in all required fields to publish."
+msgstr "Por favor completa todos los campos requeridos para publicar."
+
+#: jobs/views.py:638
+msgid "Invalid action."
+msgstr "Acción inválida."
+
+#: jobs/views.py:680 templates/jobs/job_detail.html:125
+msgid "This job has been completed and is no longer accepting submissions."
+msgstr "Este trabajo ha sido completado y ya no acepta envíos."
+
+#: jobs/views.py:685
+msgid "This job is not currently accepting submissions."
+msgstr "Este trabajo no está aceptando envíos actualmente."
+
+#: jobs/views.py:690
+msgid ""
+"This job has reached its submission limit or deadline. Submissions are no "
+"longer being accepted."
+msgstr "Este trabajo ha alcanzado su límite de envío o fecha límite. Ya no se aceptan envíos."
+
+#: jobs/views.py:696 templates/jobs/job_detail.html:98
+msgid ""
+"You have already submitted work for this job. You can only submit once per "
+"job."
+msgstr "Ya has enviado trabajo para este trabajo. Solo puedes enviar una vez por trabajo."
+
+#: jobs/views.py:701
+#, python-brace-format
+msgid ""
+"This job has reached its maximum number of responses ({max}). No more "
+"submissions are being accepted."
+msgstr "Este trabajo ha alcanzado su número máximo de respuestas ({max}). Ya no se aceptan más envíos."
+
+#: jobs/views.py:782
+msgid "Submission created successfully!"
+msgstr "¡Envío creado exitosamente!"
+
+#: jobs/views.py:795
+msgid "This submission is already accepted."
+msgstr "Este envío ya está aceptado."
+
+#: jobs/views.py:800
+#, python-brace-format
+msgid ""
+"This job has reached its maximum number of responses ({max}). Cannot accept "
+"more submissions."
+msgstr "Este trabajo ha alcanzado su número máximo de respuestas ({max}). No se pueden aceptar más envíos."
+
+#: jobs/views.py:830
+#, python-brace-format
+msgid "Submission accepted! ({accepted}/{max} responses)"
+msgstr "¡Envío aceptado! ({accepted}/{max} respuestas)"
+
+#: jobs/views.py:932
+msgid "This job is already marked as completed."
+msgstr "Este trabajo ya está marcado como completado."
+
+#: jobs/views.py:936
+msgid "You need at least one accepted submission before completing a job."
+msgstr "Necesitas al menos un envío aceptado antes de completar un trabajo."
+
+#: jobs/views.py:941
+msgid "Job marked as completed."
+msgstr "Trabajo marcado como completado."
+
+#: jobs/views.py:953
+msgid "You have already applied to this job."
+msgstr "Ya has aplicado a este trabajo."
+
+#: jobs/views.py:958
+msgid "You cannot apply to your own job."
+msgstr "No puedes aplicar a tu propio trabajo."
+
+#: jobs/views.py:963
+msgid "This job is not currently accepting applications."
+msgstr "Este trabajo no está aceptando solicitudes actualmente."
+
+#: jobs/views.py:988
+msgid ""
+"Your application has been submitted! The job has reached its recruit limit "
+"and moved to selection phase."
+msgstr "¡Tu solicitud ha sido enviada! El trabajo ha alcanzado su límite de reclutamiento y pasó a la fase de selección."
+
+#: jobs/views.py:990
+msgid "Your application has been submitted! The job owner will review it."
+msgstr "¡Tu solicitud ha sido enviada! El propietario del trabajo la revisará."
+
+#: jobs/views.py:1029
+msgid "Application selected."
+msgstr "Solicitud seleccionada."
+
+#: jobs/views.py:1033
+msgid "Application rejected."
+msgstr "Solicitud rechazada."
+
+#: jobs/views.py:1037
+msgid "Application status reset to pending."
+msgstr "Estado de solicitud restablecido a pendiente."
+
+#: jobs/views.py:1050
+msgid ""
+"You need to select at least one applicant before creating pre-approved "
+"payments."
+msgstr "Necesitas seleccionar al menos un solicitante antes de crear pagos pre-aprobados."
+
+#: jobs/views.py:1054
+msgid ""
+"Pre-approved payment functionality is coming soon. This will allow you to "
+"create payment authorizations for selected workers."
+msgstr "La funcionalidad de pago pre-aprobado estará disponible pronto. Esto te permitirá crear autorizaciones de pago para trabajadores seleccionados."
+
+#: jobs/views.py:1066
+msgid "You can only mark accepted submissions as complete."
+msgstr "Solo puedes marcar envíos aceptados como completos."
+
+#: jobs/views.py:1074
+msgid "Your work has been marked as complete!"
+msgstr "¡Tu trabajo ha sido marcado como completo!"
+
+#: jobs/views.py:1107
+msgid ""
+"?Gracias! Tu audio se subi? correctamente. El equipo lo revisar? antes de "
+"publicarlo."
+msgstr ""
+
+#: jobs/views.py:1113
+msgid ""
+"Gracias por tu inter?s en fondear este audio. Conectaremos los pagos de 10 "
+"pesos muy pronto."
+msgstr ""
+
+#: templates/audio/audio_player.html:16
+#, python-format
+msgid "Play audio for %(field)s in %(lang)s"
+msgstr ""
+
+#: templates/audio/audio_player.html:19 templates/jobs/apply_to_job.html:73
+#: templates/jobs/dashboard.html:491
+msgid "Listen"
+msgstr "Escuchar"
+
+#: templates/audio/audio_player.html:25
+#, python-format
+msgid "Audio player for %(field)s in %(lang)s"
+msgstr ""
+
+#: templates/audio/audio_player.html:28 templates/audio/audio_player.html:49
+#: templates/jobs/job_detail.html:40 templates/jobs/submit_job.html:27
+#: templates/jobs/view_applications.html:77
+msgid "Your browser does not support the audio element."
+msgstr "Tu navegador no soporta el elemento de audio."
+
+#: templates/audio/audio_player.html:30 templates/audio/audio_player.html:51
+msgid "Close audio player"
+msgstr "Cerrar reproductor de audio"
+
+#: templates/audio/audio_player.html:36
+#, python-format
+msgid "Play fallback audio for %(field)s in %(lang)s"
+msgstr ""
+
+#: templates/audio/audio_player.html:39
+msgid "Listen (Fallback)"
+msgstr ""
+
+#: templates/audio/audio_player.html:46
+#, python-format
+msgid "Fallback audio player for %(field)s in %(lang)s"
+msgstr ""
+
+#: templates/audio/audio_player.html:56
+#, python-format
+msgid "Request audio for %(field)s in %(lang)s"
+msgstr ""
+
+#: templates/audio/audio_player.html:59 templates/audio/audio_player.html:146
+msgid "Request audio"
+msgstr "Solicitar audio"
+
+#: templates/audio/audio_player.html:84
+msgid "Error loading audio. Please try again."
+msgstr "Error al cargar audio. Por favor intenta de nuevo."
+
+#: templates/audio/audio_player.html:114
+msgid "Requesting..."
+msgstr "Solicitando..."
+
+#: templates/audio/audio_player.html:133
+msgid "Thank you! Your request has been submitted."
+msgstr "¡Gracias! Tu solicitud ha sido enviada."
+
+#: templates/audio/audio_player.html:142
+msgid "Sorry, there was an error submitting your request. Please try again."
+msgstr "Lo siento, hubo un error al enviar tu solicitud. Por favor intenta de nuevo."
+
+#: templates/base.html:7
+msgid "Interledger-powered marketplace for native language jobs"
+msgstr ""
+
+#: templates/base.html:8
+msgid "Marketplace"
+msgstr ""
+
+#: templates/base.html:421
+msgid "Skip to main content"
+msgstr ""
+
+#: templates/base.html:424 templates/jobs/dashboard.html:211
+msgid "Main navigation"
+msgstr ""
+
+#: templates/base.html:426
+msgid "Home"
+msgstr "Inicio"
+
+#: templates/base.html:427
+msgid "MP"
+msgstr ""
+
+#: templates/base.html:430
+msgid "Toggle menu"
+msgstr ""
+
+#: templates/base.html:438 templates/jobs/job_list.html:4
+msgid "Browse Jobs"
+msgstr "Explorar Trabajos"
+
+#: templates/base.html:441 templates/jobs/create_job.html:4
+#: templates/jobs/create_job.html:215
+msgid "Create Job"
+msgstr "Crear Trabajo"
+
+#: templates/base.html:442 templates/jobs/my_jobs.html:4
+msgid "My Jobs"
+msgstr "Mis Trabajos"
+
+#: templates/base.html:445 templates/jobs/accepted_jobs.html:4
+#: templates/jobs/my_money.html:33
+msgid "Accepted Jobs"
+msgstr "Trabajos Aceptados"
+
+#: templates/base.html:447 templates/users/profile.html:4
+msgid "Profile"
+msgstr "Perfil"
+
+#: templates/base.html:448
+msgid "Logout"
+msgstr "Cerrar Sesión"
+
+#: templates/base.html:450 templates/jobs/job_detail.html:143
+#: templates/users/login.html:4 templates/users/login.html:7
+#: templates/users/login.html:23
+msgid "Login"
+msgstr "Iniciar Sesión"
+
+#: templates/base.html:451
+msgid "Register as Creator"
+msgstr ""
+
+#: templates/base.html:452
+msgid "Register as Doer"
+msgstr ""
+
+#: templates/base.html:459
+msgid "Select language"
+msgstr "Seleccionar idioma"
+
+#: templates/base.html:473
+msgid "Text stays in Spanish while audio plays in your selected language."
+msgstr ""
+
+#: templates/base.html:492
+msgid "Interledger Marketplace - Supporting Native Languages"
+msgstr "Mercado Interledger - Apoyando Idiomas Nativos"
+
+#: templates/jobs/accepted_jobs.html:7
+msgid "My Accepted Jobs"
+msgstr "Mis Trabajos Aceptados"
+
+#: templates/jobs/accepted_jobs.html:10
+msgid "Accepted job submissions"
+msgstr "Envíos de trabajos aceptados"
+
+#: templates/jobs/accepted_jobs.html:18
+msgid "Your Note"
+msgstr "Tu Nota"
+
+#: templates/jobs/accepted_jobs.html:20
+#: templates/jobs/view_applications.html:13
+msgid "View Job"
+msgstr "Ver Trabajo"
+
+#: templates/jobs/accepted_jobs.html:26
+msgid "You have no accepted jobs yet."
+msgstr "Aún no tienes trabajos aceptados."
+
+#: templates/jobs/accepted_jobs.html:27
+msgid "Browse Available Jobs"
+msgstr "Explorar Trabajos Disponibles"
+
+#: templates/jobs/apply_to_job.html:4 templates/jobs/apply_to_job.html:11
+msgid "Apply to Job"
+msgstr "Aplicar al Trabajo"
+
+#: templates/jobs/apply_to_job.html:17 templates/jobs/submit_job.html:16
+msgid "Required Deliverables"
+msgstr "Entregables Requeridos"
+
+#: templates/jobs/apply_to_job.html:22
+msgid "Submit Your Profile"
+msgstr "Envía Tu Perfil"
+
+#: templates/jobs/apply_to_job.html:23
+msgid ""
+"Tell the job owner about yourself and why you are interested in this job. "
+"You can include audio, video, or image files to introduce yourself."
+msgstr "Cuéntale al propietario del trabajo sobre ti y por qué estás interesado en este trabajo. Puedes incluir archivos de audio, video o imagen para presentarte."
+
+#: templates/jobs/apply_to_job.html:26
+msgid "Auto-fill from profile"
+msgstr "Completar automáticamente desde el perfil"
+
+#: templates/jobs/apply_to_job.html:26
+msgid ""
+"Your profile information has been pre-filled below. You can edit it or leave "
+"it as is. If you don\\"
+msgstr ""
+
+#: templates/jobs/apply_to_job.html:42 users/forms.py:73
+msgid "Profile Audio (Optional)"
+msgstr "Audio de Perfil (Opcional)"
+
+#: templates/jobs/apply_to_job.html:45 templates/jobs/create_job.html:169
+#: templates/jobs/edit_job.html:199 templates/jobs/submit_job.html:72
+msgid "Start recording"
+msgstr "Comenzar grabación"
+
+#: templates/jobs/apply_to_job.html:47 templates/jobs/create_job.html:171
+#: templates/jobs/edit_job.html:201 templates/jobs/submit_job.html:74
+msgid "Record Audio"
+msgstr "Grabar Audio"
+
+#: templates/jobs/apply_to_job.html:49 templates/jobs/create_job.html:173
+#: templates/jobs/edit_job.html:203 templates/jobs/submit_job.html:76
+msgid "Record again"
+msgstr "Grabar de nuevo"
+
+#: templates/jobs/apply_to_job.html:51 templates/jobs/create_job.html:175
+#: templates/jobs/edit_job.html:205 templates/jobs/submit_job.html:78
+msgid "Record Again"
+msgstr "Grabar de Nuevo"
+
+#: templates/jobs/apply_to_job.html:53 templates/jobs/create_job.html:177
+#: templates/jobs/edit_job.html:207 templates/jobs/submit_job.html:80
+msgid "Stop recording"
+msgstr "Detener grabación"
+
+#: templates/jobs/apply_to_job.html:55 templates/jobs/create_job.html:179
+#: templates/jobs/edit_job.html:209 templates/jobs/submit_job.html:82
+msgid "Stop"
+msgstr "Detener"
+
+#: templates/jobs/apply_to_job.html:57 templates/jobs/create_job.html:181
+#: templates/jobs/edit_job.html:211 templates/jobs/submit_job.html:84
+msgid "Cancel recording"
+msgstr "Cancelar grabación"
+
+#: templates/jobs/apply_to_job.html:59 templates/jobs/apply_to_job.html:108
+#: templates/jobs/create_job.html:183 templates/jobs/edit_job.html:213
+#: templates/jobs/edit_job.html:250 templates/jobs/submit_job.html:86
+#: templates/jobs/submit_job.html:112
+msgid "Cancel"
+msgstr "Cancelar"
+
+#: templates/jobs/apply_to_job.html:71 templates/jobs/create_job.html:195
+#: templates/jobs/edit_job.html:225 templates/jobs/submit_job.html:98
+msgid "Or upload an audio file:"
+msgstr "O sube un archivo de audio:"
+
+#: templates/jobs/apply_to_job.html:73
+msgid "Leave empty to use your profile audio:"
+msgstr "Deja vacío para usar tu audio de perfil:"
+
+#: templates/jobs/apply_to_job.html:83 users/forms.py:83
+msgid "Profile Video (Optional)"
+msgstr "Video de Perfil (Opcional)"
+
+#: templates/jobs/apply_to_job.html:86 templates/jobs/submit_job.html:66
+msgid "Record with your camera or upload an existing video."
+msgstr "Graba con tu cámara o sube un video existente."
+
+#: templates/jobs/apply_to_job.html:94 users/forms.py:93
+msgid "Profile Image (Optional)"
+msgstr "Imagen de Perfil (Opcional)"
+
+#: templates/jobs/apply_to_job.html:97 templates/jobs/submit_job.html:105
+msgid "Take a quick photo or upload an existing image."
+msgstr "Toma una foto rápida o sube una imagen existente."
+
+#: templates/jobs/apply_to_job.html:99
+msgid "Leave empty to use your profile image:"
+msgstr "Deja vacío para usar tu imagen de perfil:"
+
+#: templates/jobs/apply_to_job.html:99 templates/jobs/view_applications.html:92
+msgid "Profile image"
+msgstr "Imagen de perfil"
+
+#: templates/jobs/apply_to_job.html:107
+msgid "Submit Application"
+msgstr "Enviar Solicitud"
+
+#: templates/jobs/audio_support.html:18
+msgid "Fondear esta grabaci?n"
+msgstr ""
+
+#: templates/jobs/audio_support.html:20
+#, python-format
+msgid "Puedes comprometer  %(amount)s pesos para que grabemos este audio."
+msgstr ""
+
+#: templates/jobs/audio_support.html:25
+#, python-format
+msgid "Fondear con %(amount)s pesos"
+msgstr ""
+
+#: templates/jobs/audio_support.html:28
+msgid ""
+"A?n estamos conectando los pagos. Guardaremos tu intenci?n para avisarte "
+"cuando est? listo."
+msgstr ""
+
+#: templates/jobs/audio_support.html:33
+msgid "Esta secci?n ya est? financiada. Puedes ayudar subiendo audio."
+msgstr ""
+
+#: templates/jobs/audio_support.html:39
+msgid "Subir audio comunitario"
+msgstr ""
+
+#: templates/jobs/audio_support.html:40
+msgid ""
+"Graba un mensaje corto (menos de 30 segundos) explicando el bot?n y s?belo "
+"aqu?. Puedes grabar directamente desde tu navegador o subir un archivo de "
+"audio."
+msgstr ""
+
+#: templates/jobs/audio_support.html:43
+msgid "Idioma requerido"
+msgstr ""
+
+#: templates/jobs/audio_support.html:45
+msgid "Este audio debe estar en el idioma especificado arriba."
+msgstr ""
+
+#: templates/jobs/audio_support.html:63
+msgid "O graba directamente usando los controles de arriba"
+msgstr ""
+
+#: templates/jobs/audio_support.html:77
+msgid "Enviar audio"
+msgstr ""
+
+#: templates/jobs/create_job.html:53
+msgid "Create New Job"
+msgstr "Crear Nuevo Trabajo"
+
+#: templates/jobs/create_job.html:106 templates/jobs/edit_job.html:121
+msgid "Select one or more deliverable types for this job"
+msgstr "Selecciona uno o más tipos de entregables para este trabajo"
+
+#: templates/jobs/create_job.html:110 templates/jobs/edit_job.html:125
+msgid "Amount Per Person (ILP)"
+msgstr ""
+
+#: templates/jobs/create_job.html:112 templates/jobs/edit_job.html:127
+msgid "How much you will pay each person who completes this job"
+msgstr "Cuánto pagarás a cada persona que complete este trabajo"
+
+#: templates/jobs/create_job.html:116 templates/jobs/edit_job.html:131
+msgid "Number of Responses Needed"
+msgstr "Número de Respuestas Necesarias"
+
+#: templates/jobs/create_job.html:118 templates/jobs/edit_job.html:133
+msgid ""
+"How many people should submit work for this job? (e.g., if you want 20 "
+"people to do the same voice or picture set, enter 20)"
+msgstr "¿Cuántas personas deben enviar trabajo para este trabajo? (ej., si quieres que 20 personas hagan el mismo conjunto de voz o imagen, ingresa 20)"
+
+#: templates/jobs/create_job.html:122 templates/jobs/edit_job.html:137
+#: templates/jobs/job_detail.html:18 templates/jobs/job_list.html:155
+msgid "Total Budget"
+msgstr "Presupuesto Total"
+
+#: templates/jobs/create_job.html:126 templates/jobs/edit_job.html:141
+msgid "Total amount needed: Amount per person ? Number of responses"
+msgstr "Cantidad total necesaria: Cantidad por persona × Número de respuestas"
+
+#: templates/jobs/create_job.html:136 templates/jobs/edit_job.html:151
+msgid "Recruit Deadline (Days)"
+msgstr "Fecha Límite de Reclutamiento (Días)"
+
+#: templates/jobs/create_job.html:138 templates/jobs/edit_job.html:153
+msgid ""
+"Number of days from now when recruiting will automatically end and move to "
+"selection phase"
+msgstr "Número de días desde ahora cuando el reclutamiento terminará automáticamente y pasará a la fase de selección"
+
+#: templates/jobs/create_job.html:148 templates/jobs/edit_job.html:163
+msgid "Submit Deadline (Days)"
+msgstr "Fecha Límite de Envío (Días)"
+
+#: templates/jobs/create_job.html:150 templates/jobs/edit_job.html:165
+msgid ""
+"Number of days from when submitting phase starts until deadline (when job "
+"transitions to submitting state)"
+msgstr "Número de días desde que comienza la fase de envío hasta la fecha límite (cuando el trabajo pasa al estado de envío)"
+
+#: templates/jobs/create_job.html:154 templates/jobs/edit_job.html:169
+msgid "Expired Date (Days)"
+msgstr "Fecha de Expiración (Días)"
+
+#: templates/jobs/create_job.html:156 templates/jobs/edit_job.html:171
+msgid ""
+"Number of days from now when the job will expire if no applications (in "
+"recruiting) or no submissions (in submitting) are received. Wallet contracts "
+"expire 7 days after this date."
+msgstr "Número de días desde ahora cuando el trabajo expirará si no se reciben solicitudes (en reclutamiento) o envíos (en envío). Los contratos de billetera expiran 7 días después de esta fecha."
+
+#: templates/jobs/create_job.html:160 templates/jobs/edit_job.html:175
+msgid "Optional reference media"
+msgstr "Medios de referencia opcionales"
+
+#: templates/jobs/create_job.html:161 templates/jobs/edit_job.html:176
+msgid ""
+"Record audio or upload photos/videos so creators understand what you need "
+"even if they do not read the description."
+msgstr "Graba audio o sube fotos/videos para que los creadores entiendan lo que necesitas incluso si no leen la descripción."
+
+#: templates/jobs/create_job.html:166 templates/jobs/edit_job.html:196
+#: templates/jobs/job_detail.html:38 templates/jobs/submit_job.html:25
+msgid "Audio instructions"
+msgstr "Instrucciones de audio"
+
+#: templates/jobs/create_job.html:201 templates/jobs/edit_job.html:231
+#: templates/jobs/job_detail.html:46 templates/jobs/submit_job.html:33
+msgid "Video reference"
+msgstr "Referencia de video"
+
+#: templates/jobs/create_job.html:203 templates/jobs/edit_job.html:233
+msgid "Record with your camera or upload an existing clip."
+msgstr "Graba con tu cámara o sube un clip existente."
+
+#: templates/jobs/create_job.html:207 templates/jobs/edit_job.html:237
+#: templates/jobs/job_detail.html:54 templates/jobs/submit_job.html:41
+msgid "Image reference"
+msgstr "Referencia de imagen"
+
+#: templates/jobs/create_job.html:209 templates/jobs/edit_job.html:239
+msgid "Take a quick photo or upload inspiration images."
+msgstr "Toma una foto rápida o sube imágenes de inspiración."
+
+#: templates/jobs/create_job.html:214
+msgid "Save as Draft"
+msgstr "Guardar como Borrador"
+
+#: templates/jobs/dashboard.html:4 templates/jobs/dashboard.html:209
+msgid "Dashboard"
+msgstr "Panel de Control"
+
+#: templates/jobs/dashboard.html:213
+msgid "Post Job"
+msgstr "Publicar Trabajo"
+
+#: templates/jobs/dashboard.html:215 templates/jobs/dashboard.html:218
+msgid "Job Post"
+msgstr "Publicación de Trabajo"
+
+#: templates/jobs/dashboard.html:235
+msgid "Manage My Jobs"
+msgstr "Administrar Mis Trabajos"
+
+#: templates/jobs/dashboard.html:238
+msgid "My Job Dashboard"
+msgstr "Mi Panel de Control de Trabajos"
+
+#: templates/jobs/dashboard.html:244 templates/jobs/dashboard.html:246
+#: templates/jobs/dashboard.html:249 templates/jobs/my_products.html:4
+#: templates/jobs/my_products.html:8
+msgid "My Products"
+msgstr "Mis Productos"
+
+#: templates/jobs/dashboard.html:265 templates/jobs/dashboard.html:267
+#: templates/jobs/dashboard.html:270 templates/jobs/my_money.html:4
+#: templates/jobs/my_money.html:8
+msgid "My Money"
+msgstr ""
+
+#: templates/jobs/dashboard.html:287 templates/jobs/pending_jobs.html:4
+msgid "Pending Jobs"
+msgstr "Trabajos Pendientes"
+
+#: templates/jobs/dashboard.html:289 templates/jobs/dashboard.html:292
+#: templates/jobs/pending_jobs.html:8
+msgid "My Pending to Finish Jobs"
+msgstr "Mis Trabajos Pendientes por Terminar"
+
+#: templates/jobs/dashboard.html:309 templates/jobs/dashboard.html:311
+#: templates/jobs/dashboard.html:314 templates/jobs/filler_page_1.html:4
+#: templates/jobs/filler_page_1.html:8
+msgid "Page 1"
+msgstr "Página 1"
+
+#: templates/jobs/dashboard.html:330 templates/jobs/dashboard.html:332
+#: templates/jobs/dashboard.html:335 templates/jobs/filler_page_2.html:4
+#: templates/jobs/filler_page_2.html:8
+msgid "Page 2"
+msgstr "Página 2"
+
+#: templates/jobs/dashboard.html:417
+msgid "Close"
+msgstr "Cerrar"
+
+#: templates/jobs/dashboard.html:492
+msgid "Play audio"
+msgstr "Reproducir audio"
+
+#: templates/jobs/edit_job.html:4 templates/jobs/edit_job.html:64
+msgid "Edit Job"
+msgstr "Editar Trabajo"
+
+#: templates/jobs/edit_job.html:178
+msgid "Current files:"
+msgstr "Archivos actuales:"
+
+#: templates/jobs/edit_job.html:181 templates/jobs/edit_job.html:184
+#: templates/jobs/edit_job.html:187
+msgid "View"
+msgstr "Ver"
+
+#: templates/jobs/edit_job.html:190
+msgid "Upload new files to replace existing ones."
+msgstr "Sube nuevos archivos para reemplazar los existentes."
+
+#: templates/jobs/edit_job.html:244
+msgid "Save Draft"
+msgstr "Guardar Borrador"
+
+#: templates/jobs/edit_job.html:246
+msgid "Publish Job"
+msgstr "Publicar Trabajo"
+
+#: templates/jobs/edit_job.html:248
+msgid "Update Job"
+msgstr "Actualizar Trabajo"
+
+#: templates/jobs/filler_page_1.html:9 templates/jobs/filler_page_2.html:9
+msgid "This is a placeholder page."
+msgstr "Esta es una página de marcador de posición."
+
+#: templates/jobs/job_detail.html:15 templates/jobs/job_list.html:152
+msgid "Dialect"
+msgstr "Dialecto"
+
+#: templates/jobs/job_detail.html:20
+msgid "Responses Needed"
+msgstr "Respuestas Necesarias"
+
+#: templates/jobs/job_detail.html:21
+#: templates/jobs/job_owner_dashboard.html:176
+msgid "accepted"
+msgstr "aceptadas"
+
+#: templates/jobs/job_detail.html:23
+msgid "Still accepting submissions"
+msgstr "Aún aceptando envíos"
+
+#: templates/jobs/job_detail.html:30
+#: templates/jobs/job_owner_dashboard.html:132
+#: templates/jobs/job_owner_dashboard.html:163
+msgid "Created"
+msgstr "Creado"
+
+#: templates/jobs/job_detail.html:34 templates/jobs/submit_job.html:21
+msgid "Reference Media From Funder"
+msgstr "Medios de Referencia del Financiador"
+
+#: templates/jobs/job_detail.html:35
+msgid "Use these examples to better understand the request."
+msgstr "Usa estos ejemplos para entender mejor la solicitud."
+
+#: templates/jobs/job_detail.html:48 templates/jobs/submit_job.html:35
+#: templates/jobs/view_applications.html:85
+msgid "Your browser does not support the video element."
+msgstr "Tu navegador no soporta el elemento de video."
+
+#: templates/jobs/job_detail.html:55 templates/jobs/submit_job.html:42
+msgid "Reference image for this job"
+msgstr "Imagen de referencia para este trabajo"
+
+#: templates/jobs/job_detail.html:70 templates/jobs/job_list.html:164
+#: templates/jobs/job_owner_dashboard.html:198 templates/jobs/my_jobs.html:35
+msgid "Submissions"
+msgstr "Envíos"
+
+#: templates/jobs/job_detail.html:78
+msgid "Accept"
+msgstr "Aceptar"
+
+#: templates/jobs/job_detail.html:87
+#: templates/jobs/job_owner_dashboard.html:242
+#: templates/jobs/job_owner_dashboard.html:245
+msgid "No submissions yet."
+msgstr "Aún no hay envíos."
+
+#: templates/jobs/job_detail.html:94
+#, python-format
+msgid ""
+"This job has reached its maximum number of responses (%(max)s). No more "
+"submissions are being accepted."
+msgstr "Este trabajo ha alcanzado su número máximo de respuestas (%(max)s). Ya no se aceptan más envíos."
+
+#: templates/jobs/job_detail.html:102
+msgid "Ready to Submit Work?"
+msgstr "¿Listo para Enviar Trabajo?"
+
+#: templates/jobs/job_detail.html:103
+msgid "This job is accepting submissions. Click below to submit your work."
+msgstr "Este trabajo está aceptando envíos. Haz clic abajo para enviar tu trabajo."
+
+#: templates/jobs/job_detail.html:105
+msgid "Submit Work for This Job"
+msgstr "Enviar Trabajo para Este Trabajo"
+
+#: templates/jobs/job_detail.html:112
+msgid "Interested in This Job?"
+msgstr "¿Interesado en Este Trabajo?"
+
+#: templates/jobs/job_detail.html:113
+msgid ""
+"Submit your profile to apply for this job. The job owner will review "
+"applications and select workers."
+msgstr "Envía tu perfil para aplicar a este trabajo. El propietario del trabajo revisará las solicitudes y seleccionará trabajadores."
+
+#: templates/jobs/job_detail.html:115
+msgid "Apply to This Job"
+msgstr "Aplicar a Este Trabajo"
+
+#: templates/jobs/job_detail.html:121
+msgid ""
+"This job is waiting for the funder to review submissions. No additional "
+"submissions are being accepted right now."
+msgstr "Este trabajo está esperando que el financiador revise los envíos. No se aceptan envíos adicionales en este momento."
+
+#: templates/jobs/job_detail.html:131
+msgid "Your Submissions"
+msgstr "Tus Envíos"
+
+#: templates/jobs/job_detail.html:143
+msgid "to submit work for this job."
+msgstr "para enviar trabajo para este trabajo."
+
+#: templates/jobs/job_list.html:80
+msgid "Available Jobs"
+msgstr "Trabajos Disponibles"
+
+#: templates/jobs/job_list.html:84
+msgid "Jobs Waiting for Your Submission"
+msgstr "Trabajos Esperando Tu Envío"
+
+#: templates/jobs/job_list.html:85
+msgid "You\\"
+msgstr ""
+
+#: templates/jobs/job_list.html:86
+msgid "Jobs waiting for submission"
+msgstr "Trabajos esperando envío"
+
+#: templates/jobs/job_list.html:90 templates/jobs/job_list.html:150
+msgid "Language"
+msgstr "Idioma"
+
+#: templates/jobs/job_list.html:93
+msgid "Submit Work Now"
+msgstr "Enviar Trabajo Ahora"
+
+#: templates/jobs/job_list.html:103
+msgid "Search Jobs"
+msgstr "Buscar Trabajos"
+
+#: templates/jobs/job_list.html:104
+msgid "Search by title or description..."
+msgstr "Buscar por título o descripción..."
+
+#: templates/jobs/job_list.html:107
+msgid "Filter by Language"
+msgstr "Filtrar por Idioma"
+
+#: templates/jobs/job_list.html:109
+msgid "All Languages"
+msgstr "Todos los Idiomas"
+
+#: templates/jobs/job_list.html:121
+msgid "Filter Options"
+msgstr "Opciones de Filtro"
+
+#: templates/jobs/job_list.html:125
+msgid "Hide jobs I\\"
+msgstr ""
+
+#: templates/jobs/job_list.html:131 templates/jobs/my_jobs.html:24
+msgid "Filter"
+msgstr "Filtrar"
+
+#: templates/jobs/job_list.html:136
+msgid "Job listings"
+msgstr "Listados de trabajos"
+
+#: templates/jobs/job_list.html:142 templates/jobs/view_applications.html:25
+msgid "Applied"
+msgstr "Aplicado"
+
+#: templates/jobs/job_list.html:145
+msgid "About to Start"
+msgstr "A punto de Empezar"
+
+#: templates/jobs/job_list.html:160
+msgid "Applications"
+msgstr "Solicitudes"
+
+#: templates/jobs/job_list.html:168
+msgid "Deliverables"
+msgstr "Entregables"
+
+#: templates/jobs/job_list.html:170 templates/jobs/my_jobs.html:36
+msgid "View Details"
+msgstr "Ver Detalles"
+
+#: templates/jobs/job_list.html:177
+msgid "No jobs available at the moment."
+msgstr ""
+
+#: templates/jobs/job_owner_dashboard.html:4
+#: templates/jobs/job_owner_dashboard.html:115
+msgid "Job Owner Dashboard"
+msgstr "Panel de Control del Propietario del Trabajo"
+
+#: templates/jobs/job_owner_dashboard.html:116
+msgid ""
+"Review progress, download deliverables, and mark jobs as complete once you "
+"are satisfied."
+msgstr "Revisa el progreso, descarga entregables y marca trabajos como completos una vez que estés satisfecho."
+
+#: templates/jobs/job_owner_dashboard.html:120
+msgid "You have not created any jobs yet."
+msgstr "Aún no has creado ningún trabajo."
+
+#: templates/jobs/job_owner_dashboard.html:121
+msgid "Create a Job"
+msgstr "Crear un Trabajo"
+
+#: templates/jobs/job_owner_dashboard.html:125
+msgid "Drafts"
+msgstr "Borradores"
+
+#: templates/jobs/job_owner_dashboard.html:147
+msgid "Edit Draft"
+msgstr "Editar Borrador"
+
+#: templates/jobs/job_owner_dashboard.html:148
+msgid "Preview"
+msgstr "Vista Previa"
+
+#: templates/jobs/job_owner_dashboard.html:156
+msgid "Published Jobs"
+msgstr "Trabajos Publicados"
+
+#: templates/jobs/job_owner_dashboard.html:176
+msgid "Progress"
+msgstr "Progreso"
+
+#: templates/jobs/job_owner_dashboard.html:177
+msgid "Pending reviews"
+msgstr "Revisiones pendientes"
+
+#: templates/jobs/job_owner_dashboard.html:178
+msgid "Total submissions"
+msgstr "Total de envíos"
+
+#: templates/jobs/job_owner_dashboard.html:183
+msgid "View public page"
+msgstr "Ver página pública"
+
+#: templates/jobs/job_owner_dashboard.html:185
+msgid "Edit"
+msgstr "Editar"
+
+#: templates/jobs/job_owner_dashboard.html:190
+msgid "Mark job completed"
+msgstr "Marcar trabajo como completado"
+
+#: templates/jobs/job_owner_dashboard.html:193
+msgid "Job is completed"
+msgstr "El trabajo está completado"
+
+#: templates/jobs/job_owner_dashboard.html:218
+msgid "Download text"
+msgstr "Descargar texto"
+
+#: templates/jobs/job_owner_dashboard.html:223
+msgid "Download audio"
+msgstr "Descargar audio"
+
+#: templates/jobs/job_owner_dashboard.html:228
+msgid "Download video"
+msgstr "Descargar video"
+
+#: templates/jobs/job_owner_dashboard.html:233
+msgid "Download image"
+msgstr "Descargar imagen"
+
+#: templates/jobs/job_owner_dashboard.html:238
+msgid "No files attached."
+msgstr "No hay archivos adjuntos."
+
+#: templates/jobs/my_jobs.html:7
+msgid "My Posted Jobs"
+msgstr "Mis Trabajos Publicados"
+
+#: templates/jobs/my_jobs.html:12
+msgid "Filter by Status"
+msgstr "Filtrar por Estado"
+
+#: templates/jobs/my_jobs.html:14
+msgid "All Statuses"
+msgstr "Todos los Estados"
+
+#: templates/jobs/my_jobs.html:29
+msgid "My job listings"
+msgstr "Mis listados de trabajos"
+
+#: templates/jobs/my_jobs.html:42
+msgid "You have not posted any jobs yet."
+msgstr "Aún no has publicado ningún trabajo."
+
+#: templates/jobs/my_jobs.html:43
+msgid "Create Your First Job"
+msgstr "Crea Tu Primer Trabajo"
+
+#: templates/jobs/my_money.html:12 users/forms.py:20
+msgid "Wallet Endpoint"
+msgstr "Endpoint de Billetera"
+
+#: templates/jobs/my_money.html:18
+msgid "Total Earned"
+msgstr "Total Ganado"
+
+#: templates/jobs/my_money.html:23
+msgid "Total Spent"
+msgstr "Total Gastado"
+
+#: templates/jobs/my_money.html:28
+msgid "Balance"
+msgstr "Saldo"
+
+#: templates/jobs/my_products.html:9
+msgid "This page will display your products and services."
+msgstr "Esta página mostrará tus productos y servicios."
+
+#: templates/jobs/my_products.html:10
+msgid "Coming soon..."
+msgstr "Próximamente..."
+
+#: templates/jobs/pending_jobs.html:23
+msgid "No pending jobs to finish."
+msgstr "No hay trabajos pendientes por terminar."
+
+#: templates/jobs/submit_job.html:4
+msgid "Submit Work"
+msgstr "Enviar Trabajo"
+
+#: templates/jobs/submit_job.html:11
+msgid "Submit Work for"
+msgstr "Enviar Trabajo para"
+
+#: templates/jobs/submit_job.html:22
+msgid "Review these examples before submitting your work."
+msgstr "Revisa estos ejemplos antes de enviar tu trabajo."
+
+#: templates/jobs/submit_job.html:54
+msgid "Additional information about your submission..."
+msgstr "Información adicional sobre tu envío..."
+
+#: templates/jobs/submit_job.html:111
+msgid "Submit"
+msgstr "Enviar"
+
+#: templates/jobs/view_applications.html:4
+msgid "View Applications"
+msgstr "Ver Solicitudes"
+
+#: templates/jobs/view_applications.html:7
+msgid "Applications for"
+msgstr "Solicitudes para"
+
+#: templates/jobs/view_applications.html:11
+msgid "Selected Applicants"
+msgstr "Solicitantes Seleccionados"
+
+#: templates/jobs/view_applications.html:12
+msgid "Total Applications"
+msgstr "Total de Solicitudes"
+
+#: templates/jobs/view_applications.html:18
+msgid "All Applications"
+msgstr "Todas las Solicitudes"
+
+#: templates/jobs/view_applications.html:39
+msgid "Select"
+msgstr "Seleccionar"
+
+#: templates/jobs/view_applications.html:44
+msgid "Reject"
+msgstr "Rechazar"
+
+#: templates/jobs/view_applications.html:50
+#: templates/jobs/view_applications.html:56
+msgid "Reset to Pending"
+msgstr "Restablecer a Pendiente"
+
+#: templates/jobs/view_applications.html:71
+msgid "Profile Media"
+msgstr "Medios de Perfil"
+
+#: templates/jobs/view_applications.html:104
+msgid "Pre-approve Payments"
+msgstr "Pre-aprobar Pagos"
+
+#: templates/jobs/view_applications.html:105
+msgid "You have selected"
+msgstr "Has seleccionado"
+
+#: templates/jobs/view_applications.html:105
+msgid "applicant(s). Click below to create pre-approved payments for them."
+msgstr "solicitante(s). Haz clic abajo para crear pagos pre-aprobados para ellos."
+
+#: templates/jobs/view_applications.html:108
+msgid "Create Pre-approved Payments"
+msgstr "Crear Pagos Pre-aprobados"
+
+#: templates/jobs/view_applications.html:111
+msgid ""
+"Note: This functionality is coming soon. It will allow you to create payment "
+"authorizations for selected workers."
+msgstr "Nota: Esta funcionalidad estará disponible pronto. Te permitirá crear autorizaciones de pago para trabajadores seleccionados."
+
+#: templates/jobs/view_applications.html:117
+msgid "No applications yet."
+msgstr "Aún no hay solicitudes."
+
+#: templates/users/login.html:14 templates/users/profile.html:29
+#: templates/users/register.html:14 templates/users/register_creator.html:16
+#: templates/users/register_doer.html:16
+msgid "Username"
+msgstr "Nombre de Usuario"
+
+#: templates/users/login.html:19 templates/users/register.html:24
+#: templates/users/register_creator.html:26
+#: templates/users/register_doer.html:26
+msgid "Password"
+msgstr "Contraseña"
+
+#: templates/users/login.html:25
+msgid "Don\\"
+msgstr ""
+
+#: templates/users/login.html:26 templates/users/register_creator.html:4
+#: templates/users/register_creator.html:7
+#: templates/users/register_creator.html:35
+msgid "Register as Job Creator"
+msgstr "Registrarse como Creador de Trabajos"
+
+#: templates/users/login.html:27 templates/users/register_doer.html:4
+#: templates/users/register_doer.html:7 templates/users/register_doer.html:35
+msgid "Register as Job Doer"
+msgstr "Registrarse como Trabajador"
+
+#: templates/users/profile.html:11
+msgid "My Profile"
+msgstr "Mi Perfil"
+
+#: templates/users/profile.html:23
+msgid "Profile Information"
+msgstr "Información del Perfil"
+
+#: templates/users/profile.html:31
+msgid "Username cannot be changed"
+msgstr "El nombre de usuario no puede ser cambiado"
+
+#: templates/users/profile.html:117
+msgid "Update Profile"
+msgstr "Actualizar Perfil"
+
+#: templates/users/profile.html:123 templates/users/profile.html:178
+msgid "Change Password"
+msgstr "Cambiar Contraseña"
+
+#: templates/users/register.html:4 templates/users/register.html:7
+#: templates/users/register.html:42
+msgid "Register"
+msgstr "Registrarse"
+
+#: templates/users/register.html:19 templates/users/register_creator.html:21
+#: templates/users/register_doer.html:21 users/forms.py:11
+msgid "Email"
+msgstr "Correo Electrónico"
+
+#: templates/users/register.html:29 templates/users/register_creator.html:31
+#: templates/users/register_doer.html:31
+msgid "Confirm Password"
+msgstr "Confirmar Contraseña"
+
+#: templates/users/register.html:34 users/forms.py:55
+msgid "Role"
+msgstr "Rol"
+
+#: templates/users/register.html:36
+msgid "Both (Funder & Creator)"
+msgstr "Ambos (Financiador y Creador)"
+
+#: templates/users/register.html:43 templates/users/register_creator.html:37
+#: templates/users/register_doer.html:37
+msgid "Already have an account? Login here."
+msgstr "¿Ya tienes una cuenta? Inicia sesión aquí."
+
+#: templates/users/register_creator.html:10
+msgid "Create jobs and find talented workers to complete them."
+msgstr "Crea trabajos y encuentra trabajadores talentosos para completarlos."
+
+#: templates/users/register_creator.html:38
+msgid "Looking to do jobs instead? Register as Job Doer"
+msgstr "¿Buscas hacer trabajos en su lugar? Regístrate como Trabajador"
+
+#: templates/users/register_doer.html:10
+msgid "Find jobs and get paid for completing them."
+msgstr "Encuentra trabajos y recibe pago por completarlos."
+
+#: templates/users/register_doer.html:38
+msgid "Looking to create jobs instead? Register as Job Creator"
+msgstr "¿Buscas crear trabajos en su lugar? Regístrate como Creador de Trabajos"
+
+#: users/forms.py:15
+msgid "your.email@example.com"
+msgstr "tu.correo@ejemplo.com"
+
+#: users/forms.py:25 users/models.py:25
+msgid "Interledger wallet endpoint"
+msgstr "Endpoint de billetera Interledger"
+
+#: users/forms.py:27
+msgid "Your Interledger wallet endpoint URL"
+msgstr "URL del endpoint de tu billetera Interledger"
+
+#: users/forms.py:31
+msgid "Preferred Language"
+msgstr "Idioma Preferido"
+
+#: users/forms.py:44
+msgid "Native Languages"
+msgstr "Idiomas Nativos"
+
+#: users/forms.py:49
+msgid "Comma-separated: nahuatl, otomi"
+msgstr "Separados por comas: nahuatl, otomi"
+
+#: users/forms.py:51
+msgid "List languages you can work in (comma-separated)"
+msgstr "Lista los idiomas en los que puedes trabajar (separados por comas)"
+
+#: users/forms.py:58
+msgid "Your role in the marketplace"
+msgstr "Tu rol en el mercado"
+
+#: users/forms.py:67
+msgid "Tell job owners about yourself and why you are interested..."
+msgstr "Cuéntales a los propietarios de trabajos sobre ti y por qué estás interesado..."
+
+#: users/forms.py:69
+msgid "This will be used to auto-fill your job applications"
+msgstr "Esto se usará para completar automáticamente tus solicitudes de trabajo"
+
+#: users/forms.py:114
+msgid "This email is already in use."
+msgstr "Este correo electrónico ya está en uso."
+
+#: users/forms.py:122
+msgid "Current Password"
+msgstr "Contraseña Actual"
+
+#: users/forms.py:131
+msgid "New Password"
+msgstr "Nueva Contraseña"
+
+#: users/forms.py:141
+msgid "Confirm New Password"
+msgstr "Confirmar Nueva Contraseña"
+
+#: users/forms.py:157
+msgid "Your current password is incorrect."
+msgstr "Tu contraseña actual es incorrecta."
+
+#: users/forms.py:167
+msgid "The two password fields didn't match."
+msgstr "Los dos campos de contraseña no coinciden."
+
+#: users/models.py:12
+msgid "Both"
+msgstr "Ambos"
+
+#: users/models.py:19
+msgid "User role: funder creates jobs, creator accepts jobs"
+msgstr ""
+
+#: users/models.py:31
+msgid "Preferred language for interface"
+msgstr ""
+
+#: users/models.py:37
+msgid "Comma-separated list of native languages (e.g., nahuatl, otomi)"
+msgstr ""
+
+#: users/models.py:44
+msgid "Tell job owners about yourself and why you are interested"
+msgstr ""
+
+#: users/models.py:75
+msgid "User"
+msgstr ""
+
+#: users/models.py:76
+msgid "Users"
+msgstr ""
+
+#: users/views.py:20 users/views.py:49 users/views.py:78
+msgid "Passwords do not match."
+msgstr "Las contraseñas no coinciden."
+
+#: users/views.py:24 users/views.py:53 users/views.py:82
+msgid "Username already exists."
+msgstr "El nombre de usuario ya existe."
+
+#: users/views.py:34
+msgid "Registration successful!"
+msgstr "¡Registro exitoso!"
+
+#: users/views.py:63
+msgid "Registration successful! Welcome, job creator!"
+msgstr "¡Registro exitoso! ¡Bienvenido, creador de trabajos!"
+
+#: users/views.py:92
+msgid "Registration successful! Welcome, job doer!"
+msgstr "¡Registro exitoso! ¡Bienvenido, trabajador!"
+
+#: users/views.py:111
+msgid "Profile updated successfully!"
+msgstr "¡Perfil actualizado exitosamente!"
+
+#: users/views.py:118
+msgid "Password changed successfully!"
+msgstr "¡Contraseña cambiada exitosamente!"

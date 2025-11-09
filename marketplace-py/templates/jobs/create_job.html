@@ -50,7 +50,8 @@
 {% endblock %}
 
 {% block content %}
-<h1>{% trans 'Create New Job' %}</h1>
+{% load audio_tags %}
+{% include 'components/static_title_with_audio.html' with title_text="Create New Job" slug="page_create_job" heading_tag="h1" %}
 
 <div class="card">
     <form method="post" enctype="multipart/form-data">

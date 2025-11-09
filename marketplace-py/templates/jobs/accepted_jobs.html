@@ -4,13 +4,14 @@
 {% block title %}{% trans 'Accepted Jobs' %} - {{ block.super }}{% endblock %}
 
 {% block content %}
-<h1>{% trans 'My Accepted Jobs' %}</h1>
+{% load audio_tags %}
+{% include 'components/static_title_with_audio.html' with title_text="My Accepted Jobs" slug="page_my_accepted_jobs" heading_tag="h1" %}
 
 {% if accepted_submissions %}
     <div role="list" aria-label="{% trans 'Accepted job submissions' %}">
         {% for submission in accepted_submissions %}
             <article class="card" role="listitem">
-                <h2><a href="{% url 'jobs:detail' submission.job.pk %}">{{ submission.job.title }}</a></h2>
+                {% include 'components/title_with_audio.html' with title=submission.job.title content_object=submission.job field_name="title" heading_tag="h2" link_url_name="jobs:detail" link_url_arg=submission.job.pk %}
                 <p><strong>{% trans 'Funder' %}:</strong> {{ submission.job.funder.username }}</p>
                 <p><strong>{% trans 'Budget' %}:</strong> {{ submission.job.budget }} ILP</p>
                 <p><strong>{% trans 'Accepted' %}:</strong> {{ submission.created_at|date:"F d, Y" }}</p>

@@ -272,3 +272,56 @@ class AudioContribution(models.Model):
 
     def __str__(self):
         return f"Contribution for {self.target_slug} ({self.language_code})"
+
+
+class StaticUIElement(models.Model):
+    """
+    Represents a static UI element (dashboard item, form label, button, etc.)
+    that can have audio translations.
+    """
+    slug = models.CharField(
+        max_length=100,
+        unique=True,
+        verbose_name=_('Slug'),
+        help_text=_('Unique identifier for this UI element (e.g., "dashboard_my_money", "form_password")')
+    )
+    label_es = models.CharField(
+        max_length=255,
+        verbose_name=_('Spanish Label'),
+        help_text=_('The Spanish text that appears in the UI')
+    )
+    label_en = models.CharField(
+        max_length=255,
+        blank=True,
+        verbose_name=_('English Label'),
+        help_text=_('Optional English translation')
+    )
+    description = models.TextField(
+        blank=True,
+        verbose_name=_('Description'),
+        help_text=_('Description of what this UI element is')
+    )
+    category = models.CharField(
+        max_length=50,
+        choices=[
+            ('dashboard', _('Dashboard')),
+            ('form', _('Form Field')),
+            ('button', _('Button')),
+            ('navigation', _('Navigation')),
+            ('message', _('Message')),
+            ('other', _('Other')),
+        ],
+        default='other',
+        verbose_name=_('Category')
+    )
+    
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        verbose_name = _('Static UI Element')
+        verbose_name_plural = _('Static UI Elements')
+        ordering = ['category', 'slug']
+    
+    def __str__(self):
+        return f"{self.slug} ({self.label_es})"

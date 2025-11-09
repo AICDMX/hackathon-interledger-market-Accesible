@@ -4,7 +4,10 @@
 {% block title %}{% trans 'View Applications' %} - {{ block.super }}{% endblock %}
 
 {% block content %}
-<h1>{% trans 'Applications for' %}: {{ job.title }}</h1>
+{% load audio_tags %}
+{% include 'components/static_title_with_audio.html' with title_text="Applications for" slug="page_view_applications" heading_tag="h1" %}
+<div style="display: inline-block; margin-left: 0.5rem;">{{ job.title }}</div>
+{% audio_player job "title" %}
 
 <div class="card">
     <p><strong>{% trans 'Status' %}:</strong> {{ job.get_status_display }}</p>
@@ -15,7 +18,8 @@
 
 {% if applications %}
     <div style="margin-top: 1.5rem;">
-        <h2>{% trans 'All Applications' %}</h2>
+        {% load audio_tags %}
+        {% include 'components/static_title_with_audio.html' with title_text="All Applications" slug="section_all_applications" heading_tag="h2" %}
         {% for application in applications %}
             <div class="card" style="margin-top: 1rem; border-left: 4px solid {% if application.status == 'selected' %}#10b981{% elif application.status == 'rejected' %}#ef4444{% else %}#f59e0b{% endif %};">
                 <div style="display: flex; justify-content: space-between; align-items: start; flex-wrap: wrap; gap: 1rem;">
@@ -101,7 +105,8 @@
     
     {% if selected_count > 0 %}
         <div class="card" style="margin-top: 1.5rem; background-color: #f0fdf4; border: 2px solid #10b981;">
-            <h2>{% trans 'Pre-approve Payments' %}</h2>
+            {% load audio_tags %}
+            {% include 'components/static_title_with_audio.html' with title_text="Pre-approve Payments" slug="section_pre_approve_payments" heading_tag="h2" %}
             <p>{% trans 'You have selected' %} {{ selected_count }} {% trans 'applicant(s). Click below to create pre-approved payments for them.' %}</p>
             <form method="post" action="{% url 'jobs:pre_approve_payments' job.pk %}">
                 {% csrf_token %}

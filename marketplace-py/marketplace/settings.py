@@ -128,7 +128,7 @@ LANGUAGES = [
     ('en', 'English'),
     ('es', 'Spanish'),
     ('nah', 'Nahuatl'),
-    ('oto', 'Otomi'),
+    ('oto', 'Otomi (?uhu)'),
     ('maz', 'Mazahua'),
     ('que', 'Quechua'),
 ]
@@ -206,6 +206,16 @@ AUDIO_CACHE_TIMEOUT = 300  # 5 minutes
 # This file will be used when audio snippets are not available
 # Format: MP3 is recommended for widest browser support
 AUDIO_FALLBACK_FILE = 'audio/fallback.mp3'  # Path relative to static files
+
+# Language-specific fallback audio files
+# Maps language codes to fallback audio file paths (relative to STATIC_URL)
+AUDIO_FALLBACK_BY_LANGUAGE = {
+    'oto': 'audio/fallback-oto.mp3',  # Otomi-specific fallback
+    # Add more language-specific fallbacks here as needed
+    # 'nah': 'audio/fallback-nah.mp3',
+    # 'maz': 'audio/fallback-maz.mp3',
+    # 'que': 'audio/fallback-que.mp3',
+}
 
 # Payments service configuration
 PAYMENTS_SERVICE_URL = os.environ.get('PAYMENTS_SERVICE_URL', 'http://payments:3000')

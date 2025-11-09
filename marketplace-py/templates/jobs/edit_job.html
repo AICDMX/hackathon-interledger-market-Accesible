@@ -61,7 +61,8 @@
 {% endblock %}
 
 {% block content %}
-<h1>{% trans 'Edit Job' %}</h1>
+{% load audio_tags %}
+{% include 'components/static_title_with_audio.html' with title_text="Edit Job" slug="page_edit_job" heading_tag="h1" %}
 
 {% if job.status == 'draft' %}
     <div class="draft-badge">{% trans 'Draft' %}</div>

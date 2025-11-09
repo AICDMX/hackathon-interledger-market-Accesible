@@ -41,9 +41,10 @@ def job_list(request):
     jobs = Job.objects.filter(status__in=['recruiting', 'open', 'submitting']).order_by('-created_at')
     
     # Annotate with counts for applications and submissions
+    # For submissions, count only pending and accepted (not rejected) since those count toward the goal
     jobs = jobs.annotate(
         applications_count=Count('applications', distinct=True),
-        submissions_count=Count('submissions', distinct=True),
+        submissions_count=Count('submissions', filter=Q(submissions__status__in=['pending', 'accepted']), distinct=True),
     )
     
     # Filter by language if provided
@@ -738,36 +739,38 @@ def submit_job(request, pk):
         
         # Save files as profile defaults if they're empty
         # Copy files explicitly to ensure they're saved to profile upload paths
-        if 'audio' in deliverable_types and submission.audio_file and not user.profile_audio:
-            # Copy the file content to the profile field
-            submission.audio_file.open('rb')
-            user.profile_audio.save(
-                submission.audio_file.name,
-                ContentFile(submission.audio_file.read()),
-                save=False
-            )
-            submission.audio_file.close()
-            profile_updated = True
-        
-        if 'video' in deliverable_types and submission.video_file and not user.profile_video:
-            submission.video_file.open('rb')
-            user.profile_video.save(
-                submission.video_file.name,
-                ContentFile(submission.video_file.read()),
-                save=False
-            )
-            submission.video_file.close()
-            profile_updated = True
-        
-        if 'image' in deliverable_types and submission.image_file and not user.profile_image:
-            submission.image_file.open('rb')
-            user.profile_image.save(
-                submission.image_file.name,
-                ContentFile(submission.image_file.read()),
-                save=False
-            )
-            submission.image_file.close()
-            profile_updated = True
+        # Use request.FILES directly for better efficiency and reliability
+        try:
+            if 'audio' in deliverable_types and 'audio_file' in request.FILES and not user.profile_audio:
+                audio_file = request.FILES['audio_file']
+                user.profile_audio.save(
+                    audio_file.name,
+                    ContentFile(audio_file.read()),
+                    save=False
+                )
+                profile_updated = True
+            
+            if 'video' in deliverable_types and 'video_file' in request.FILES and not user.profile_video:
+                video_file = request.FILES['video_file']
+                user.profile_video.save(
+                    video_file.name,
+                    ContentFile(video_file.read()),
+                    save=False
+                )
+                profile_updated = True
+            
+            if 'image' in deliverable_types and 'image_file' in request.FILES and not user.profile_image:
+                image_file = request.FILES['image_file']
+                user.profile_image.save(
+                    image_file.name,
+                    ContentFile(image_file.read()),
+                    save=False
+                )
+                profile_updated = True
+        except Exception as e:
+            # Log error but don't fail the submission
+            logger = logging.getLogger(__name__)
+            logger.warning(f"Error saving profile defaults: {e}")
         
         if profile_updated:
             user.save()

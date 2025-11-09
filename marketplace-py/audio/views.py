@@ -144,10 +144,8 @@ class AudioSnippetViewSet(viewsets.ModelViewSet):
                 data['fallback_used'] = True
             return Response(data)
         else:
-            # Return fallback audio URL when snippet is not available
-            from django.templatetags.static import static
-            fallback_path = getattr(settings, 'AUDIO_FALLBACK_FILE', 'audio/fallback.mp3')
-            fallback_url = self.request.build_absolute_uri(static(fallback_path))
+            # Return fallback audio URL when snippet is not available (language-specific)
+            fallback_url = get_fallback_audio_url(actual_language_code, self.request)
             
             return Response(
                 {
@@ -339,6 +337,10 @@ def upload_audio_contribution(request):
         )
     except Exception as e:
         return Response(
+            {'error': f'Error uploading audio: {str(e)}'},
+            status=status.HTTP_500_INTERNAL_SERVER_ERROR
+        )
+      return Response(
             {'error': f'Error uploading audio: {str(e)}'},
             status=status.HTTP_500_INTERNAL_SERVER_ERROR
         )

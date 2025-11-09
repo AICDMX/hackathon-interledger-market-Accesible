@@ -33,7 +33,7 @@ class ProfileForm(forms.ModelForm):
             ('en', 'English'),
             ('es', 'Spanish'),
             ('nah', 'Nahuatl'),
-            ('oto', 'Otomi'),
+            ('oto', 'Otomi (?uhu)'),
             ('maz', 'Mazahua'),
             ('que', 'Quechua'),
         ],

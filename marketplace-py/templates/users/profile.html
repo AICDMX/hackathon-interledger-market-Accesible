@@ -20,7 +20,7 @@
 
 <!-- Profile Information Section -->
 <div class="card">
-    <h2>{% trans 'Profile Information' %}</h2>
+    {% include 'components/static_title_with_audio.html' with title_text="Profile Information" slug="section_profile_information" heading_tag="h2" %}
     <form method="post" enctype="multipart/form-data">
         {% csrf_token %}
         <input type="hidden" name="update_profile" value="1">
@@ -120,7 +120,7 @@
 
 <!-- Password Change Section -->
 <div class="card">
-    <h2>{% trans 'Change Password' %}</h2>
+    {% include 'components/static_title_with_audio.html' with title_text="Change Password" slug="section_change_password" heading_tag="h2" %}
     <form method="post">
         {% csrf_token %}
         <input type="hidden" name="change_password" value="1">

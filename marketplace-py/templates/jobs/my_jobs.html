@@ -4,7 +4,8 @@
 {% block title %}{% trans 'My Jobs' %} - {{ block.super }}{% endblock %}
 
 {% block content %}
-<h1>{% trans 'My Posted Jobs' %}</h1>
+{% load audio_tags %}
+{% include 'components/static_title_with_audio.html' with title_text="My Posted Jobs" slug="page_my_posted_jobs" heading_tag="h1" %}
 
 <div class="card">
     <form method="get" action="{% url 'jobs:my_jobs' %}">
@@ -29,7 +30,7 @@
     <div role="list" aria-label="{% trans 'My job listings' %}">
         {% for job in jobs %}
             <article class="card" role="listitem">
-                <h2><a href="{% url 'jobs:detail' job.pk %}">{{ job.title }}</a></h2>
+                {% include 'components/title_with_audio.html' with title=job.title content_object=job field_name="title" heading_tag="h2" link_url_name="jobs:detail" link_url_arg=job.pk %}
                 <p><strong>{% trans 'Status' %}:</strong> {{ job.get_status_display }}</p>
                 <p><strong>{% trans 'Budget' %}:</strong> {{ job.budget }} ILP</p>
                 <p><strong>{% trans 'Submissions' %}:</strong> {{ job.submissions.count }}</p>

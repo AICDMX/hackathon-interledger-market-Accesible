@@ -4,14 +4,15 @@
 {% block title %}{% trans 'Pending Jobs' %}{% endblock %}
 
 {% block content %}
+{% load audio_tags %}
 <div class="card">
-    <h2>{% trans 'My Pending to Finish Jobs' %}</h2>
+    {% include 'components/static_title_with_audio.html' with title_text="My Pending to Finish Jobs" slug="page_pending_jobs" heading_tag="h2" %}
     
     {% if pending_jobs %}
     <ul>
         {% for submission in pending_jobs %}
         <li class="card" style="margin-bottom: 1rem;">
-            <h3><a href="{% url 'jobs:detail' pk=submission.job.pk %}">{{ submission.job.title }}</a></h3>
+            {% include 'components/title_with_audio.html' with title=submission.job.title content_object=submission.job field_name="title" heading_tag="h3" link_url_name="jobs:detail" link_url_arg=submission.job.pk %}
             <p>{{ submission.job.description|truncatewords:30 }}</p>
             <p><strong>{% trans 'Budget' %}:</strong> {{ submission.job.budget|floatformat:2 }} ILP</p>
             <p><strong>{% trans 'Status' %}:</strong> {{ submission.job.get_status_display }}</p>

@@ -39,3 +39,6 @@
 [x] add a demo users list where the json 
 [x] make it so the defualt jobs are in diffrent job states from the docs/job-states file. we dont need expired. just the usefull states. 
 [x] all the stuff in apply should exsist in profile and auto fill from profile
+[x] browser jobs dashboard should show how many have been submited of workers or if in works submit stage it should show how many of needed have been submited. it should also have some tags. applied would be good. or about to start when its like 48 hours or less be for deadline
+[x] lots of things missing spanish translation. can we get that added to the forms and such. 
+[x] anyplace we have titles we want to start having the speaker button so we can read out the thing in the native langauge selected

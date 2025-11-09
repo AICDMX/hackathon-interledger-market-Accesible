@@ -6,7 +6,7 @@ from django.db import models
 from django.utils.translation import gettext_lazy as _
 from django.core.cache import cache
 from django.conf import settings
-from .models import AudioSnippet, AudioRequest
+from .models import AudioSnippet, AudioRequest, StaticUIElement
 
 
 class AudioMixin:
@@ -260,3 +260,65 @@ def get_audio_with_fallback(content_object, target_field, preferred_language_cod
     
     # No audio found in any language
     return None, fallback_chain[0] if fallback_chain else settings.LANGUAGE_CODE
+
+
+def get_fallback_audio_url(language_code=None, request=None):
+    """
+    Get the fallback audio URL for a given language.
+    
+    Args:
+        language_code: Language code (e.g., 'oto', 'nah'). If None, uses generic fallback.
+        request: Django request object (optional, for building absolute URLs)
+    
+    Returns:
+        URL string for the fallback audio file
+    """
+    from django.templatetags.static import static
+    from django.contrib.staticfiles.storage import staticfiles_storage
+    
+    # Get language-specific fallback if available
+    fallback_by_language = getattr(settings, 'AUDIO_FALLBACK_BY_LANGUAGE', {})
+    fallback_path = fallback_by_language.get(language_code) if language_code else None
+    
+    # If no language-specific fallback, use generic one
+    if not fallback_path:
+        fallback_path = getattr(settings, 'AUDIO_FALLBACK_FILE', 'audio/fallback.mp3')
+    
+    # Build URL
+    if request:
+        return request.build_absolute_uri(staticfiles_storage.url(fallback_path))
+    else:
+        return static(fallback_path)
+
+
+def get_audio_for_static_ui(slug, target_field='label', language_code=None, preferred_language_code=None, status='ready', use_cache=True):
+    """
+    Get audio snippet for a static UI element by slug.
+    
+    Args:
+        slug: The slug identifier for the UI element (e.g., 'dashboard_my_money')
+        target_field: The target field name (default: 'label')
+        language_code: Specific language code (if provided, uses that directly)
+        preferred_language_code: User's preferred language (used for fallback if language_code not provided)
+        status: Filter by status (default: 'ready')
+        use_cache: Whether to use cache (default: True)
+    
+    Returns:
+        AudioSnippet instance or None (or tuple with language_code if preferred_language_code provided)
+    """
+    try:
+        ui_element = StaticUIElement.objects.get(slug=slug)
+    except StaticUIElement.DoesNotExist:
+        return None if not preferred_language_code else (None, None)
+    
+    content_type = ContentType.objects.get_for_model(StaticUIElement)
+    
+    if language_code:
+        # Use specific language code
+        return get_audio_for_content(ui_element, target_field, language_code, status, use_cache)
+    elif preferred_language_code:
+        # Use fallback chain
+        return get_audio_with_fallback(ui_element, target_field, preferred_language_code, status, use_cache)
+    else:
+        # Try with fallback chain using settings
+        return get_audio_with_fallback(ui_element, target_field, None, status, use_cache)

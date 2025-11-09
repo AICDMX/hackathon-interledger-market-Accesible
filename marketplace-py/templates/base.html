@@ -65,6 +65,12 @@
             flex-wrap: wrap;
         }
         
+        .nav-links li {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
         .nav-links a {
             color: #fff;
             text-decoration: none;
@@ -435,21 +441,49 @@
                 </span>
             </button>
             <ul class="nav-links" id="nav-links">
-                <li><a href="{% url 'jobs:list' %}">{% trans 'Browse Jobs' %}</a></li>
+                {% load audio_tags %}
+                <li>
+                    <a href="{% url 'jobs:list' %}">{% trans 'Browse Jobs' %}</a>
+                    {% audio_player_static_ui "nav_browse_jobs" "label" %}
+                </li>
                 {% if user.is_authenticated %}
                     {% if user.is_funder %}
-                        <li><a href="{% url 'jobs:create' %}">{% trans 'Create Job' %}</a></li>
-                        <li><a href="{% url 'jobs:my_jobs' %}">{% trans 'My Jobs' %}</a></li>
+                        <li>
+                            <a href="{% url 'jobs:create' %}">{% trans 'Create Job' %}</a>
+                            {% audio_player_static_ui "nav_create_job" "label" %}
+                        </li>
+                        <li>
+                            <a href="{% url 'jobs:my_jobs' %}">{% trans 'My Jobs' %}</a>
+                            {% audio_player_static_ui "nav_my_jobs" "label" %}
+                        </li>
                     {% endif %}
                     {% if user.is_creator %}
-                        <li><a href="{% url 'jobs:accepted' %}">{% trans 'Accepted Jobs' %}</a></li>
+                        <li>
+                            <a href="{% url 'jobs:accepted' %}">{% trans 'Accepted Jobs' %}</a>
+                            {% audio_player_static_ui "nav_accepted_jobs" "label" %}
+                        </li>
                     {% endif %}
-                    <li><a href="{% url 'users:profile' %}">{% trans 'Profile' %}</a></li>
-                    <li><a href="{% url 'users:logout' %}">{% trans 'Logout' %}</a></li>
+                    <li>
+                        <a href="{% url 'users:profile' %}">{% trans 'Profile' %}</a>
+                        {% audio_player_static_ui "nav_profile" "label" %}
+                    </li>
+                    <li>
+                        <a href="{% url 'users:logout' %}">{% trans 'Logout' %}</a>
+                        {% audio_player_static_ui "nav_logout" "label" %}
+                    </li>
                 {% else %}
-                    <li><a href="{% url 'users:login' %}">{% trans 'Login' %}</a></li>
-                    <li><a href="{% url 'users:register_creator' %}">{% trans 'Register as Creator' %}</a></li>
-                    <li><a href="{% url 'users:register_doer' %}">{% trans 'Register as Doer' %}</a></li>
+                    <li>
+                        <a href="{% url 'users:login' %}">{% trans 'Login' %}</a>
+                        {% audio_player_static_ui "nav_login" "label" %}
+                    </li>
+                    <li>
+                        <a href="{% url 'users:register_creator' %}">{% trans 'Register as Creator' %}</a>
+                        {% audio_player_static_ui "nav_register_creator" "label" %}
+                    </li>
+                    <li>
+                        <a href="{% url 'users:register_doer' %}">{% trans 'Register as Doer' %}</a>
+                        {% audio_player_static_ui "nav_register_doer" "label" %}
+                    </li>
                 {% endif %}
             </ul>
             <div class="language-selector">

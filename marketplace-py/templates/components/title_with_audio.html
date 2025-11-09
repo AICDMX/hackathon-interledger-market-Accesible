@@ -1,0 +1,33 @@
+{% load i18n audio_tags %}
+{% comment %}
+Reusable component for displaying a title with an audio speaker button.
+Usage: {% include 'components/title_with_audio.html' with title=job.title content_object=job field_name="title" heading_tag="h1" %}
+Or with link: {% include 'components/title_with_audio.html' with title=job.title content_object=job field_name="title" heading_tag="h2" link_url_name="jobs:detail" link_url_arg=job.pk %}
+Parameters:
+- title: The text to display as the title
+- content_object: The model instance (e.g., job object)
+- field_name: The field name for audio lookup (default: "title")
+- heading_tag: HTML heading tag to use (h1, h2, h3, etc.) - default: "h1"
+- heading_id: Optional ID attribute for the heading tag (for aria-labelledby)
+- link_url: Optional direct URL string to make the title a link
+- link_url_name: Optional URL name (e.g., "jobs:detail") to generate the link
+- link_url_arg: Optional argument for link_url_name (e.g., job.pk)
+- language_code: Optional language code (if not provided, uses user's preferred audio language)
+{% endcomment %}
+
+{% with heading_tag=heading_tag|default:"h1" field_name=field_name|default:"title" %}
+<div class="title-with-audio" style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+    <{{ heading_tag }}{% if heading_id %} id="{{ heading_id }}"{% endif %} style="margin: 0; flex: 1;">
+        {% if link_url %}
+            <a href="{{ link_url }}">{{ title }}</a>
+        {% elif link_url_name %}
+            <a href="{% url link_url_name link_url_arg %}">{{ title }}</a>
+        {% else %}
+            {{ title }}
+        {% endif %}
+    </{{ heading_tag }}>
+    {% if content_object %}
+        {% audio_player content_object field_name language_code %}
+    {% endif %}
+</div>
+{% endwith %}
