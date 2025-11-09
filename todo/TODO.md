@@ -10,4 +10,9 @@ if wallet work is needed make sure to add it todo-wallet.md cause the wallet par
 you can break things up into more tasks in this file. but only do one task at a time. so first mark it p for in progress then create a new job with [] but dont do it. just stop at the part your doing and leave that for later. 
 
 ## jobs
-[P] where we can upload job titles we should have a associated optional upload for the title and that should match the target langague
+[x] where we can upload job titles we should have a associated optional upload for the title and that should match the target langague
+[C] the main dashboard page when your logged in should be the one with all the big icons
+[C] main dashboard goes off the screen on some screen sizes. can we do better?
+[X] i get this error on the docker version Error loading audio: Error: Failed to fetch audio
+    loadAudioPlayer http://127.0.0.1:8000/static/audio/audio-player.js:42
+[C] i see images that still have blank space instead of - can we get that fixed?

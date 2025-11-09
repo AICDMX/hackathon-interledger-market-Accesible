@@ -10,6 +10,9 @@
         margin: 0;
         padding: 1rem;
         min-height: calc(100vh - 200px);
+        box-sizing: border-box;
+        overflow-x: hidden;
+        width: 100%;
     }
 
     .dashboard-grid {
@@ -17,6 +20,8 @@
         grid-template-columns: repeat(2, 1fr);
         gap: 1rem;
         padding: 0;
+        width: 100%;
+        box-sizing: border-box;
     }
 
     .dashboard-icon-card {
@@ -34,6 +39,9 @@
         justify-content: center;
         min-height: 160px;
         border: 2px solid transparent;
+        box-sizing: border-box;
+        width: 100%;
+        overflow: hidden;
     }
 
     .dashboard-icon-card:hover,
@@ -52,6 +60,16 @@
         font-size: 4rem;
         margin-bottom: 0.75rem;
         line-height: 1;
+        width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .dashboard-icon img {
+        max-width: 100%;
+        height: auto;
+        object-fit: contain;
     }
 
         .dashboard-label {
@@ -64,6 +82,10 @@
             justify-content: center;
             gap: 0.5rem;
             flex-wrap: wrap;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+            width: 100%;
+            box-sizing: border-box;
         }
 
         .dashboard-audio-wrapper {
@@ -221,7 +243,7 @@
         {% if user.is_funder %}
         <a href="{% url 'jobs:create' %}" class="dashboard-icon-card" role="gridcell" aria-label="{% trans 'Post Job' %}">
             <div class="dashboard-icon" aria-hidden="true">
-                <img src="/media/available%20jobs.png" alt="{% trans 'Job Post' %}" style="width: 5rem; height: 5rem; object-fit: contain;" loading="lazy" />
+                <img src="/media/available-jobs.png" alt="{% trans 'Job Post' %}" style="width: 5rem; height: 5rem; object-fit: contain;" loading="lazy" />
             </div>
             <p class="dashboard-label">
                 {% trans 'Job Post' %}
@@ -242,7 +264,7 @@
 
         {% if has_posted_jobs %}
         <a href="{% url 'jobs:owner_dashboard' %}" class="dashboard-icon-card" role="gridcell" aria-label="{% trans 'Manage My Jobs' %}">
-            <div class="dashboard-icon" aria-hidden="true">📊</div>
+            <div class="dashboard-icon" aria-hidden="true">??</div>
             <p class="dashboard-label">
                 {% trans 'My Job Dashboard' %}
             </p>
@@ -252,7 +274,7 @@
 
         <a href="{% url 'jobs:my_products' %}" class="dashboard-icon-card" role="gridcell" aria-label="{% trans 'My Products' %}">
             <div class="dashboard-icon" aria-hidden="true">
-                <img src="/media/my%20products.png" alt="{% trans 'My Products' %}" style="width: 5rem; height: 5rem; object-fit: contain;" loading="lazy" />
+                <img src="/media/my-products.png" alt="{% trans 'My Products' %}" style="width: 5rem; height: 5rem; object-fit: contain;" loading="lazy" />
             </div>
             <p class="dashboard-label">
                 {% trans 'My Products' %}
@@ -273,7 +295,7 @@
 
         <a href="{% url 'jobs:my_money' %}" class="dashboard-icon-card" role="gridcell" aria-label="{% trans 'My Money' %}">
             <div class="dashboard-icon" aria-hidden="true">
-                <img src="/media/my%20money.png" alt="{% trans 'My Money' %}" style="width: 5rem; height: 5rem; object-fit: contain;" loading="lazy" />
+                <img src="/media/my-money.png" alt="{% trans 'My Money' %}" loading="lazy" />
             </div>
             <p class="dashboard-label">
                 {% trans 'My Money' %}
@@ -295,7 +317,7 @@
         {% if user.is_creator %}
         <a href="{% url 'jobs:pending_jobs' %}" class="dashboard-icon-card" role="gridcell" aria-label="{% trans 'Pending Jobs' %}">
             <div class="dashboard-icon" aria-hidden="true">
-                <img src="/media/my%20pending%20to%20do%20.png" alt="{% trans 'My Pending to Finish Jobs' %}" style="width: 5rem; height: 5rem; object-fit: contain;" loading="lazy" />
+                <img src="/media/my-pending-to-do.png" alt="{% trans 'My Pending to Finish Jobs' %}" loading="lazy" />
             </div>
             <p class="dashboard-label">
                 {% trans 'My Pending to Finish Jobs' %}
@@ -317,7 +339,7 @@
 
         <a href="{% url 'jobs:filler_1' %}" class="dashboard-icon-card" role="gridcell" aria-label="{% trans 'Page 1' %}">
             <div class="dashboard-icon" aria-hidden="true">
-                <img src="/media/watch%20video.png" alt="{% trans 'Page 1' %}" style="width: 5rem; height: 5rem; object-fit: contain;" loading="lazy" />
+                <img src="/media/watch-video.png" alt="{% trans 'Page 1' %}" style="width: 5rem; height: 5rem; object-fit: contain;" loading="lazy" />
             </div>
             <p class="dashboard-label">
                 {% trans 'Page 1' %}
@@ -338,7 +360,7 @@
 
         <a href="{% url 'jobs:filler_2' %}" class="dashboard-icon-card" role="gridcell" aria-label="{% trans 'Page 2' %}">
             <div class="dashboard-icon" aria-hidden="true">
-                <img src="{{ audio_config.icon_active }}" alt="{% trans 'Page 2' %}" style="width: 5rem; height: 5rem; object-fit: contain;" loading="lazy" />
+                <img src="{{ audio_config.icon_active }}" alt="{% trans 'Page 2' %}" loading="lazy" />
             </div>
             <p class="dashboard-label">
                 {% trans 'Page 2' %}

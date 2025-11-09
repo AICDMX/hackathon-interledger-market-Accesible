@@ -35,6 +35,13 @@ def _build_audio_targets():
     return targets
 
 
+def home(request):
+    """Home page - redirects logged-in users to dashboard, others to job list."""
+    if request.user.is_authenticated:
+        return redirect('jobs:dashboard')
+    return redirect('jobs:list')
+
+
 def job_list(request):
     """List all available jobs."""
     # Show jobs that are recruiting (available for applications) or submitting (in work submission stage)

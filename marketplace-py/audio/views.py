@@ -14,7 +14,7 @@ from django.utils.decorators import method_decorator
 from django.views.decorators.http import require_http_methods
 from .models import AudioSnippet, AudioRequest, AudioContribution
 from .serializers import AudioSnippetSerializer, AudioRequestSerializer, AudioSnippetCreateSerializer
-from .mixins import get_audio_for_content, get_audio_with_fallback
+from .mixins import get_audio_for_content, get_audio_with_fallback, get_fallback_audio_url
 
 
 class AudioSnippetViewSet(viewsets.ModelViewSet):
@@ -82,6 +82,10 @@ class AudioSnippetViewSet(viewsets.ModelViewSet):
         """
         Get a specific audio snippet with language fallback.
         
+        Supports both numeric IDs and slug-based lookups:
+        - Numeric IDs: /api/audio/snippets/get/<content_type_id>/<object_id>/<target_field>/<language_code>/
+        - Slug-based (StaticUIElement): /api/audio/snippets/get/static_ui/<slug>/<target_field>/<language_code>/
+        
         Uses fallback chain:
         1. Requested language_code
         2. Language fallback (FALLBACK_TEXT_LANGUAGE)
@@ -89,28 +93,98 @@ class AudioSnippetViewSet(viewsets.ModelViewSet):
         
         URL: /api/audio/snippets/get/<content_type_id>/<object_id>/<target_field>/<language_code>/
         """
-        try:
-            content_type = ContentType.objects.get(pk=content_type_id)
-        except ContentType.DoesNotExist:
-            return Response(
-                {'error': 'Invalid content_type_id'},
-                status=status.HTTP_400_BAD_REQUEST
-            )
+        from .models import StaticUIElement
         
-        # Get the content object
-        try:
-            model_class = content_type.model_class()
-            if model_class is None:
+        # Handle slug-based lookup for StaticUIElement
+        # If content_type_id is "static_ui" or a non-numeric string, try slug lookup
+        if content_type_id.lower() == 'static_ui' or (not content_type_id.isdigit() and content_type_id.lower() != 'none'):
+            # Try to find StaticUIElement by slug
+            # object_id should be the slug (e.g., "page_2", "dashboard_my_money")
+            ui_element = None
+            slug_candidates = []
+            
+            # If content_type_id is "dashboard" or similar, construct slug from both
+            if content_type_id.lower() == 'dashboard' and object_id:
+                # Try different slug formats
+                slug_candidates = [
+                    object_id,  # Try as-is (e.g., "page_2")
+                    f'dashboard_{object_id}',  # Try with dashboard prefix (e.g., "dashboard_page_2")
+                    f'{content_type_id}_{object_id}',  # Try with content_type prefix
+                ]
+            else:
+                # Use object_id directly as slug
+                slug_candidates = [object_id]
+            
+            # Try each slug candidate
+            for slug in slug_candidates:
+                try:
+                    ui_element = StaticUIElement.objects.get(slug=slug)
+                    break
+                except StaticUIElement.DoesNotExist:
+                    continue
+            
+            if ui_element is None:
+                # StaticUIElement doesn't exist yet - return fallback audio URL
+                # This allows the UI to still play fallback audio while the element is being set up
+                fallback_url = get_fallback_audio_url(language_code, self.request)
                 return Response(
-                    {'error': 'Invalid content type'},
+                    {
+                        'available': False,
+                        'message': f'StaticUIElement with slug "{object_id}" not found. Using fallback audio.',
+                        'fallback_audio_url': fallback_url,
+                        'content_type_id': None,
+                        'object_id': object_id,
+                        'target_field': target_field,
+                        'requested_language_code': language_code,
+                    },
+                    status=status.HTTP_404_NOT_FOUND
+                )
+            
+            try:
+                content_type = ContentType.objects.get_for_model(StaticUIElement)
+                content_object = ui_element
+            except Exception as e:
+                return Response(
+                    {'error': f'Error looking up StaticUIElement: {str(e)}', 'available': False},
                     status=status.HTTP_400_BAD_REQUEST
                 )
-            content_object = model_class.objects.get(pk=object_id)
-        except Exception:
-            return Response(
-                {'error': 'Content object not found'},
-                status=status.HTTP_404_NOT_FOUND
-            )
+        else:
+            # Handle numeric ID lookup
+            # Skip if content_type_id or object_id is None or invalid
+            if content_type_id.lower() == 'none' or object_id.lower() == 'none' or not content_type_id or not object_id:
+                return Response(
+                    {'error': 'Invalid content_type_id or object_id', 'available': False},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+            
+            try:
+                content_type = ContentType.objects.get(pk=content_type_id)
+            except (ContentType.DoesNotExist, ValueError):
+                return Response(
+                    {'error': f'Invalid content_type_id: {content_type_id}', 'available': False},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+            
+            # Get the content object
+            try:
+                model_class = content_type.model_class()
+                if model_class is None:
+                    return Response(
+                        {'error': 'Invalid content type', 'available': False},
+                        status=status.HTTP_400_BAD_REQUEST
+                    )
+                try:
+                    content_object = model_class.objects.get(pk=object_id)
+                except (ValueError, TypeError):
+                    return Response(
+                        {'error': f'Invalid object_id: {object_id}', 'available': False},
+                        status=status.HTTP_400_BAD_REQUEST
+                    )
+            except Exception as e:
+                return Response(
+                    {'error': f'Content object not found: {str(e)}', 'available': False},
+                    status=status.HTTP_404_NOT_FOUND
+                )
         
         # Get user's preferred language from cookie/context
         # This is the language the user wants to hear audio in
@@ -145,7 +219,20 @@ class AudioSnippetViewSet(viewsets.ModelViewSet):
             return Response(data)
         else:
             # Return fallback audio URL when snippet is not available (language-specific)
+            # Return 200 OK since the StaticUIElement exists, just no audio snippet yet
             fallback_url = get_fallback_audio_url(actual_language_code, self.request)
+            
+            # Build fallback chain for debugging info
+            fallback_chain = []
+            preferred_lang = preferred_audio or language_code
+            if preferred_lang:
+                fallback_chain.append(preferred_lang)
+            fallback_language = getattr(settings, 'FALLBACK_TEXT_LANGUAGE', None)
+            if fallback_language and fallback_language not in fallback_chain:
+                fallback_chain.append(fallback_language)
+            final_fallback = settings.LANGUAGE_CODE
+            if final_fallback not in fallback_chain:
+                fallback_chain.append(final_fallback)
             
             return Response(
                 {
@@ -158,7 +245,7 @@ class AudioSnippetViewSet(viewsets.ModelViewSet):
                     'requested_language_code': language_code,
                     'tried_languages': fallback_chain
                 },
-                status=status.HTTP_404_NOT_FOUND
+                status=status.HTTP_200_OK
             )
     
     @action(detail=True, methods=['get'])
