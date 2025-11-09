@@ -20,12 +20,6 @@ class Job(models.Model):
         ('reviewing', _('Reviewing')),
         ('expired', _('Expired')),
         ('complete', _('Complete')),
-        # Legacy statuses kept for backward compatibility
-        ('open', _('Open')),
-        ('in_review', _('In Review')),
-        ('rejected', _('Rejected')),
-        ('waiting_completion', _('Waiting Completion')),
-        ('completed', _('Completed')),
     ]
     
     DELIVERABLE_CHOICES = [

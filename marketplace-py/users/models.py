@@ -37,6 +37,37 @@ class User(AbstractUser):
         help_text=_('Comma-separated list of native languages (e.g., nahuatl, otomi)')
     )
     
+    # Profile fields for job applications
+    profile_note = models.TextField(
+        blank=True,
+        verbose_name=_('Profile Note'),
+        help_text=_('Tell job owners about yourself and why you are interested')
+    )
+    
+    profile_audio = models.FileField(
+        upload_to='profiles/audio/',
+        blank=True,
+        null=True,
+        verbose_name=_('Profile Audio'),
+        help_text=_('Optional audio introduction')
+    )
+    
+    profile_video = models.FileField(
+        upload_to='profiles/video/',
+        blank=True,
+        null=True,
+        verbose_name=_('Profile Video'),
+        help_text=_('Optional video introduction')
+    )
+    
+    profile_image = models.ImageField(
+        upload_to='profiles/images/',
+        blank=True,
+        null=True,
+        verbose_name=_('Profile Image'),
+        help_text=_('Optional profile image')
+    )
+    
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     

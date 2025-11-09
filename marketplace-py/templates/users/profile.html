@@ -1,55 +1,192 @@
 {% extends 'base.html' %}
-{% load i18n %}
+{% load i18n static %}
 
 {% block title %}{% trans 'Profile' %} - {{ block.super }}{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'audio/audio-contribution.css' %}">
+{% endblock %}
 
 {% block content %}
 <h1>{% trans 'My Profile' %}</h1>
 
+{% if messages %}
+<ul class="messages">
+    {% for message in messages %}
+    <li class="{{ message.tags }}">{{ message }}</li>
+    {% endfor %}
+</ul>
+{% endif %}
+
+<!-- Profile Information Section -->
 <div class="card">
-    <form method="post">
+    <h2>{% trans 'Profile Information' %}</h2>
+    <form method="post" enctype="multipart/form-data">
         {% csrf_token %}
+        <input type="hidden" name="update_profile" value="1">
         
         <div class="form-group">
             <label for="username">{% trans 'Username' %}</label>
             <input type="text" id="username" value="{{ user.username }}" disabled>
-            <small>{% trans 'Username cannot be changed' %}</small>
+            <small class="text-muted">{% trans 'Username cannot be changed' %}</small>
         </div>
         
         <div class="form-group">
-            <label for="email">{% trans 'Email' %}</label>
-            <input type="email" id="email" value="{{ user.email }}" disabled>
+            <label for="{{ profile_form.email.id_for_label }}">{{ profile_form.email.label }}</label>
+            {{ profile_form.email }}
+            {% if profile_form.email.errors %}
+                <ul class="errorlist">
+                    {% for error in profile_form.email.errors %}
+                        <li>{{ error }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+            {% if profile_form.email.help_text %}
+                <small class="text-muted">{{ profile_form.email.help_text }}</small>
+            {% endif %}
         </div>
         
         <div class="form-group">
-            <label for="role">{% trans 'Role' %}</label>
-            <input type="text" id="role" value="{{ user.get_role_display }}" disabled>
+            <label for="{{ profile_form.role.id_for_label }}">{{ profile_form.role.label }}</label>
+            {{ profile_form.role }}
+            {% if profile_form.role.errors %}
+                <ul class="errorlist">
+                    {% for error in profile_form.role.errors %}
+                        <li>{{ error }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+            {% if profile_form.role.help_text %}
+                <small class="text-muted">{{ profile_form.role.help_text }}</small>
+            {% endif %}
         </div>
         
         <div class="form-group">
-            <label for="wallet_endpoint">{% trans 'Wallet Endpoint' %}</label>
-            <input type="text" id="wallet_endpoint" name="wallet_endpoint" value="{{ user.wallet_endpoint }}" placeholder="{% trans 'Interledger wallet endpoint' %}">
+            <label for="{{ profile_form.wallet_endpoint.id_for_label }}">{{ profile_form.wallet_endpoint.label }}</label>
+            {{ profile_form.wallet_endpoint }}
+            {% if profile_form.wallet_endpoint.errors %}
+                <ul class="errorlist">
+                    {% for error in profile_form.wallet_endpoint.errors %}
+                        <li>{{ error }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+            {% if profile_form.wallet_endpoint.help_text %}
+                <small class="text-muted">{{ profile_form.wallet_endpoint.help_text }}</small>
+            {% endif %}
         </div>
         
         <div class="form-group">
-            <label for="preferred_language">{% trans 'Preferred Language' %}</label>
-            <select id="preferred_language" name="preferred_language">
-                <option value="en" {% if user.preferred_language == 'en' %}selected{% endif %}>English</option>
-                <option value="es" {% if user.preferred_language == 'es' %}selected{% endif %}>Spanish</option>
-                <option value="nah" {% if user.preferred_language == 'nah' %}selected{% endif %}>Nahuatl</option>
-                <option value="oto" {% if user.preferred_language == 'oto' %}selected{% endif %}>Otomi</option>
-                <option value="maz" {% if user.preferred_language == 'maz' %}selected{% endif %}>Mazahua</option>
-                <option value="que" {% if user.preferred_language == 'que' %}selected{% endif %}>Quechua</option>
-            </select>
+            <label for="{{ profile_form.preferred_language.id_for_label }}">{{ profile_form.preferred_language.label }}</label>
+            {{ profile_form.preferred_language }}
+            {% if profile_form.preferred_language.errors %}
+                <ul class="errorlist">
+                    {% for error in profile_form.preferred_language.errors %}
+                        <li>{{ error }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+            {% if profile_form.preferred_language.help_text %}
+                <small class="text-muted">{{ profile_form.preferred_language.help_text }}</small>
+            {% endif %}
         </div>
         
         <div class="form-group">
-            <label for="native_languages">{% trans 'Native Languages' %}</label>
-            <input type="text" id="native_languages" name="native_languages" value="{{ user.native_languages }}" placeholder="{% trans 'Comma-separated: nahuatl, otomi' %}">
-            <small>{% trans 'List languages you can work in' %}</small>
+            <label for="{{ profile_form.native_languages.id_for_label }}">{{ profile_form.native_languages.label }}</label>
+            {{ profile_form.native_languages }}
+            {% if profile_form.native_languages.errors %}
+                <ul class="errorlist">
+                    {% for error in profile_form.native_languages.errors %}
+                        <li>{{ error }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+            {% if profile_form.native_languages.help_text %}
+                <small class="text-muted">{{ profile_form.native_languages.help_text }}</small>
+            {% endif %}
         </div>
+        
+        {% if profile_form.non_field_errors %}
+            <ul class="errorlist">
+                {% for error in profile_form.non_field_errors %}
+                    <li>{{ error }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
         
         <button type="submit" class="btn btn-primary">{% trans 'Update Profile' %}</button>
     </form>
 </div>
+
+<!-- Password Change Section -->
+<div class="card">
+    <h2>{% trans 'Change Password' %}</h2>
+    <form method="post">
+        {% csrf_token %}
+        <input type="hidden" name="change_password" value="1">
+        
+        <div class="form-group">
+            <label for="{{ password_form.old_password.id_for_label }}">{{ password_form.old_password.label }}</label>
+            {{ password_form.old_password }}
+            {% if password_form.old_password.errors %}
+                <ul class="errorlist">
+                    {% for error in password_form.old_password.errors %}
+                        <li>{{ error }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+        </div>
+        
+        <div class="form-group">
+            <label for="{{ password_form.new_password1.id_for_label }}">{{ password_form.new_password1.label }}</label>
+            {{ password_form.new_password1 }}
+            {% if password_form.new_password1.errors %}
+                <ul class="errorlist">
+                    {% for error in password_form.new_password1.errors %}
+                        <li>{{ error }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+            {% if password_form.new_password1.help_text %}
+                <div class="help-text">{{ password_form.new_password1.help_text|safe }}</div>
+            {% endif %}
+        </div>
+        
+        <div class="form-group">
+            <label for="{{ password_form.new_password2.id_for_label }}">{{ password_form.new_password2.label }}</label>
+            {{ password_form.new_password2 }}
+            {% if password_form.new_password2.errors %}
+                <ul class="errorlist">
+                    {% for error in password_form.new_password2.errors %}
+                        <li>{{ error }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+            {% if password_form.new_password2.help_text %}
+                <small class="text-muted">{{ password_form.new_password2.help_text }}</small>
+            {% endif %}
+        </div>
+        
+        {% if password_form.non_field_errors %}
+            <ul class="errorlist">
+                {% for error in password_form.non_field_errors %}
+                    <li>{{ error }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+        
+        <button type="submit" class="btn btn-primary">{% trans 'Change Password' %}</button>
+    </form>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'audio/audio-recorder.js' %}"></script>
+<script>
+    // Initialize audio recording for profile audio
+    if (document.querySelector('[data-audio-recording][data-file-input-id="{{ profile_form.profile_audio.id_for_label }}"]')) {
+        const audioSection = document.querySelector('[data-audio-recording][data-file-input-id="{{ profile_form.profile_audio.id_for_label }}"]');
+        // Audio recording will be initialized by audio-recorder.js
+    }
+</script>
 {% endblock %}

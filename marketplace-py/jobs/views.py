@@ -797,7 +797,7 @@ def pending_jobs(request):
     ).select_related('job').order_by('-created_at')
     
     # Filter to only show jobs that aren't completed
-    pending = [sub for sub in accepted_submissions if sub.job.status != 'completed']
+    pending = [sub for sub in accepted_submissions if sub.job.status != 'complete']
     
     context = {
         'pending_jobs': pending,
@@ -875,11 +875,20 @@ def apply_to_job(request, pk):
         return redirect('jobs:detail', pk=job.pk)
     
     if request.method == 'POST':
-        form = JobApplicationForm(request.POST, request.FILES)
+        form = JobApplicationForm(request.POST, request.FILES, user=request.user)
         if form.is_valid():
             application = form.save(commit=False)
             application.job = job
             application.applicant = request.user
+            
+            # If no files provided in form, copy from user profile
+            if 'profile_audio' not in request.FILES and request.user.profile_audio:
+                application.profile_audio = request.user.profile_audio
+            if 'profile_video' not in request.FILES and request.user.profile_video:
+                application.profile_video = request.user.profile_video
+            if 'profile_image' not in request.FILES and request.user.profile_image:
+                application.profile_image = request.user.profile_image
+            
             application.save()
             
             # Check if job should auto-transition to selecting
@@ -892,11 +901,12 @@ def apply_to_job(request, pk):
                 messages.success(request, _('Your application has been submitted! The job owner will review it.'))
             return redirect('jobs:detail', pk=job.pk)
     else:
-        form = JobApplicationForm()
+        form = JobApplicationForm(user=request.user)
     
     context = {
         'job': job,
         'form': form,
+        'user': request.user,
     }
     return render(request, 'jobs/apply_to_job.html', context)
 

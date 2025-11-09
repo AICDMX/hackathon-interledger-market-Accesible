@@ -21,6 +21,11 @@
 <div class="card">
     <h2>{% trans 'Submit Your Profile' %}</h2>
     <p class="muted-text">{% trans 'Tell the job owner about yourself and why you are interested in this job. You can include audio, video, or image files to introduce yourself.' %}</p>
+    {% if user.profile_note or user.profile_audio or user.profile_video or user.profile_image %}
+    <div class="info-box" style="background-color: #e3f2fd; padding: 1rem; border-radius: 4px; margin-bottom: 1rem;">
+        <p><strong>{% trans 'Auto-fill from profile' %}:</strong> {% trans 'Your profile information has been pre-filled below. You can edit it or leave it as is. If you don\'t upload new files, your profile files will be used automatically.' %}</p>
+    </div>
+    {% endif %}
     
     <form method="post" enctype="multipart/form-data">
         {% csrf_token %}
@@ -64,6 +69,9 @@
             </div>
             <p class="muted-text" style="font-size: 0.875rem; margin-top: 0.5rem;">
                 {% trans 'Or upload an audio file:' %}
+                {% if user.profile_audio %}
+                    <br><small>{% trans 'Leave empty to use your profile audio:' %} <a href="{{ user.profile_audio.url }}" target="_blank">{% trans 'Listen' %}</a></small>
+                {% endif %}
             </p>
             {{ form.profile_audio }}
             {% if form.profile_audio.errors %}
@@ -87,6 +95,9 @@
             {{ form.profile_image }}
             <p class="muted-text" style="font-size: 0.875rem; margin-top: 0.5rem;">
                 {% trans 'Take a quick photo or upload an existing image.' %}
+                {% if user.profile_image %}
+                    <br><small>{% trans 'Leave empty to use your profile image:' %} <img src="{{ user.profile_image.url }}" alt="{% trans 'Profile image' %}" style="max-width: 100px; vertical-align: middle; margin-left: 0.5rem;"></small>
+                {% endif %}
             </p>
             {% if form.profile_image.errors %}
                 <div class="error">{{ form.profile_image.errors }}</div>

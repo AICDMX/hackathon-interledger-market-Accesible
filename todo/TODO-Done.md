@@ -30,3 +30,12 @@
 [x] make a submitting limit say 10 defualt and a time frame. so if either hits it swiches to review and submissions are not allowed anymore.
 [x] we need to add a new work flow. so when a user creates a job. then workers can submit their profile. the job maker needs to see all the workers and select those they want to do. then there needs to be a button (doesnt work yet) that will send them to make the pre approved payment for those people. then when users upload the work. they need to be able mark the work as complete.
 [x] jobs should have a expired date. if nothing is reqruited in the time or if its in submitting if no submissions by then it swiches to expired. created wallet contract should expire 7 days after this date.
+[x] we need to search for places where funding is mentioned. that does not match the new flow. the new flow is they make a job. then it goes up for reqruiting. then the poster can view and select who will have the job. at the end the click "create contract" button that will take them to the pre approve payment page. or click close for submissions and it goes to selecting. selecting can be skipped if they just click create contract then it goes to submitting. at any time they can close for sumbisions then it goes to reviewing. they can review basics of submissions and hit complete. if complete the state changes and the contract payment is released.
+[x] make a reqruite limit so when that limit is hit it changes to selecting. also add a time that it will auto change default to 7 days. should be an option in job creation.
+[x] on job creation give a way to save it as a draft. make the drafts discoverable in one of dashboard were job creaters can see their jobs
+[x] seprate signup pages for job creaters and job doers
+[x] make creaters and doers only see links to things relevent to themselves
+[x] add a profile page where users can update their profile
+[x] add a demo users list where the json 
+[x] make it so the defualt jobs are in diffrent job states from the docs/job-states file. we dont need expired. just the usefull states. 
+[x] all the stuff in apply should exsist in profile and auto fill from profile

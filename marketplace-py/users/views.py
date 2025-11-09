@@ -1,8 +1,10 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth import login
+from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.utils.translation import gettext_lazy as _
 from .models import User
+from .forms import ProfileForm, PasswordChangeForm
 
 
 def register(request):
@@ -93,15 +95,30 @@ def register_doer(request):
     return render(request, 'users/register_doer.html')
 
 
+@login_required
 def profile(request):
-    """User profile view."""
-    if request.method == 'POST':
-        user = request.user
-        user.wallet_endpoint = request.POST.get('wallet_endpoint', '')
-        user.preferred_language = request.POST.get('preferred_language', 'en')
-        user.native_languages = request.POST.get('native_languages', '')
-        user.save()
-        messages.success(request, _('Profile updated successfully!'))
-        return redirect('users:profile')
+    """User profile view with update form."""
+    user = request.user
+    profile_form = ProfileForm(instance=user)
+    password_form = PasswordChangeForm(user=user)
     
-    return render(request, 'users/profile.html')
+    if request.method == 'POST':
+        # Check which form was submitted
+        if 'update_profile' in request.POST:
+            profile_form = ProfileForm(request.POST, request.FILES, instance=user)
+            if profile_form.is_valid():
+                profile_form.save()
+                messages.success(request, _('Profile updated successfully!'))
+                return redirect('users:profile')
+        
+        elif 'change_password' in request.POST:
+            password_form = PasswordChangeForm(user=user, data=request.POST)
+            if password_form.is_valid():
+                password_form.save()
+                messages.success(request, _('Password changed successfully!'))
+                return redirect('users:profile')
+    
+    return render(request, 'users/profile.html', {
+        'profile_form': profile_form,
+        'password_form': password_form,
+    })

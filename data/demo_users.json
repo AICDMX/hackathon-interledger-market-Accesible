@@ -1,0 +1,102 @@
+[
+  {
+    "username": "maria_nahuatl",
+    "email": "maria@demo.local",
+    "first_name": "Mar?a",
+    "last_name": "Santos",
+    "role": "creator",
+    "preferred_language": "es",
+    "native_languages": "nahuatl,es",
+    "password": "demo123"
+  },
+  {
+    "username": "carlos_otomi",
+    "email": "carlos@demo.local",
+    "first_name": "Carlos",
+    "last_name": "Hern?ndez",
+    "role": "creator",
+    "preferred_language": "es",
+    "native_languages": "otomi,es",
+    "password": "demo123"
+  },
+  {
+    "username": "ana_quechua",
+    "email": "ana@demo.local",
+    "first_name": "Ana",
+    "last_name": "Quispe",
+    "role": "creator",
+    "preferred_language": "es",
+    "native_languages": "quechua,es",
+    "password": "demo123"
+  },
+  {
+    "username": "luis_tsotsil",
+    "email": "luis@demo.local",
+    "first_name": "Luis",
+    "last_name": "G?mez",
+    "role": "creator",
+    "preferred_language": "es",
+    "native_languages": "tsotsil,es",
+    "password": "demo123"
+  },
+  {
+    "username": "rosa_maya",
+    "email": "rosa@demo.local",
+    "first_name": "Rosa",
+    "last_name": "Chan",
+    "role": "creator",
+    "preferred_language": "es",
+    "native_languages": "maya,es",
+    "password": "demo123"
+  },
+  {
+    "username": "juan_mixteco",
+    "email": "juan@demo.local",
+    "first_name": "Juan",
+    "last_name": "L?pez",
+    "role": "creator",
+    "preferred_language": "es",
+    "native_languages": "mixteco,es",
+    "password": "demo123"
+  },
+  {
+    "username": "demo_funder_1",
+    "email": "funder1@demo.local",
+    "first_name": "Roberto",
+    "last_name": "Mart?nez",
+    "role": "funder",
+    "preferred_language": "es",
+    "native_languages": "es",
+    "password": "demo123"
+  },
+  {
+    "username": "demo_funder_2",
+    "email": "funder2@demo.local",
+    "first_name": "Patricia",
+    "last_name": "Ram?rez",
+    "role": "funder",
+    "preferred_language": "en",
+    "native_languages": "en,es",
+    "password": "demo123"
+  },
+  {
+    "username": "demo_both_1",
+    "email": "both1@demo.local",
+    "first_name": "Miguel",
+    "last_name": "Torres",
+    "role": "both",
+    "preferred_language": "es",
+    "native_languages": "zapoteco,es",
+    "password": "demo123"
+  },
+  {
+    "username": "demo_both_2",
+    "email": "both2@demo.local",
+    "first_name": "Sofia",
+    "last_name": "Morales",
+    "role": "both",
+    "preferred_language": "es",
+    "native_languages": "pur?pecha,es",
+    "password": "demo123"
+  }
+]
