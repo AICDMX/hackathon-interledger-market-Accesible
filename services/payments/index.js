@@ -11,7 +11,7 @@ import fs from 'fs';
   const privateKey = fs.readFileSync('./private.key', 'utf8');
   const client = await createAuthenticatedClient({
     walletAddressUrl: 'https://ilp.interledger-test.dev/mvr5656',
-    privateKey: 'private.key',
+    privateKey: privateKey,
     keyId: 'fe775339-6ebc-4eb8-a4b4-0811acba3b62'
   });
 
