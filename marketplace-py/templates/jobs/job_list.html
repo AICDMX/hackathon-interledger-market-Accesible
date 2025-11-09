@@ -39,6 +39,40 @@
         cursor: pointer;
         flex-shrink: 0;
     }
+    
+    .job-tags {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        margin-bottom: 0.75rem;
+    }
+    
+    .job-tag {
+        display: inline-block;
+        padding: 0.25rem 0.75rem;
+        border-radius: 12px;
+        font-size: 0.875rem;
+        font-weight: 600;
+        text-transform: uppercase;
+    }
+    
+    .job-tag.applied {
+        background-color: #dbeafe;
+        color: #1e40af;
+    }
+    
+    .job-tag.deadline-soon {
+        background-color: #fef3c7;
+        color: #92400e;
+    }
+    
+    .job-count-info {
+        margin-top: 0.5rem;
+        padding: 0.5rem;
+        background-color: #f3f4f6;
+        border-radius: 4px;
+        font-size: 0.9rem;
+    }
 </style>
 {% endblock %}
 
@@ -100,8 +134,18 @@
 
 {% if jobs %}
     <div role="list" aria-label="{% trans 'Job listings' %}">
-        {% for job in jobs %}
+        {% for job_item in jobs %}
+            {% with job=job_item.job %}
             <article class="card" role="listitem">
+                <div class="job-tags">
+                    {% if job_item.has_applied %}
+                        <span class="job-tag applied">{% trans 'Applied' %}</span>
+                    {% endif %}
+                    {% if job_item.deadline_soon %}
+                        <span class="job-tag deadline-soon">{% trans 'About to Start' %}</span>
+                    {% endif %}
+                </div>
+                
                 <h2><a href="{% url 'jobs:detail' job.pk %}">{{ job.title }}</a></h2>
                 <p><strong>{% trans 'Language' %}:</strong> {{ job.target_language }}</p>
                 {% if job.target_dialect %}
@@ -110,10 +154,22 @@
                 <p><strong>{% trans 'Amount Per Person' %}:</strong> {{ job.amount_per_person }} ILP</p>
                 <p><strong>{% trans 'Total Budget' %}:</strong> {{ job.budget }} ILP</p>
                 <p><strong>{% trans 'Status' %}:</strong> {{ job.get_status_display }}</p>
+                
+                {% if job.status == 'recruiting' or job.status == 'open' %}
+                    <div class="job-count-info">
+                        <strong>{% trans 'Applications' %}:</strong> {{ job.applications_count }} / {{ job.recruit_limit }}
+                    </div>
+                {% elif job.status == 'submitting' %}
+                    <div class="job-count-info">
+                        <strong>{% trans 'Submissions' %}:</strong> {{ job.submissions_count }} / {{ job.max_responses }}
+                    </div>
+                {% endif %}
+                
                 <p><strong>{% trans 'Deliverables' %}:</strong> {{ job.get_deliverable_types_display }}</p>
                 <p>{{ job.description|truncatewords:30 }}</p>
                 <a href="{% url 'jobs:detail' job.pk %}" class="btn btn-primary">{% trans 'View Details' %}</a>
             </article>
+            {% endwith %}
         {% endfor %}
     </div>
 {% else %}

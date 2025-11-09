@@ -9,6 +9,7 @@ from django.http import Http404
 from django.views.decorators.http import require_POST
 from django.utils import timezone
 from datetime import timedelta
+from django.core.files.base import ContentFile
 from audio.forms import AudioContributionForm
 from .forms import JobApplicationForm
 from .models import Job, JobSubmission, JobApplication
@@ -35,9 +36,15 @@ def _build_audio_targets():
 
 def job_list(request):
     """List all available jobs."""
-    # Show only jobs that are recruiting (available for applications)
+    # Show jobs that are recruiting (available for applications) or submitting (in work submission stage)
     # Include both 'recruiting' and legacy 'open' status for backward compatibility
-    jobs = Job.objects.filter(status__in=['recruiting', 'open']).order_by('-created_at')
+    jobs = Job.objects.filter(status__in=['recruiting', 'open', 'submitting']).order_by('-created_at')
+    
+    # Annotate with counts for applications and submissions
+    jobs = jobs.annotate(
+        applications_count=Count('applications', distinct=True),
+        submissions_count=Count('submissions', distinct=True),
+    )
     
     # Filter by language if provided
     language_filter = request.GET.get('language')
@@ -76,8 +83,42 @@ def job_list(request):
                 if not job.submissions.filter(creator=request.user).exists():
                     waiting_for_submission.append(job)
     
+    # Get user's applied job IDs for tag display
+    user_applied_job_ids = set()
+    if request.user.is_authenticated:
+        user_applied_job_ids = set(
+            JobApplication.objects.filter(
+                applicant=request.user
+            ).values_list('job_id', flat=True)
+        )
+    
+    # Convert queryset to list and add computed fields for each job
+    jobs_list = []
+    now = timezone.now()
+    for job in jobs:
+        # Check if user has applied
+        has_applied = job.pk in user_applied_job_ids
+        
+        # Check if deadline is within 48 hours
+        deadline_soon = False
+        deadline = None
+        if job.status in ['recruiting', 'open'] and job.recruit_deadline:
+            deadline = job.recruit_deadline
+        elif job.status == 'submitting' and job.submit_deadline:
+            deadline = job.submit_deadline
+        
+        if deadline:
+            time_until_deadline = deadline - now
+            deadline_soon = time_until_deadline <= timedelta(hours=48) and time_until_deadline > timedelta(0)
+        
+        jobs_list.append({
+            'job': job,
+            'has_applied': has_applied,
+            'deadline_soon': deadline_soon,
+        })
+    
     context = {
-        'jobs': jobs,
+        'jobs': jobs_list,
         'language_filter': language_filter,
         'search_query': search_query,
         'hide_applied': hide_applied,
@@ -682,6 +723,54 @@ def submit_job(request, pk):
             submission.image_file = request.FILES['image_file']
         
         submission.save()
+        
+        # Refresh submission to ensure files are saved
+        submission.refresh_from_db()
+        
+        # If user doesn't have profile defaults set, save submission values as defaults
+        user = request.user
+        profile_updated = False
+        
+        # Save note as profile_note if profile_note is empty
+        if note and not user.profile_note:
+            user.profile_note = note
+            profile_updated = True
+        
+        # Save files as profile defaults if they're empty
+        # Copy files explicitly to ensure they're saved to profile upload paths
+        if 'audio' in deliverable_types and submission.audio_file and not user.profile_audio:
+            # Copy the file content to the profile field
+            submission.audio_file.open('rb')
+            user.profile_audio.save(
+                submission.audio_file.name,
+                ContentFile(submission.audio_file.read()),
+                save=False
+            )
+            submission.audio_file.close()
+            profile_updated = True
+        
+        if 'video' in deliverable_types and submission.video_file and not user.profile_video:
+            submission.video_file.open('rb')
+            user.profile_video.save(
+                submission.video_file.name,
+                ContentFile(submission.video_file.read()),
+                save=False
+            )
+            submission.video_file.close()
+            profile_updated = True
+        
+        if 'image' in deliverable_types and submission.image_file and not user.profile_image:
+            submission.image_file.open('rb')
+            user.profile_image.save(
+                submission.image_file.name,
+                ContentFile(submission.image_file.read()),
+                save=False
+            )
+            submission.image_file.close()
+            profile_updated = True
+        
+        if profile_updated:
+            user.save()
         
         # Refresh job to check if it should transition to reviewing
         # Need to refresh to get updated submission count
