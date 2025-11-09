@@ -17,12 +17,16 @@ COPY pyproject.toml uv.lock ./
 # Install dependencies (checkpoint 2: expensive step, cached unless pyproject.toml/uv.lock change)
 RUN uv sync --frozen --no-install-project
 
-# Create directories for media and static files (checkpoint 3: static directories)
-RUN mkdir -p /app/media /app/staticfiles /app/locale
+# Create directories for static files (checkpoint 3: static directories)
+# Note: media directory will be created by COPY command
+RUN mkdir -p /app/staticfiles /app/locale
 
 # Copy project code last (checkpoint 4: only this layer rebuilds when marketplace-py changes)
 # Since Dockerfile is now in marketplace-py/, copy all contents from build context
 COPY . ./
+
+# Explicitly copy media files to ensure they're included
+COPY media/ /app/media/
 
 # Expose port
 EXPOSE 8000
