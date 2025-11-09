@@ -97,6 +97,31 @@
             outline-offset: 2px;
         }
         
+        .nav-links form {
+            display: inline;
+        }
+        
+        .nav-links button.logout-button {
+            color: #fff;
+            text-decoration: none;
+            padding: 0.5rem;
+            border-radius: 4px;
+            transition: background-color 0.2s;
+            font-size: 1rem;
+            white-space: nowrap;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-family: inherit;
+        }
+        
+        .nav-links button.logout-button:hover,
+        .nav-links button.logout-button:focus {
+            background-color: #34495e;
+            outline: 2px solid #fff;
+            outline-offset: 2px;
+        }
+        
         /* Language selector */
         .language-selector {
             display: flex;
@@ -451,6 +476,22 @@
                 background-color: #34495e;
             }
             
+            .nav-links li > button.logout-button {
+                display: block;
+                padding: 1.25rem 1rem;
+                flex: 1;
+                font-size: 1.125rem;
+                font-weight: 500;
+                min-width: 0;
+                text-align: left;
+                width: 100%;
+            }
+            
+            .nav-links li > button.logout-button:hover,
+            .nav-links li > button.logout-button:focus {
+                background-color: #34495e;
+            }
+            
             /* Ensure audio players in nav don't shrink the menu */
             .nav-links li > * {
                 flex-shrink: 0;
@@ -609,7 +650,12 @@
                         {% audio_player_static_ui "nav_profile" "label" %}
                     </li>
                     <li>
-                        <a href="{% url 'users:logout' %}">{% trans 'Logout' %}</a>
+                        <form method="post" action="{% url 'users:logout' %}">
+                            {% csrf_token %}
+                            <button type="submit" class="logout-button">
+                                {% trans 'Logout' %}
+                            </button>
+                        </form>
                         {% audio_player_static_ui "nav_logout" "label" %}
                     </li>
                 {% else %}
