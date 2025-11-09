@@ -26,8 +26,15 @@
         </div>
         <p>
             {% trans 'Don\'t have an account?' %}<br>
-            <a href="{% url 'users:register_creator' %}">{% trans 'Register as Job Creator' %}</a> | 
-            <a href="{% url 'users:register_doer' %}">{% trans 'Register as Job Doer' %}</a>
+            <span style="display: inline-flex; align-items: center; gap: 0.25rem;">
+                <a href="{% url 'users:register_creator' %}">{% trans 'Register as Job Creator' %}</a>
+                {% audio_player_static_ui "button_register_job_creator" "label" %}
+            </span>
+            | 
+            <span style="display: inline-flex; align-items: center; gap: 0.25rem;">
+                <a href="{% url 'users:register_doer' %}">{% trans 'Register as Job Doer' %}</a>
+                {% audio_player_static_ui "button_register_job_doer" "label" %}
+            </span>
         </p>
     </form>
 </div>

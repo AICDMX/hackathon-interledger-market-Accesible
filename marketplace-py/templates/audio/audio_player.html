@@ -4,17 +4,19 @@ Audio player template component.
 Usage: {% audio_player content_object "title" "en" %}
 {% endcomment %}
 
+{# Audio configuration and script are loaded once in base.html #}
+{# Only set config if not already set (for edge cases) #}
 <script>
-// Inject audio configuration from Django
-window.AUDIO_CONFIG = {
-    iconInactive: '{{ audio_config.icon_inactive }}',
-    iconActive: '{{ audio_config.icon_active }}',
-    fallbackAudio: {{ audio_config.fallback_audio|safe }},
-    fallbackFile: '{{ audio_config.fallback_file }}',
-    staticUrl: '{{ audio_config.static_url }}'
-};
+if (!window.AUDIO_CONFIG) {
+    window.AUDIO_CONFIG = {
+        iconInactive: '{{ audio_config.icon_inactive }}',
+        iconActive: '{{ audio_config.icon_active }}',
+        fallbackAudio: {{ audio_config.fallback_audio|safe }},
+        fallbackFile: '{{ audio_config.fallback_file }}',
+        staticUrl: '{{ audio_config.static_url }}'
+    };
+}
 </script>
-<script src="{% static 'audio/audio-player-core.js' %}"></script>
 
 <div class="audio-player-wrapper" 
      data-audio-target="{{ target_field }}"
@@ -41,35 +43,14 @@ window.AUDIO_CONFIG = {
             <button type="button" class="audio-close-btn" onclick="closeAudioPlayer(this, event); return false;" aria-label="{% trans 'Close audio player' %}">?</button>
         </div>
     {% else %}
-        {# Audio not available - try fallback #}
-        {% if fallback_audio_url %}
-            <button type="button" class="audio-play-btn audio-fallback-btn" 
-                    aria-label="{% blocktrans with field=target_field lang=language_code %}Play fallback audio for {{ field }} in {{ lang }}{% endblocktrans %}"
-                    onclick="playAudio(this, event); return false;">
-                <img src="{{ audio_config.icon_inactive }}" alt="{% trans 'Listen (Fallback)' %}" class="audio-icon" aria-hidden="true">
-            </button>
-            
-            <div class="audio-player-container" style="display: none;">
-                <audio controls 
-                       preload="none"
-                       data-fallback="true"
-                       aria-label="{% blocktrans with field=target_field lang=language_code %}Fallback audio player for {{ field }} in {{ lang }}{% endblocktrans %}">
-                    <source src="{{ fallback_audio_url }}" type="audio/mpeg">
-                    <source src="{{ fallback_audio_url }}" type="audio/ogg">
-                    {% trans "Your browser does not support the audio element." %}
-                </audio>
-                <button type="button" class="audio-close-btn" onclick="closeAudioPlayer(this, event); return false;" aria-label="{% trans 'Close audio player' %}">?</button>
-            </div>
-        {% else %}
-            {# No fallback - show request button #}
-            <button type="button" class="audio-request-btn" 
-                    aria-label="{% blocktrans with field=target_field lang=language_code %}Request audio for {{ field }} in {{ lang }}{% endblocktrans %}"
-                    onclick="requestAudio(this, event)">
-                <img src="{{ audio_config.icon_inactive }}" alt="{% trans 'Request audio' %}" class="audio-icon" aria-hidden="true">
-            </button>
-            
-            <div class="audio-request-message" style="display: none;" role="alert"></div>
-        {% endif %}
+        {# Audio not available - show request button #}
+        <button type="button" class="audio-request-btn" 
+                aria-label="{% blocktrans with field=target_field lang=language_code %}Request audio for {{ field }} in {{ lang }}{% endblocktrans %}"
+                onclick="requestAudio(this, event)">
+            <img src="{{ audio_config.icon_inactive }}" alt="{% trans 'Request audio' %}" class="audio-icon" aria-hidden="true">
+        </button>
+        
+        <div class="audio-request-message" style="display: none;" role="alert"></div>
     {% endif %}
 </div>
 
@@ -257,15 +238,6 @@ function playFallbackAudio(button, languageCode) {
 .audio-request-btn:disabled {
     opacity: 0.5;
     cursor: not-allowed;
-}
-
-.audio-fallback-btn {
-    opacity: 0.8;
-}
-
-.audio-fallback-btn:hover,
-.audio-fallback-btn:focus {
-    opacity: 0.6;
 }
 
 .audio-icon {

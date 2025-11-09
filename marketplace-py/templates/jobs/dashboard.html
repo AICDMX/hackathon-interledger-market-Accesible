@@ -295,7 +295,7 @@
 
         <a href="{% url 'jobs:my_money' %}" class="dashboard-icon-card" role="gridcell" aria-label="{% trans 'My Money' %}">
             <div class="dashboard-icon" aria-hidden="true">
-                <img src="/media/my-money.png" alt="{% trans 'My Money' %}" loading="lazy" />
+                <img src="/media/my-money.png" alt="{% trans 'My Money' %}" style="width: 5rem; height: 5rem; object-fit: contain;" loading="lazy" />
             </div>
             <p class="dashboard-label">
                 {% trans 'My Money' %}
@@ -317,7 +317,7 @@
         {% if user.is_creator %}
         <a href="{% url 'jobs:pending_jobs' %}" class="dashboard-icon-card" role="gridcell" aria-label="{% trans 'Pending Jobs' %}">
             <div class="dashboard-icon" aria-hidden="true">
-                <img src="/media/my-pending-to-do.png" alt="{% trans 'My Pending to Finish Jobs' %}" loading="lazy" />
+                <img src="/media/my-pending-to-do.png" alt="{% trans 'My Pending to Finish Jobs' %}" style="width: 5rem; height: 5rem; object-fit: contain;" loading="lazy" />
             </div>
             <p class="dashboard-label">
                 {% trans 'My Pending to Finish Jobs' %}
@@ -360,7 +360,7 @@
 
         <a href="{% url 'jobs:filler_2' %}" class="dashboard-icon-card" role="gridcell" aria-label="{% trans 'Page 2' %}">
             <div class="dashboard-icon" aria-hidden="true">
-                <img src="{{ audio_config.icon_active }}" alt="{% trans 'Page 2' %}" loading="lazy" />
+                <img src="{{ audio_config.icon_active }}" alt="{% trans 'Page 2' %}" style="width: 5rem; height: 5rem; object-fit: contain;" loading="lazy" />
             </div>
             <p class="dashboard-label">
                 {% trans 'Page 2' %}
@@ -395,18 +395,18 @@ document.addEventListener('DOMContentLoaded', function() {
         moduleMissing: 'El reproductor todav?a no est? listo en este dispositivo.',
         notConfigured: 'Conecta este bot?n con un contenido para habilitar el audio.'
     };
-    // Load audio configuration and core module
-    window.AUDIO_CONFIG = {
-        iconInactive: '{{ audio_config.icon_inactive }}',
-        iconActive: '{{ audio_config.icon_active }}',
-        fallbackAudio: {{ audio_config.fallback_audio|safe }},
-        fallbackFile: '{{ audio_config.fallback_file }}',
-        staticUrl: '{{ audio_config.static_url }}'
-    };
-    // Load the centralized audio player module
-    const script = document.createElement('script');
-    script.src = '{% static "audio/audio-player-core.js" %}';
-    document.head.appendChild(script);
+    // Audio configuration and script are already loaded in base.html
+    // Only set config if not already set (for edge cases)
+    if (!window.AUDIO_CONFIG) {
+        window.AUDIO_CONFIG = {
+            iconInactive: '{{ audio_config.icon_inactive }}',
+            iconActive: '{{ audio_config.icon_active }}',
+            fallbackAudio: {{ audio_config.fallback_audio|safe }},
+            fallbackFile: '{{ audio_config.fallback_file }}',
+            staticUrl: '{{ audio_config.static_url }}'
+        };
+    }
+    // Script is already loaded in base.html, no need to load again
     
     const defaultFundAmount = {{ community_fund_amount|default:10 }};
 

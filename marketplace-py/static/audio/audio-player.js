@@ -64,9 +64,6 @@
                 if (data.available !== false && data.audio_url) {
                     // Audio available - inject player
                     injectAudioPlayer(container, data.audio_url, targetField, languageCode);
-                } else if (data.fallback_audio_url) {
-                    // Audio not available but fallback exists - inject player with fallback
-                    injectAudioPlayer(container, data.fallback_audio_url, targetField, languageCode, true);
                 } else {
                     // Audio not available - inject request button
                     injectAudioRequestButton(container, contentTypeId, objectId, targetField, languageCode);
@@ -77,18 +74,17 @@
             });
     }
     
-    function injectAudioPlayer(container, audioUrl, targetField, languageCode, isFallback = false) {
-        const labelText = isFallback ? 'Listen (Fallback)' : 'Listen';
+    function injectAudioPlayer(container, audioUrl, targetField, languageCode) {
         const playerHtml = `
             <div class="audio-player-wrapper">
-                <button class="audio-play-btn ${isFallback ? 'audio-fallback-btn' : ''}" 
-                        aria-label="Play audio for ${targetField} in ${languageCode}${isFallback ? ' (fallback)' : ''}"
+                <button class="audio-play-btn" 
+                        aria-label="Play audio for ${targetField} in ${languageCode}"
                         onclick="window.audioPlayerModule.playAudio(this)">
                     <span class="audio-icon" aria-hidden="true">??</span>
-                    <span class="audio-label">${labelText}</span>
+                    <span class="audio-label">Listen</span>
                 </button>
                 <div class="audio-player-container" style="display: none;">
-                    <audio controls preload="none" ${isFallback ? 'data-fallback="true"' : ''}>
+                    <audio controls preload="none">
                         <source src="${audioUrl}" type="audio/mpeg">
                         <source src="${audioUrl}" type="audio/ogg">
                         Your browser does not support the audio element.

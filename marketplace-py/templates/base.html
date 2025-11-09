@@ -62,6 +62,7 @@
             flex-wrap: wrap;
             position: relative;
             overflow: visible;
+            gap: 1rem;
         }
         
         .nav-links {
@@ -127,11 +128,25 @@
             display: flex;
             gap: 0.5rem;
             align-items: center;
-            flex-wrap: wrap;
+            flex-wrap: nowrap;
+            flex-shrink: 0;
+            margin-left: auto;
         }
         
         .language-selector form {
-            display: inline;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            flex-wrap: nowrap;
+            white-space: nowrap;
+        }
+        
+        .language-selector form > div {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            flex-wrap: nowrap;
+            white-space: nowrap;
         }
         
         .language-selector select {
@@ -146,6 +161,8 @@
             font-size: 0.75rem;
             color: #ecf0f1;
             margin: 0;
+            white-space: nowrap;
+            flex-shrink: 0;
         }
         
         /* Main content */
@@ -507,8 +524,9 @@
             
             .language-selector {
                 order: 3;
-                margin-left: 0.5rem;
+                margin-left: auto;
                 flex-shrink: 0;
+                flex-wrap: nowrap;
             }
             
             nav > div:first-child {
@@ -535,6 +553,8 @@
             
             .language-selector {
                 font-size: 0.875rem;
+                margin-left: auto;
+                flex-wrap: nowrap;
             }
             
             .language-selector label {
@@ -563,7 +583,7 @@
             
             .language-selector {
                 font-size: 0.8rem;
-                margin-left: 0.25rem;
+                margin-left: auto;
             }
             
             .language-selector select {
@@ -588,6 +608,8 @@
             
             .language-selector {
                 font-size: 0.75rem;
+                margin-left: auto;
+                flex-wrap: nowrap;
             }
             
             .language-selector select {
@@ -674,10 +696,10 @@
                 {% endif %}
             </ul>
             <div class="language-selector">
-                <form action="{% url 'set_language_custom' %}" method="post" style="display: inline;">
+                <form action="{% url 'set_language_custom' %}" method="post">
                     {% csrf_token %}
                     <input type="hidden" name="next" value="{{ request.get_full_path }}">
-                    <div style="display: flex; align-items: center; gap: 0.5rem;">
+                    <div>
                         <label for="language-select">{% trans 'Select language' %}</label>
                         {% audio_player_static_ui "label_select_language" "label" %}
                     </div>
@@ -776,6 +798,21 @@
             });
         });
     </script>
+    
+    {# Load audio player core script once per page #}
+    <script>
+    // Set audio configuration (only if not already set)
+    if (!window.AUDIO_CONFIG) {
+        window.AUDIO_CONFIG = {
+            iconInactive: '{{ audio_config.icon_inactive }}',
+            iconActive: '{{ audio_config.icon_active }}',
+            fallbackAudio: {{ audio_config.fallback_audio|safe }},
+            fallbackFile: '{{ audio_config.fallback_file }}',
+            staticUrl: '{{ audio_config.static_url }}'
+        };
+    }
+    </script>
+    <script src="{% static 'audio/audio-player-core.js' %}"></script>
     
     {% block extra_js %}{% endblock %}
 </body>
