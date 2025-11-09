@@ -1,1 +1,0 @@
-[] where it says Entregables: Audio we should also have icons what video.png  if there we need more icons for this

@@ -71,7 +71,7 @@
         
         <div class="form-group">
             {% include 'components/form_label_with_audio.html' with label_text="Description" slug="form_description" field_id="description" required=True %}
-            <textarea id="description" name="description" rows="5" required aria-required="true"></textarea>
+            <textarea id="description" name="description" rows="5" required aria-required="true">{{ description|default:'' }}</textarea>
         </div>
         
         <div class="form-group">
@@ -88,7 +88,7 @@
         
         <div class="form-group">
             {% include 'components/form_label_with_audio.html' with label_text="Target Dialect" slug="form_target_dialect" field_id="target_dialect" %}
-            <input type="text" id="target_dialect" name="target_dialect">
+            <input type="text" id="target_dialect" name="target_dialect" value="{{ target_dialect|default:'' }}">
         </div>
         
         <div class="form-group">
@@ -122,7 +122,7 @@
         
         <div class="form-group">
             {% include 'components/form_label_with_audio.html' with label_text="Number of Responses Needed" slug="form_max_responses" field_id="max_responses" required=True %}
-            <input type="number" id="max_responses" name="max_responses" min="1" value="1" required aria-required="true">
+            <input type="number" id="max_responses" name="max_responses" min="1" value="{{ max_responses|default:'1' }}" required aria-required="true">
             <small class="form-text text-muted">{% trans 'How many people should submit work for this job? (e.g., if you want 20 people to do the same voice or picture set, enter 20)' %}</small>
         </div>
         
@@ -136,31 +136,31 @@
         
         <div class="form-group">
             {% include 'components/form_label_with_audio.html' with label_text="Recruit Limit" slug="form_recruit_limit" field_id="recruit_limit" required=True %}
-            <input type="number" id="recruit_limit" name="recruit_limit" min="1" value="10" required aria-required="true">
+            <input type="number" id="recruit_limit" name="recruit_limit" min="1" value="{{ recruit_limit|default:'10' }}" required aria-required="true">
             <small class="form-text text-muted">{% trans 'Maximum number of applications to accept before automatically moving to selection phase' %}</small>
         </div>
         
         <div class="form-group">
             {% include 'components/form_label_with_audio.html' with label_text="Recruit Deadline (Days)" slug="form_recruit_deadline_days" field_id="recruit_deadline_days" required=True %}
-            <input type="number" id="recruit_deadline_days" name="recruit_deadline_days" min="1" value="7" required aria-required="true">
+            <input type="number" id="recruit_deadline_days" name="recruit_deadline_days" min="1" value="{{ recruit_deadline_days|default:'7' }}" required aria-required="true">
             <small class="form-text text-muted">{% trans 'Number of days from now when recruiting will automatically end and move to selection phase' %}</small>
         </div>
         
         <div class="form-group">
             {% include 'components/form_label_with_audio.html' with label_text="Submit Limit" slug="form_submit_limit" field_id="submit_limit" required=True %}
-            <input type="number" id="submit_limit" name="submit_limit" min="1" value="10" required aria-required="true">
+            <input type="number" id="submit_limit" name="submit_limit" min="1" value="{{ submit_limit|default:'10' }}" required aria-required="true">
             <small class="form-text text-muted">{% trans 'Maximum number of submissions to accept before automatically moving to review phase' %}</small>
         </div>
         
         <div class="form-group">
             {% include 'components/form_label_with_audio.html' with label_text="Submit Deadline (Days)" slug="form_submit_deadline_days" field_id="submit_deadline_days" required=True %}
-            <input type="number" id="submit_deadline_days" name="submit_deadline_days" min="1" value="7" required aria-required="true">
+            <input type="number" id="submit_deadline_days" name="submit_deadline_days" min="1" value="{{ submit_deadline_days|default:'7' }}" required aria-required="true">
             <small class="form-text text-muted">{% trans 'Number of days from when submitting phase starts until deadline (when job transitions to submitting state)' %}</small>
         </div>
         
         <div class="form-group">
             {% include 'components/form_label_with_audio.html' with label_text="Expired Date (Days)" slug="form_expired_date_days" field_id="expired_date_days" required=True %}
-            <input type="number" id="expired_date_days" name="expired_date_days" min="1" value="14" required aria-required="true">
+            <input type="number" id="expired_date_days" name="expired_date_days" min="1" value="{{ expired_date_days|default:'14' }}" required aria-required="true">
             <small class="form-text text-muted">{% trans 'Number of days from now when the job will expire if no applications (in recruiting) or no submissions (in submitting) are received. Wallet contracts expire 7 days after this date.' %}</small>
         </div>
         
@@ -262,3 +262,4 @@
     });
 </script>
 {% endblock %}
+%}

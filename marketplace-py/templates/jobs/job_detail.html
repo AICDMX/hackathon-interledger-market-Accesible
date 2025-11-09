@@ -67,35 +67,22 @@
     
     {% if user.is_authenticated %}
         {% if user == job.funder %}
-            <div class="card" style="margin-top: 1rem; background-color: #fff7ed; border: 2px solid #fb923c;">
-                {% include 'components/static_title_with_audio.html' with title_text="Approve Quote & Pay" slug="section_approve_quote" heading_tag="h2" %}
-                {% if job.payment_url %}
-                    <p class="muted-text">{% trans 'Payment link has been generated. Click below to complete payment.' %}</p>
-                    <div style="display: flex; flex-direction: column; gap: 0.75rem;">
-                        <div style="display: flex; align-items: center; gap: 0.5rem;">
-                            <a href="{{ job.payment_url }}" class="btn btn-primary" target="_blank" rel="noopener noreferrer">
-                                {% trans 'Complete Payment' %}
-                            </a>
-                            {% audio_player_static_ui "button_complete_payment" "label" %}
-                        </div>
-                        <div style="background-color: #f5f5f5; padding: 0.75rem; border-radius: 0.5rem; word-break: break-all;">
-                            <p style="margin: 0; font-size: 0.875rem;"><strong>{% trans 'Payment Link:' %}</strong></p>
-                            <p style="margin: 0.25rem 0 0 0; font-size: 0.875rem; font-family: monospace;">{{ job.payment_url }}</p>
-                        </div>
-                        {% if job.payment_id %}
-                            <p style="margin: 0; font-size: 0.75rem; color: #666;">
-                                {% trans 'Payment ID:' %} <code>{{ job.payment_id }}</code>
-                            </p>
-                        {% endif %}
-                    </div>
-                {% else %}
-                    <p class="muted-text">{% trans 'Start the payment flow. You will be redirected to your wallet.' %}</p>
-                    <div style="display: flex; align-items: center; gap: 0.5rem;">
-                        <a href="{% url 'jobs:approve_quote' job.pk %}" class="btn btn-primary">{% trans 'Approve quote & pay' %}</a>
-                        {% audio_player_static_ui "button_approve_quote" "label" %}
+            <div style="margin-top: 1.5rem; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+                {% if job.status == 'draft' %}
+                    <div style="display: inline-flex; align-items: center; gap: 0.5rem;">
+                        <a href="{% url 'jobs:edit' job.pk %}" class="btn btn-primary">{% trans 'Edit Draft' %}</a>
+                        {% audio_player_static_ui "button_edit_draft" "label" %}
                     </div>
                 {% endif %}
+                <form method="post" action="{% url 'jobs:duplicate' job.pk %}" style="display: inline;">
+                    {% csrf_token %}
+                    <div style="display: inline-flex; align-items: center; gap: 0.5rem;">
+                        <button type="submit" class="btn btn-secondary">{% trans 'Duplicate Job' %}</button>
+                        {% audio_player_static_ui "button_duplicate_job" "label" %}
+                    </div>
+                </form>
             </div>
+            
             <div>
                 {% include 'components/static_title_with_audio.html' with title_text="Submissions" slug="section_submissions" heading_tag="h2" %}
                 {% if job.submissions.all %}
@@ -108,6 +95,8 @@
                                     <div style="display: inline-flex; align-items: center; gap: 0.5rem;">
                                         <a href="{% url 'jobs:accept_submission' job.pk submission.pk %}" class="btn btn-success">{% trans 'Accept' %}</a>
                                         {% audio_player_static_ui "button_accept" "label" %}
+                                        <a href="{% url 'jobs:decline_submission' job.pk submission.pk %}" class="btn btn-danger">{% trans 'Decline' %}</a>
+                                        {% audio_player_static_ui "button_decline" "label" %}
                                     </div>
                                 {% endif %}
                                 {% if submission.note %}
@@ -127,31 +116,189 @@
                 {% endif %}
             </div>
             
-            {% if can_complete_contract %}
-                <div class="card" style="margin-top: 1.5rem; background-color: #f0fdf4; border: 2px solid #10b981;">
-                    {% include 'components/static_title_with_audio.html' with title_text="Complete Contract" slug="section_complete_contract" heading_tag="h2" %}
-                    <p>{% trans 'All accepted submissions have been marked as complete by workers. You can now complete the contract to release payments.' %}</p>
-                    <form method="post" action="{% url 'jobs:complete_contract' job.pk %}">
+            {% if job.status == 'recruiting' or job.status == 'selecting' %}
+                <div style="margin-top: 1.5rem;">
+                    {% include 'components/static_title_with_audio.html' with title_text="Applications" slug="section_applications" heading_tag="h2" %}
+                    {% if applications %}
+                        <p><strong>{% trans 'Approved Applicants' %}:</strong> {{ selected_count }} / {{ job.max_responses }}</p>
+                        <p><strong>{% trans 'Total Applications' %}:</strong> {{ applications.count }}</p>
+                        <div style="margin-top: 1rem;">
+                            {% for application in applications %}
+                                <div class="card" style="margin-top: 0.75rem; border-left: 4px solid {% if application.status == 'selected' %}#10b981{% elif application.status == 'rejected' %}#ef4444{% else %}#f59e0b{% endif %};">
+                                    <div style="display: flex; justify-content: space-between; align-items: start; flex-wrap: wrap; gap: 1rem;">
+                                        <div style="flex: 1;">
+                                            <h3 style="margin: 0;">{{ application.applicant.get_display_name }}</h3>
+                                            <p class="text-muted" style="margin: 0.25rem 0;">
+                                                {% trans 'Applied' %}: {{ application.created_at|date:"F d, Y H:i" }}
+                                            </p>
+                                            <p style="margin: 0.25rem 0;">
+                                                <strong>{% trans 'Status' %}:</strong> 
+                                                <span class="status-pill status-{{ application.status }}">
+                                                    {{ application.get_status_display }}
+                                                </span>
+                                            </p>
+                                        </div>
+                                        <div>
+                                            {% if application.status == 'pending' %}
+                                                <form method="post" action="{% url 'jobs:select_application' job.pk application.pk %}" style="display: inline;">
+                                                    {% csrf_token %}
+                                                    <input type="hidden" name="action" value="approve">
+                                                    <div style="display: inline-flex; align-items: center; gap: 0.5rem;">
+                                                        <button type="submit" class="btn btn-success">{% trans 'Approve' %}</button>
+                                                        {% audio_player_static_ui "button_approve" "label" %}
+                                                    </div>
+                                                </form>
+                                                <form method="post" action="{% url 'jobs:select_application' job.pk application.pk %}" style="display: inline;">
+                                                    {% csrf_token %}
+                                                    <input type="hidden" name="action" value="reject">
+                                                    <div style="display: inline-flex; align-items: center; gap: 0.5rem;">
+                                                        <button type="submit" class="btn btn-danger">{% trans 'Reject' %}</button>
+                                                        {% audio_player_static_ui "button_reject" "label" %}
+                                                    </div>
+                                                </form>
+                                            {% elif application.status == 'selected' %}
+                                                <form method="post" action="{% url 'jobs:select_application' job.pk application.pk %}" style="display: inline;">
+                                                    {% csrf_token %}
+                                                    <input type="hidden" name="action" value="pending">
+                                                    <div style="display: inline-flex; align-items: center; gap: 0.5rem;">
+                                                        <button type="submit" class="btn">{% trans 'Reset to Pending' %}</button>
+                                                        {% audio_player_static_ui "button_reset_to_pending" "label" %}
+                                                    </div>
+                                                </form>
+                                            {% elif application.status == 'rejected' %}
+                                                <form method="post" action="{% url 'jobs:select_application' job.pk application.pk %}" style="display: inline;">
+                                                    {% csrf_token %}
+                                                    <input type="hidden" name="action" value="pending">
+                                                    <div style="display: inline-flex; align-items: center; gap: 0.5rem;">
+                                                        <button type="submit" class="btn">{% trans 'Reset to Pending' %}</button>
+                                                        {% audio_player_static_ui "button_reset_to_pending" "label" %}
+                                                    </div>
+                                                </form>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                    
+                                    {% if application.profile_note %}
+                                        <div style="margin-top: 1rem;">
+                                            <strong>{% trans 'Profile Note' %}:</strong>
+                                            <p>{{ application.profile_note|linebreaks }}</p>
+                                        </div>
+                                    {% endif %}
+                                    
+                                    {% if application.profile_audio or application.profile_video or application.profile_image %}
+                                        <div style="margin-top: 1rem;">
+                                            <strong>{% trans 'Profile Media' %}:</strong>
+                                            <div style="display: flex; flex-wrap: wrap; gap: 1rem; margin-top: 0.5rem;">
+                                                {% if application.profile_audio %}
+                                                    <div>
+                                                        <p style="margin-bottom: 0.25rem;"><strong>{% trans 'Audio' %}</strong></p>
+                                                        <audio controls src="{{ application.profile_audio.url }}" style="width: 100%; max-width: 300px;">
+                                                            {% trans 'Your browser does not support the audio element.' %}
+                                                        </audio>
+                                                    </div>
+                                                {% endif %}
+                                                {% if application.profile_video %}
+                                                    <div>
+                                                        <p style="margin-bottom: 0.25rem;"><strong>{% trans 'Video' %}</strong></p>
+                                                        <video controls src="{{ application.profile_video.url }}" style="width: 100%; max-width: 300px; max-height: 200px;">
+                                                            {% trans 'Your browser does not support the video element.' %}
+                                                        </video>
+                                                    </div>
+                                                {% endif %}
+                                                {% if application.profile_image %}
+                                                    <div>
+                                                        <p style="margin-bottom: 0.25rem;"><strong>{% trans 'Image' %}</strong></p>
+                                                        <img src="{{ application.profile_image.url }}" alt="{% trans 'Profile image' %}" style="max-width: 200px; border-radius: 0.5rem;">
+                                                    </div>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <p>{% trans 'No applications yet.' %}</p>
+                    {% endif %}
+                </div>
+                
+                {% if show_start_contract_button %}
+                    <div class="card" style="margin-top: 1.5rem; background-color: {% if can_start_contract %}#f0fdf4{% else %}#f9fafb{% endif %}; border: 2px solid {% if can_start_contract %}#10b981{% else %}#d1d5db{% endif %};">
+                        {% include 'components/static_title_with_audio.html' with title_text="Start Contract" slug="section_start_contract" heading_tag="h2" %}
+                        <p>{% trans 'Approved' %}: {{ selected_count }} / {{ job.max_responses }} {% trans 'applicants' %}</p>
+                        {% if selected_count < job.max_responses %}
+                            <p class="text-warning">{% blocktrans with selected=selected_count max=job.max_responses %}You have approved {{ selected }} out of {{ max }} requested workers. You can start the contract now with the currently approved workers, but no more applications will be accepted after starting.{% endblocktrans %}</p>
+                        {% endif %}
+                        <form method="post" action="{% url 'jobs:start_contract' job.pk %}" id="start-contract-form">
+                            {% csrf_token %}
+                            <div style="display: flex; align-items: center; gap: 0.5rem;">
+                                <button type="submit" 
+                                        class="btn {% if can_start_contract %}btn-primary{% else %}btn-secondary{% endif %}" 
+                                        id="start-contract-btn"
+                                        {% if not can_start_contract %}disabled{% endif %}>
+                                    {% trans 'Start Contract' %}
+                                </button>
+                                {% audio_player_static_ui "button_start_contract" "label" %}
+                            </div>
+                        </form>
+                        {% if not can_start_contract %}
+                            <p class="text-muted" style="margin-top: 0.5rem; font-size: 0.875rem;">
+                                {% trans 'Approve at least one applicant to start the contract.' %}
+                            </p>
+                        {% endif %}
+                    </div>
+                {% endif %}
+            {% endif %}
+            
+            {% if show_cancel_contract_button %}
+                <div class="card" style="margin-top: 1.5rem; background-color: #fef2f2; border: 2px solid #ef4444;">
+                    {% include 'components/static_title_with_audio.html' with title_text="Cancel Contract" slug="section_cancel_contract" heading_tag="h2" %}
+                    <p>{% trans 'Cancel this contract/job. This action cannot be undone. No further actions can be taken on this job after cancellation.' %}</p>
+                    <form method="post" action="{% url 'jobs:cancel_contract' job.pk %}" id="cancel-contract-form">
                         {% csrf_token %}
                         <div style="display: flex; align-items: center; gap: 0.5rem;">
-                            <button type="submit" class="btn btn-success">{% trans 'Complete Contract' %}</button>
+                            <button type="submit" 
+                                    class="btn btn-danger" 
+                                    id="cancel-contract-btn"
+                                    onclick="return confirm('{% trans 'Are you sure you want to cancel this contract? This action cannot be undone.' %}');">
+                                {% trans 'Cancel Contract' %}
+                            </button>
+                            {% audio_player_static_ui "button_cancel_contract" "label" %}
+                        </div>
+                    </form>
+                </div>
+            {% endif %}
+            
+            {% if job.status == 'canceled' %}
+                <div class="card" style="margin-top: 1.5rem; background-color: #fef2f2; border: 2px solid #ef4444;">
+                    <p><strong>{% trans 'This job has been canceled.' %}</strong> {% trans 'No further actions can be taken on this job.' %}</p>
+                </div>
+            {% endif %}
+            
+            {% if show_complete_contract_button %}
+                <div class="card" style="margin-top: 1.5rem; background-color: {% if can_complete_contract %}#f0fdf4{% else %}#f9fafb{% endif %}; border: 2px solid {% if can_complete_contract %}#10b981{% else %}#d1d5db{% endif %};">
+                    {% include 'components/static_title_with_audio.html' with title_text="Complete Contract" slug="section_complete_contract" heading_tag="h2" %}
+                    <p>{% trans 'Accepted Submissions' %}: {{ accepted_submissions_count }} / {{ job.max_responses }}</p>
+                    {% if accepted_submissions_count < job.max_responses %}
+                        <p class="text-warning">{% blocktrans with accepted=accepted_submissions_count max=job.max_responses %}You have {{ accepted }} accepted submission(s) out of {{ max }} requested. You can complete the contract now with the currently accepted submissions, but no more submissions will be accepted after completing.{% endblocktrans %}</p>
+                    {% endif %}
+                    {% if accepted_submissions_count > 0 %}
+                        <p>{% trans 'All accepted submissions are ready. You can now complete the contract to release payments.' %}</p>
+                    {% endif %}
+                    <form method="post" action="{% url 'jobs:complete_contract' job.pk %}" id="complete-contract-form">
+                        {% csrf_token %}
+                        <div style="display: flex; align-items: center; gap: 0.5rem;">
+                            <button type="submit" 
+                                    class="btn btn-success" 
+                                    id="complete-contract-btn">
+                                {% trans 'Complete Contract' %}
+                            </button>
                             {% audio_player_static_ui "button_complete_contract" "label" %}
                         </div>
                     </form>
                     <p class="text-muted" style="margin-top: 0.5rem; font-size: 0.875rem;">
                         {% trans 'Note: Payment release functionality is coming soon.' %}
                     </p>
-                </div>
-            {% elif job.contract_completed and job.status != 'complete' %}
-                <div class="card" style="margin-top: 1.5rem; background-color: #eff6ff; border: 2px solid #3b82f6;">
-                    <p>{% trans 'Contract has been completed. You can now mark the job as complete.' %}</p>
-                    <form method="post" action="{% url 'jobs:mark_job_completed' job.pk %}">
-                        {% csrf_token %}
-                        <div style="display: flex; align-items: center; gap: 0.5rem;">
-                            <button type="submit" class="btn btn-primary">{% trans 'Mark job completed' %}</button>
-                            {% audio_player_static_ui "button_mark_job_completed" "label" %}
-                        </div>
-                    </form>
                 </div>
             {% endif %}
         {% else %}
@@ -214,7 +361,10 @@
                     <ul>
                         {% for submission in user_submissions %}
                             <li>
-                                {{ submission.get_status_display }} - {{ submission.created_at|date:"F d, Y" }}
+                                <strong>{{ submission.get_status_display }}</strong> - {{ submission.created_at|date:"F d, Y" }}
+                                {% if submission.status == 'accepted' %}
+                                    <span class="text-success" style="margin-left: 0.5rem;">? {% trans 'Accepted' %}</span>
+                                {% endif %}
                             </li>
                         {% endfor %}
                     </ul>
@@ -225,4 +375,82 @@
         <p><a href="{% url 'users:login' %}">{% trans 'Login' %}</a> {% trans 'to submit work for this job.' %}</p>
     {% endif %}
 </article>
+
+{% if user.is_authenticated and user == job.funder and show_start_contract_button %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const startContractForm = document.getElementById('start-contract-form');
+    const startContractBtn = document.getElementById('start-contract-btn');
+    
+    if (startContractForm && startContractBtn) {
+        const submitHandler = function(e) {
+            e.preventDefault();
+            
+            const selectedCount = {{ selected_count }};
+            const maxResponses = {{ job.max_responses }};
+            
+            let message;
+            if (selectedCount < maxResponses) {
+                message = {% blocktrans with selected=selected_count max=job.max_responses %}'Warning: You are starting the contract with {{ selected }} approved worker(s) out of {{ max }} requested.\n\nOnce the contract is started, no more applications will be accepted and you cannot get additional workers later.\n\nDo you want to continue?'{% endblocktrans %};
+            } else {
+                message = {% trans 'Are you sure you want to start the contract? This will allow approved workers to submit their work. No more applications will be accepted after starting.' %};
+            }
+            
+            if (confirm(message)) {
+                // Remove event listener and submit the form
+                startContractForm.removeEventListener('submit', submitHandler);
+                startContractForm.submit();
+            }
+        };
+        startContractForm.addEventListener('submit', submitHandler);
+    }
+});
+</script>
+{% endif %}
+
+{% if user.is_authenticated and user == job.funder and show_complete_contract_button %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const completeContractForm = document.getElementById('complete-contract-form');
+    const completeContractBtn = document.getElementById('complete-contract-btn');
+    
+    if (completeContractForm && completeContractBtn) {
+        const submitHandler = function(e) {
+            e.preventDefault();
+            
+            const acceptedCount = {{ accepted_submissions_count }};
+            const maxResponses = {{ job.max_responses }};
+            
+            let message;
+            if (acceptedCount < maxResponses) {
+                message = {% blocktrans with accepted=accepted_submissions_count max=job.max_responses %}'Warning: You are completing the contract with {{ accepted }} accepted submission(s) out of {{ max }} requested.\n\nOnce the contract is completed, no more submissions will be accepted and you cannot get additional workers later.\n\nDo you want to continue?'{% endblocktrans %};
+            } else {
+                message = {% trans 'Are you sure you want to complete the contract? This will release payments to workers.' %};
+            }
+            
+            if (confirm(message)) {
+                // Remove event listener and submit the form
+                completeContractForm.removeEventListener('submit', submitHandler);
+                completeContractForm.submit();
+            }
+        };
+        completeContractForm.addEventListener('submit', submitHandler);
+    }
+});
+</script>
+{% endif %}
+
+<style>
+.status-pill {
+    padding: 0.25rem 0.75rem;
+    border-radius: 999px;
+    font-size: 0.875rem;
+    font-weight: 600;
+    text-transform: capitalize;
+    display: inline-block;
+}
+.status-pending { background-color: #fef3c7; color: #92400e; }
+.status-selected { background-color: #dcfce7; color: #166534; }
+.status-rejected { background-color: #fee2e2; color: #991b1b; }
+</style>
 {% endblock %}

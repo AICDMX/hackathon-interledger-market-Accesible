@@ -79,6 +79,20 @@ class Command(BaseCommand):
                     preferred_language=user_data.get('preferred_language', 'en'),
                     native_languages=user_data.get('native_languages', ''),
                 )
+                
+                # Set wallet address if provided
+                if user_data.get('wallet_address'):
+                    user.wallet_address = user_data.get('wallet_address')
+                
+                # Set seller credentials if provided
+                if user_data.get('seller_key_id'):
+                    user.seller_key_id = user_data.get('seller_key_id')
+                if user_data.get('seller_private_key'):
+                    user.seller_private_key = user_data.get('seller_private_key')
+                if user_data.get('seller_wallet_address'):
+                    user.seller_wallet_address = user_data.get('seller_wallet_address')
+                if user_data.get('wallet_address') or user_data.get('seller_key_id') or user_data.get('seller_private_key') or user_data.get('seller_wallet_address'):
+                    user.save()
 
                 self.stdout.write(
                     self.style.SUCCESS(

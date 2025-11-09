@@ -143,3 +143,27 @@ django.template.exceptions.TemplateSyntaxError: Invalid block tag on line 58: 'e
     6. Decline action sets submission status to 'rejected' and shows success message
 [x] mark job complete button is redundent. once they do complete contract that marks the job as complete
   - Fixed: Updated `complete_contract` view to automatically mark job status as 'complete' when contract is completed. Removed redundant "Mark job completed" button from job_detail.html and job_owner_dashboard.html templates. Now completing the contract immediately marks the job as complete in a single action.
+[x] where we can upload job titles we should have a associated optional upload for the title and that should match the target langague
+[x] i get this error on the docker version Error loading audio: Error: Failed to fetch audio
+    loadAudioPlayer http://127.0.0.1:8000/static/audio/audio-player.js:42
+[x] the main dashboard page when your logged in should be the one with all the big icons
+[x] main dashboard goes off the screen on some screen sizes. can we do better?
+[x] i see images that still have blank space instead of - can we get that fixed?
+[x] i cant see the the menu when i click on the hamburger in middl nerrow size
+[x] when i got this error it cleared all the feilds. maybe we save it first? or somehow not clear all my work, Please select at least one deliverable type.
+[x] make it so there is only one funder in demo users. add that funder to all the default jobs.
+wallet address sshould be "ilp.interledger-test.dev/send-money"
+[x] add these to all of the seller creator demo users
+seller key id 
+d7c6fdbe-c9f0-41b0-b86f-8d79877759aa
+seller private key
+-----BEGIN PRIVATE KEY-----
+MC4CAQAwBQYDK2VwBCIEIPGTviT7rj1sYw/Y5LML3ymeZnF1wpv2ku+wEq7jTzPk
+-----END PRIVATE KEY-----
+wallet address
+ilp.interledger-test.dev/get-money
+and the default language should be otomi
+[x] update the readme
+[x] create a makefile
+[x] add to profile the profile defualts that are found when doing a job for creators. we are already storeing those defaults we should make them accessable.
+[x] update the readme to include the makefile usage info.

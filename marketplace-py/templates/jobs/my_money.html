@@ -7,16 +7,6 @@
 <div class="card">
     {% include 'components/static_title_with_audio.html' with title_text="My Money" slug="page_my_money" heading_tag="h2" %}
     
-    {% if wallet_endpoint %}
-    <div class="form-group">
-        <div style="display: flex; align-items: center; gap: 0.5rem;">
-            <label>{% trans 'Wallet Endpoint' %}:</label>
-            {% audio_player_static_ui "label_wallet_endpoint" "label" %}
-        </div>
-        <p>{{ wallet_endpoint }}</p>
-    </div>
-    {% endif %}
-    
     <div class="form-group">
         <div style="display: flex; align-items: center; gap: 0.5rem;">
             <label>{% trans 'Total Earned' %}:</label>

@@ -12,7 +12,6 @@ urlpatterns = [
     path('<int:pk>/edit/', views.edit_job, name='edit'),
     path('<int:pk>/duplicate/', views.duplicate_job, name='duplicate'),
     path('<int:pk>/', views.job_detail, name='detail'),
-    path('<int:pk>/approve-quote/', views.approve_quote, name='approve_quote'),
     path('<int:pk>/submit/', views.submit_job, name='submit'),
     path('<int:pk>/preview-submission/', views.preview_submission, name='preview_submission'),
     path('my-jobs/', views.my_jobs, name='my_jobs'),
@@ -25,6 +24,8 @@ urlpatterns = [
     path('<int:pk>/applications/', views.view_applications, name='view_applications'),
     path('<int:job_pk>/applications/<int:application_pk>/select/', views.select_application, name='select_application'),
     path('<int:pk>/pre-approve-payments/', views.pre_approve_payments, name='pre_approve_payments'),
+    path('<int:pk>/start-contract/', views.start_contract, name='start_contract'),
+    path('contract-complete/<str:contract_id>/', views.complete_contract_payment, name='complete_contract_payment'),
     path('<int:pk>/complete-contract/', views.complete_contract, name='complete_contract'),
     path('<int:pk>/cancel-contract/', views.cancel_contract, name='cancel_contract'),
     # Payment finish callback (from wallet -> Django)

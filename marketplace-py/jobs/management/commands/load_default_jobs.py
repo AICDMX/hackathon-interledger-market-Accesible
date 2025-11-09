@@ -21,25 +21,17 @@ class Command(BaseCommand):
         )
 
     def handle(self, *args, **options):
-        # Get or create a default funder user
-        default_funder, created = User.objects.get_or_create(
-            username='default_funder',
-            defaults={
-                'email': 'funder@marketplace.local',
-                'role': 'funder',
-                'is_staff': True,
-            }
-        )
-        if created:
-            default_funder.set_password('default_password_change_me')
-            default_funder.save()
+        # Use the demo_funder user from demo_users.json
+        try:
+            demo_funder = User.objects.get(username='demo_funder')
             self.stdout.write(
-                self.style.SUCCESS(f'Created default funder user: {default_funder.username}')
+                self.style.SUCCESS(f'Using demo funder user: {demo_funder.username}')
             )
-        else:
+        except User.DoesNotExist:
             self.stdout.write(
-                self.style.SUCCESS(f'Using existing funder user: {default_funder.username}')
+                self.style.ERROR('demo_funder user not found. Please run: python manage.py load_demo_users')
             )
+            return
 
         # Determine JSON file path
         json_file = options.get('json_file')
@@ -105,7 +97,7 @@ class Command(BaseCommand):
                     amount_per_person=amount_per_person,
                     budget=budget_total,
                     max_responses=max_responses,
-                    funder=default_funder,
+                    funder=demo_funder,
                     status=job_status,
                 )
 

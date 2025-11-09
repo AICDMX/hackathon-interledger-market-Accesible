@@ -225,4 +225,6 @@ AUDIO_ICON_ACTIVE = 'listen-active.png'
 PAYMENTS_SERVICE_URL = os.environ.get('PAYMENTS_SERVICE_URL', 'http://payments:3000')
 # In development, use http://localhost:4001 if running payments service locally
 PAYMENTS_SELLER_ID = os.environ.get('PAYMENTS_SELLER_ID', 'seller-mvr5656')
-DEFAULT_SELLER_ID = os.environ.get('DEFAULT_SELLER_ID', 'default-seller')
+
+# Open Payments configuration
+DEFAULT_REDIRECT_AFTER_AUTH = os.environ.get('DEFAULT_REDIRECT_AFTER_AUTH', '/contract-complete/')
