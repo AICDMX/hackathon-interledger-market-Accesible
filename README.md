@@ -164,7 +164,6 @@ marketplace-py/
 
 ## Documentation
 
-- `startHere.md` - Product context and roadmap
 - `docs/design.md` - Design system and tokens
 - `docs/job-states.md` - Job state machine documentation
 - `docs/open-payments.md` - Open Payments integration notes
