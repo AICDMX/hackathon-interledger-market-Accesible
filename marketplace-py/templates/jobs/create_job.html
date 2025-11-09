@@ -1,7 +1,53 @@
 {% extends 'base.html' %}
-{% load i18n %}
+{% load i18n static %}
 
 {% block title %}{% trans 'Create Job' %} - {{ block.super }}{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'audio/audio-contribution.css' %}">
+<style>
+    .checkbox-group {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1rem;
+        margin-top: 0.5rem;
+    }
+    
+    .checkbox-group label {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        margin-bottom: 0;
+        font-weight: normal;
+        cursor: pointer;
+    }
+    
+    .checkbox-group input[type="checkbox"] {
+        width: auto;
+        margin: 0;
+        cursor: pointer;
+    }
+    
+    .total-budget-display {
+        padding: 0.75rem;
+        background-color: #f8f9fa;
+        border: 1px solid #dee2e6;
+        border-radius: 0.25rem;
+        font-size: 1.25rem;
+        color: #495057;
+    }
+    
+    .reference-media-grid {
+        display: grid;
+        gap: 1.5rem;
+        margin-top: 0.5rem;
+    }
+
+    .audio-recording-section {
+        margin-bottom: 0.5rem;
+    }
+</style>
+{% endblock %}
 
 {% block content %}
 <h1>{% trans 'Create New Job' %}</h1>
@@ -38,16 +84,138 @@
         </div>
         
         <div class="form-group">
-            <label for="deliverable_types">{% trans 'Deliverable Types' %} * ({% trans 'comma-separated: text,video,audio,image' %})</label>
-            <input type="text" id="deliverable_types" name="deliverable_types" required aria-required="true" placeholder="text,audio">
+            <label>{% trans 'Deliverable Types' %} *</label>
+            <div class="checkbox-group">
+                <label>
+                    <input type="checkbox" name="deliverable_types" value="text">
+                    {% trans 'Text' %}
+                </label>
+                <label>
+                    <input type="checkbox" name="deliverable_types" value="video">
+                    {% trans 'Video' %}
+                </label>
+                <label>
+                    <input type="checkbox" name="deliverable_types" value="audio">
+                    {% trans 'Audio' %}
+                </label>
+                <label>
+                    <input type="checkbox" name="deliverable_types" value="image">
+                    {% trans 'Image' %}
+                </label>
+            </div>
+            <small class="form-text text-muted">{% trans 'Select one or more deliverable types for this job' %}</small>
         </div>
         
         <div class="form-group">
-            <label for="budget">{% trans 'Budget (ILP)' %} *</label>
-            <input type="number" id="budget" name="budget" step="0.01" min="0" required aria-required="true">
+            <label for="amount_per_person">{% trans 'Amount Per Person (ILP)' %} *</label>
+            <input type="number" id="amount_per_person" name="amount_per_person" step="0.01" min="0" required aria-required="true">
+            <small class="form-text text-muted">{% trans 'How much you will pay each person who completes this job' %}</small>
+        </div>
+        
+        <div class="form-group">
+            <label for="max_responses">{% trans 'Number of Responses Needed' %} *</label>
+            <input type="number" id="max_responses" name="max_responses" min="1" value="1" required aria-required="true">
+            <small class="form-text text-muted">{% trans 'How many people should submit work for this job? (e.g., if you want 20 people to do the same voice or picture set, enter 20)' %}</small>
+        </div>
+        
+        <div class="form-group">
+            <label>{% trans 'Total Budget' %}</label>
+            <div id="total-budget-display" class="total-budget-display">
+                <strong>0.00 ILP</strong>
+            </div>
+            <small class="form-text text-muted">{% trans 'Total amount needed: Amount per person ? Number of responses' %}</small>
+        </div>
+        
+        <div class="form-group">
+            <label>{% trans 'Optional reference media' %}</label>
+            <p class="muted-text">{% trans 'Record audio or upload photos/videos so creators understand what you need even if they do not read the description.' %}</p>
+        </div>
+        
+        <div class="reference-media-grid">
+            <div class="form-group">
+                <label for="reference_audio">{% trans 'Audio instructions' %}</label>
+                <div class="audio-recording-section" data-audio-recording data-file-input-id="reference_audio" data-max-duration="180000" data-compression-bitrate="192000">
+                    <div class="recording-controls">
+                        <button type="button" class="btn-record" id="btn-start-recording-audio" aria-label="{% trans 'Start recording' %}">
+                            <span class="record-icon" aria-hidden="true">??</span>
+                            <span class="record-label">{% trans 'Record Audio' %}</span>
+                        </button>
+                        <button type="button" class="btn-retry" id="btn-retry-recording-audio" style="display: none;" aria-label="{% trans 'Record again' %}">
+                            <span class="retry-icon" aria-hidden="true">??</span>
+                            <span class="retry-label">{% trans 'Record Again' %}</span>
+                        </button>
+                        <button type="button" class="btn-stop" id="btn-stop-recording-audio" style="display: none;" aria-label="{% trans 'Stop recording' %}">
+                            <span class="stop-icon" aria-hidden="true">?</span>
+                            <span class="stop-label">{% trans 'Stop' %}</span>
+                        </button>
+                        <button type="button" class="btn-cancel" id="btn-cancel-recording-audio" style="display: none;" aria-label="{% trans 'Cancel recording' %}">
+                            <span class="cancel-icon" aria-hidden="true">?</span>
+                            <span class="cancel-label">{% trans 'Cancel' %}</span>
+                        </button>
+                    </div>
+                    <div class="recording-status" id="recording-status-audio" style="display: none;" role="status" aria-live="polite">
+                        <span class="recording-indicator" aria-hidden="true">??</span>
+                        <span class="recording-time" id="recording-time-audio">0:00</span>
+                    </div>
+                    <div class="recording-preview" id="recording-preview-audio" style="display: none;">
+                        <audio controls id="recording-audio-preview-audio"></audio>
+                    </div>
+                </div>
+                <p class="muted-text" style="font-size: 0.875rem; margin-top: 0.5rem;">
+                    {% trans 'Or upload an audio file:' %}
+                </p>
+                <input type="file" id="reference_audio" name="reference_audio" accept="audio/*" capture="microphone">
+            </div>
+            
+            <div class="form-group">
+                <label for="reference_video">{% trans 'Video reference' %}</label>
+                <input type="file" id="reference_video" name="reference_video" accept="video/*" capture="environment">
+                <small class="form-text text-muted">{% trans 'Record with your camera or upload an existing clip.' %}</small>
+            </div>
+            
+            <div class="form-group">
+                <label for="reference_image">{% trans 'Image reference' %}</label>
+                <input type="file" id="reference_image" name="reference_image" accept="image/*" capture="environment">
+                <small class="form-text text-muted">{% trans 'Take a quick photo or upload inspiration images.' %}</small>
+            </div>
         </div>
         
         <button type="submit" class="btn btn-primary">{% trans 'Create Job' %}</button>
     </form>
 </div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'audio/audio-recorder.js' %}"></script>
+<script src="{% static 'jobs/job-submission-audio.js' %}"></script>
+<script>
+    // Calculate total budget dynamically
+    function updateTotalBudget() {
+        const amountPerPerson = parseFloat(document.getElementById('amount_per_person').value) || 0;
+        const maxResponses = parseInt(document.getElementById('max_responses').value) || 1;
+        const total = amountPerPerson * maxResponses;
+        const display = document.getElementById('total-budget-display');
+        if (display) {
+            display.innerHTML = '<strong>' + total.toFixed(2) + ' ILP</strong>';
+        }
+    }
+    
+    document.addEventListener('DOMContentLoaded', function() {
+        const amountInput = document.getElementById('amount_per_person');
+        const responsesInput = document.getElementById('max_responses');
+        
+        if (amountInput) {
+            amountInput.addEventListener('input', updateTotalBudget);
+            amountInput.addEventListener('change', updateTotalBudget);
+        }
+        
+        if (responsesInput) {
+            responsesInput.addEventListener('input', updateTotalBudget);
+            responsesInput.addEventListener('change', updateTotalBudget);
+        }
+        
+        // Initial calculation
+        updateTotalBudget();
+    });
+</script>
 {% endblock %}

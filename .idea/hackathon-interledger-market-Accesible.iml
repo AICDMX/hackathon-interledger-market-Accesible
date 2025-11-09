@@ -18,6 +18,7 @@
     </content>
     <orderEntry type="jdk" jdkName="uv (marketplace-py)" jdkType="Python SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
+    <orderEntry type="module" module-name="hop-sauna" />
   </component>
   <component name="TemplatesService">
     <option name="TEMPLATE_CONFIGURATION" value="Django" />

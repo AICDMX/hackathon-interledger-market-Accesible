@@ -11,9 +11,7 @@
 <section class="card" style="margin-bottom: 1.5rem;">
     <h1 style="margin-bottom: 0.5rem;">{{ opportunity.title }}</h1>
     <p style="margin-bottom: 1rem;">{{ opportunity.description_es }}</p>
-    <p class="muted-text">
-        {% blocktrans %}Idioma sugerido: {{ opportunity.language_code }}{% endblocktrans %}
-    </p>
+    <p><strong>{% trans 'Target Language' %}:</strong> {{ opportunity.language_code }}</p>
 </section>
 
 <section class="card" id="funding" style="margin-bottom: 1.5rem;">
@@ -40,6 +38,13 @@
 <section class="card" id="upload-audio">
     <h2 style="margin-bottom: 0.5rem;">{% trans 'Subir audio comunitario' %}</h2>
     <p>{% trans 'Graba un mensaje corto (menos de 30 segundos) explicando el botón y súbelo aquí. Puedes grabar directamente desde tu navegador o subir un archivo de audio.' %}</p>
+    
+    <div class="card bg-info" style="margin-bottom: 1rem; padding: 0.75rem;">
+        <p style="margin: 0;"><strong>{% trans 'Idioma requerido' %}:</strong> {{ opportunity.language_code }}</p>
+        <p class="muted-text" style="margin: 0.25rem 0 0 0; font-size: 0.875rem;">
+            {% trans 'Este audio debe estar en el idioma especificado arriba.' %}
+        </p>
+    </div>
 
     <div id="audio-contribution-form" 
          data-audio-contribution
@@ -51,13 +56,7 @@
         <form method="post" enctype="multipart/form-data">
             {% csrf_token %}
             <input type="hidden" name="action" value="upload_audio">
-            <div class="form-group">
-                <label for="{{ contribution_form.language_code.id_for_label }}">{{ contribution_form.language_code.label }}</label>
-                {{ contribution_form.language_code }}
-                {% if contribution_form.language_code.errors %}
-                    <div class="form-error">{{ contribution_form.language_code.errors }}</div>
-                {% endif %}
-            </div>
+            <input type="hidden" name="language_code" value="{{ opportunity.language_code }}">
             <div class="form-group">
                 <label for="{{ contribution_form.file.id_for_label }}">{{ contribution_form.file.label }}</label>
                 <p class="muted-text" style="font-size: 0.875rem; margin-top: 0.25rem;">

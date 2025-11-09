@@ -26,6 +26,14 @@ class AudioContributionForm(forms.ModelForm):
             'notes': _('Notas para el equipo'),
         }
 
+    def __init__(self, *args, hide_language=False, **kwargs):
+        """Initialize form, optionally hiding the language field."""
+        super().__init__(*args, **kwargs)
+        if hide_language:
+            # Remove language_code from fields if it should be hidden
+            if 'language_code' in self.fields:
+                del self.fields['language_code']
+
     file = forms.FileField(
         label=_('Archivo de audio'),
         widget=forms.ClearableFileInput(attrs={'class': 'form-control', 'accept': 'audio/*'}),

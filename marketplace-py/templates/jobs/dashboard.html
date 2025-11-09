@@ -175,6 +175,32 @@
         background: #f39c12;
         color: #fff;
     }
+
+    .audio-info-close {
+        background: transparent;
+        border: none;
+        color: #fff;
+        font-size: 1.5rem;
+        line-height: 1;
+        cursor: pointer;
+        padding: 0;
+        width: 24px;
+        height: 24px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        transition: background-color 0.2s ease;
+        margin-left: 0.5rem;
+        flex-shrink: 0;
+    }
+
+    .audio-info-close:hover,
+    .audio-info-close:focus {
+        background-color: rgba(255, 255, 255, 0.2);
+        outline: 2px solid rgba(255, 255, 255, 0.5);
+        outline-offset: 2px;
+    }
 </style>
 {% endblock %}
 
@@ -201,6 +227,15 @@
                 {% endwith %}
             </p>
         </a>
+
+        {% if has_posted_jobs %}
+        <a href="{% url 'jobs:owner_dashboard' %}" class="dashboard-icon-card" role="gridcell" aria-label="{% trans 'Manage My Jobs' %}">
+            <div class="dashboard-icon" aria-hidden="true">📊</div>
+            <p class="dashboard-label">
+                {% trans 'My Job Dashboard' %}
+            </p>
+        </a>
+        {% endif %}
 
         <a href="{% url 'jobs:my_products' %}" class="dashboard-icon-card" role="gridcell" aria-label="{% trans 'My Products' %}">
             <div class="dashboard-icon" aria-hidden="true">??</div>
@@ -308,10 +343,10 @@
 // You'll need a ContentType for dashboard items (or use an existing model)
 document.addEventListener('DOMContentLoaded', function() {
     const audioMessages = {
-        error: 'No pudimos reproducir el audio. Inténtalo de nuevo o sube uno nuevo.',
-        notAvailable: 'Aún no tenemos audio para este botón.',
-        moduleMissing: 'El reproductor todavía no está listo en este dispositivo.',
-        notConfigured: 'Conecta este botón con un contenido para habilitar el audio.'
+        error: 'No pudimos reproducir el audio. Int?ntalo de nuevo o sube uno nuevo.',
+        notAvailable: 'A?n no tenemos audio para este bot?n.',
+        moduleMissing: 'El reproductor todav?a no est? listo en este dispositivo.',
+        notConfigured: 'Conecta este bot?n con un contenido para habilitar el audio.'
     };
     const fallbackAudioUrl = '{% static "audio/fallback.mp3" %}';
     const defaultFundAmount = {{ community_fund_amount|default:10 }};
@@ -325,6 +360,15 @@ document.addEventListener('DOMContentLoaded', function() {
 
     let audioInfoTimeoutId = null;
     let fallbackAudioInstance = null;
+    
+    function closeAudioBanner() {
+        if (audioInfoTimeoutId) {
+            clearTimeout(audioInfoTimeoutId);
+            audioInfoTimeoutId = null;
+        }
+        audioInfoBanner.classList.remove('show');
+    }
+    
     function showAudioMessage(message, options = {}) {
         const { actions = [], playFallback } = options;
         audioInfoBanner.innerHTML = '';
@@ -350,13 +394,22 @@ document.addEventListener('DOMContentLoaded', function() {
             audioInfoBanner.appendChild(actionLink);
         });
 
+        // Add close button
+        const closeButton = document.createElement('button');
+        closeButton.className = 'audio-info-close';
+        closeButton.innerHTML = '&times;';
+        closeButton.setAttribute('aria-label', '{% trans "Close" %}');
+        closeButton.setAttribute('type', 'button');
+        closeButton.onclick = closeAudioBanner;
+        audioInfoBanner.appendChild(closeButton);
+
         audioInfoBanner.classList.add('show');
         if (audioInfoTimeoutId) {
             clearTimeout(audioInfoTimeoutId);
         }
         audioInfoTimeoutId = setTimeout(function() {
-            audioInfoBanner.classList.remove('show');
-        }, 3500);
+            closeAudioBanner();
+        }, 30000);
 
         if (playFallback) {
             playFallbackAudio();
@@ -419,7 +472,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const audioBtn = document.createElement('button');
         audioBtn.className = 'audio-play-btn';
         audioBtn.style.cssText = 'display: inline-flex; align-items: center; gap: 0.25rem; padding: 0.25rem 0.5rem; background-color: #3498db; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 0.875rem; transition: background-color 0.2s;';
-        audioBtn.innerHTML = '<span aria-hidden="true">🔊</span><span class="audio-label">{% trans "Listen" %}</span>';
+        audioBtn.innerHTML = '<span aria-hidden="true">??</span><span class="audio-label">{% trans "Listen" %}</span>';
         audioBtn.setAttribute('aria-label', '{% trans "Play audio" %}');
         
         // Store data attributes for API calls

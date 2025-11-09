@@ -1,0 +1,28 @@
+# Completed Tasks
+
+[x] we need to make sure each job allows for uploading image/video/audio/audiorecord
+[x] we need a way for people to create and fund jobs. 
+[x] jobs should show funded when they are funded and by how much
+[x] when a user clicks on a audio translation it should use their language. if translation does not exsist it should use their language fallback. then if not that then the final fallback. 
+[x] audio translation popup is to fast. we need it to stay up 30 seconds
+[x] we need to be able to mark how many responses we want to a job. default is one. this is like if someone wants 20 people to do the same voice or the same picture set. 
+[x] setup the default jobs to auto load into the system.
+[X] create a job should have have a place to upload audio/image/video/and audio record like completing jobs does since the user might barely read or write. 
+[X] a user should only be able to complete jobs that have not been completed
+[x] a user should only be able to complete a job once. 
+[X] making a job should allow recording video then just like finishing jobs does
+[X] the defualt Quechua Voice Recording job should start as funded
+[X] search jobs on brows job page starts with None in the box
+[x] browse jobs should just show funded jobs with an optional check box to show unfunded.
+[x] Show unfunded jobs check box needs proper formating
+[x] add browse job page checkboxes for completed jobs, unfunded jobs, defualt selected should only be funded jobs
+[x] i have a funded ob but its not showing on the brows job page. we should be able to see it
+[X] when i am in a funded job i see no way to click to sumbit page?
+[X] when a user makes a job it should have an amount per person that completes it. defualt is one person so in that case they need to fund 1xamount. but if they want more then one person then it should b n*amount and that should be the amount requested for funding.
+[x] Idioma del audio should not be there for the one doing the job. when a job is created it should be created for a specific language. that language should be displayed.
+[X] Deliverable Types * (comma-separated: text,video,audio,image) should be multi select
+[X] Fund this job immediately - removed. we should create the job and will create a wallet. and then the user will fund it.
+[X] Deliverable Types * spacing has been limited
+[X] we need to have a dashboard that only shows if there are jobs we made. if we made a job it should show a list of the jobs. and its current state if completed or not. if a job is completeded we should have place we see/download files then mark complete. this should also show partial completions so we can release partial funds.
+[X] once a user has completed a job that job should stop accepting new posts. and should have that as a status. waiting completion.
+[X] finishing a job should also live recording of a video with audio or to take a picture right there rather then just upload. we want to keep upload though. Easy part done (camera capture for video/images), hard part (MediaRecorder API) documented in TODO-Hard.md

@@ -1,7 +1,11 @@
 {% extends 'base.html' %}
-{% load i18n %}
+{% load i18n static %}
 
 {% block title %}{% trans 'Submit Work' %} - {{ block.super }}{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'audio/audio-contribution.css' %}">
+{% endblock %}
 
 {% block content %}
 <h1>{% trans 'Submit Work for' %}: {{ job.title }}</h1>
@@ -9,11 +13,40 @@
 <div class="card">
     <p><strong>{% trans 'Target Language' %}:</strong> {{ job.target_language }}</p>
     <p><strong>{% trans 'Budget' %}:</strong> {{ job.budget }} ILP</p>
-    <p><strong>{% trans 'Required Deliverables' %}:</strong> {{ job.deliverable_types }}</p>
+    <p><strong>{% trans 'Required Deliverables' %}:</strong> {{ job.get_deliverable_types_display }}</p>
 </div>
 
+{% if job.has_reference_media %}
+    <div class="card">
+        <h2>{% trans 'Reference Media From Funder' %}</h2>
+        <p class="muted-text">{% trans 'Review these examples before submitting your work.' %}</p>
+        {% if job.reference_audio %}
+            <div style="margin-bottom: 1rem;">
+                <p style="margin-bottom: 0.25rem;"><strong>{% trans 'Audio instructions' %}</strong></p>
+                <audio controls src="{{ job.reference_audio.url }}" style="width: 100%;">
+                    {% trans 'Your browser does not support the audio element.' %}
+                </audio>
+            </div>
+        {% endif %}
+        {% if job.reference_video %}
+            <div style="margin-bottom: 1rem;">
+                <p style="margin-bottom: 0.25rem;"><strong>{% trans 'Video reference' %}</strong></p>
+                <video controls src="{{ job.reference_video.url }}" style="width: 100%; max-height: 360px;">
+                    {% trans 'Your browser does not support the video element.' %}
+                </video>
+            </div>
+        {% endif %}
+        {% if job.reference_image %}
+            <div>
+                <p style="margin-bottom: 0.25rem;"><strong>{% trans 'Image reference' %}</strong></p>
+                <img src="{{ job.reference_image.url }}" alt="{% trans 'Reference image for this job' %}" style="max-width: 100%; border-radius: 0.5rem;">
+            </div>
+        {% endif %}
+    </div>
+{% endif %}
+
 <div class="card">
-    <form method="post" enctype="multipart/form-data">
+    <form method="post" enctype="multipart/form-data" id="job-submission-form">
         {% csrf_token %}
         
         <div class="form-group">
@@ -28,13 +61,49 @@
                     <input type="file" id="text_file" name="text_file" accept=".txt,.doc,.docx,.pdf">
                 {% elif deliverable_type == 'video' %}
                     <label for="video_file">{% trans 'Video File' %}</label>
-                    <input type="file" id="video_file" name="video_file" accept="video/*">
+                    <input type="file" id="video_file" name="video_file" accept="video/*" capture="environment">
+                    <p class="muted-text" style="font-size: 0.875rem; margin-top: 0.5rem;">
+                        {% trans 'Record with your camera or upload an existing video.' %}
+                    </p>
                 {% elif deliverable_type == 'audio' %}
                     <label for="audio_file">{% trans 'Audio File' %}</label>
+                    <div class="audio-recording-section" data-audio-recording data-file-input-id="audio_file">
+                        <div class="recording-controls">
+                            <button type="button" class="btn-record" id="btn-start-recording-audio" aria-label="{% trans 'Start recording' %}">
+                                <span class="record-icon" aria-hidden="true">??</span>
+                                <span class="record-label">{% trans 'Record Audio' %}</span>
+                            </button>
+                            <button type="button" class="btn-retry" id="btn-retry-recording-audio" style="display: none;" aria-label="{% trans 'Record again' %}">
+                                <span class="retry-icon" aria-hidden="true">??</span>
+                                <span class="retry-label">{% trans 'Record Again' %}</span>
+                            </button>
+                            <button type="button" class="btn-stop" id="btn-stop-recording-audio" style="display: none;" aria-label="{% trans 'Stop recording' %}">
+                                <span class="stop-icon" aria-hidden="true">?</span>
+                                <span class="stop-label">{% trans 'Stop' %}</span>
+                            </button>
+                            <button type="button" class="btn-cancel" id="btn-cancel-recording-audio" style="display: none;" aria-label="{% trans 'Cancel recording' %}">
+                                <span class="cancel-icon" aria-hidden="true">?</span>
+                                <span class="cancel-label">{% trans 'Cancel' %}</span>
+                            </button>
+                        </div>
+                        <div class="recording-status" id="recording-status-audio" style="display: none;" role="status" aria-live="polite">
+                            <span class="recording-indicator" aria-hidden="true">??</span>
+                            <span class="recording-time" id="recording-time-audio">0:00</span>
+                        </div>
+                        <div class="recording-preview" id="recording-preview-audio" style="display: none;">
+                            <audio controls id="recording-audio-preview-audio"></audio>
+                        </div>
+                    </div>
+                    <p class="muted-text" style="font-size: 0.875rem; margin-top: 0.5rem;">
+                        {% trans 'Or upload an audio file:' %}
+                    </p>
                     <input type="file" id="audio_file" name="audio_file" accept="audio/*">
                 {% elif deliverable_type == 'image' %}
                     <label for="image_file">{% trans 'Image File' %}</label>
-                    <input type="file" id="image_file" name="image_file" accept="image/*">
+                    <input type="file" id="image_file" name="image_file" accept="image/*" capture="environment">
+                    <p class="muted-text" style="font-size: 0.875rem; margin-top: 0.5rem;">
+                        {% trans 'Take a quick photo or upload an existing image.' %}
+                    </p>
                 {% endif %}
             </div>
         {% endfor %}
@@ -43,4 +112,9 @@
         <a href="{% url 'jobs:detail' job.pk %}" class="btn">{% trans 'Cancel' %}</a>
     </form>
 </div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'audio/audio-recorder.js' %}"></script>
+<script src="{% static 'jobs/job-submission-audio.js' %}"></script>
 {% endblock %}

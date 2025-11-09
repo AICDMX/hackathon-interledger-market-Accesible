@@ -204,3 +204,7 @@ AUDIO_CACHE_TIMEOUT = 300  # 5 minutes
 # This file will be used when audio snippets are not available
 # Format: MP3 is recommended for widest browser support
 AUDIO_FALLBACK_FILE = 'audio/fallback.mp3'  # Path relative to static files
+
+# Payments service configuration
+PAYMENTS_SERVICE_URL = os.environ.get('PAYMENTS_SERVICE_URL', 'http://payments:3000')
+# In development, use http://localhost:4001 if running payments service locally

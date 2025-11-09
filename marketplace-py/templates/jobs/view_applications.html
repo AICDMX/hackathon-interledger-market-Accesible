@@ -1,0 +1,133 @@
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% block title %}{% trans 'View Applications' %} - {{ block.super }}{% endblock %}
+
+{% block content %}
+<h1>{% trans 'Applications for' %}: {{ job.title }}</h1>
+
+<div class="card">
+    <p><strong>{% trans 'Status' %}:</strong> {{ job.get_status_display }}</p>
+    <p><strong>{% trans 'Selected Applicants' %}:</strong> {{ selected_count }}</p>
+    <p><strong>{% trans 'Total Applications' %}:</strong> {{ applications.count }}</p>
+    <a href="{% url 'jobs:detail' job.pk %}" class="btn">{% trans 'View Job' %}</a>
+</div>
+
+{% if applications %}
+    <div style="margin-top: 1.5rem;">
+        <h2>{% trans 'All Applications' %}</h2>
+        {% for application in applications %}
+            <div class="card" style="margin-top: 1rem; border-left: 4px solid {% if application.status == 'selected' %}#10b981{% elif application.status == 'rejected' %}#ef4444{% else %}#f59e0b{% endif %};">
+                <div style="display: flex; justify-content: space-between; align-items: start; flex-wrap: wrap; gap: 1rem;">
+                    <div style="flex: 1;">
+                        <h3>{{ application.applicant.username }}</h3>
+                        <p class="text-muted" style="margin: 0;">
+                            {% trans 'Applied' %}: {{ application.created_at|date:"F d, Y H:i" }}
+                        </p>
+                        <p>
+                            <strong>{% trans 'Status' %}:</strong> 
+                            <span class="status-pill status-{{ application.status }}">
+                                {{ application.get_status_display }}
+                            </span>
+                        </p>
+                    </div>
+                    <div>
+                        {% if application.status == 'pending' %}
+                            <form method="post" action="{% url 'jobs:select_application' job.pk application.pk %}" style="display: inline;">
+                                {% csrf_token %}
+                                <input type="hidden" name="action" value="select">
+                                <button type="submit" class="btn btn-success">{% trans 'Select' %}</button>
+                            </form>
+                            <form method="post" action="{% url 'jobs:select_application' job.pk application.pk %}" style="display: inline;">
+                                {% csrf_token %}
+                                <input type="hidden" name="action" value="reject">
+                                <button type="submit" class="btn btn-danger">{% trans 'Reject' %}</button>
+                            </form>
+                        {% elif application.status == 'selected' %}
+                            <form method="post" action="{% url 'jobs:select_application' job.pk application.pk %}" style="display: inline;">
+                                {% csrf_token %}
+                                <input type="hidden" name="action" value="pending">
+                                <button type="submit" class="btn">{% trans 'Reset to Pending' %}</button>
+                            </form>
+                        {% elif application.status == 'rejected' %}
+                            <form method="post" action="{% url 'jobs:select_application' job.pk application.pk %}" style="display: inline;">
+                                {% csrf_token %}
+                                <input type="hidden" name="action" value="pending">
+                                <button type="submit" class="btn">{% trans 'Reset to Pending' %}</button>
+                            </form>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                {% if application.profile_note %}
+                    <div style="margin-top: 1rem;">
+                        <strong>{% trans 'Profile Note' %}:</strong>
+                        <p>{{ application.profile_note|linebreaks }}</p>
+                    </div>
+                {% endif %}
+                
+                {% if application.profile_audio or application.profile_video or application.profile_image %}
+                    <div style="margin-top: 1rem;">
+                        <strong>{% trans 'Profile Media' %}:</strong>
+                        <div style="display: flex; flex-wrap: wrap; gap: 1rem; margin-top: 0.5rem;">
+                            {% if application.profile_audio %}
+                                <div>
+                                    <p style="margin-bottom: 0.25rem;"><strong>{% trans 'Audio' %}</strong></p>
+                                    <audio controls src="{{ application.profile_audio.url }}" style="width: 100%; max-width: 300px;">
+                                        {% trans 'Your browser does not support the audio element.' %}
+                                    </audio>
+                                </div>
+                            {% endif %}
+                            {% if application.profile_video %}
+                                <div>
+                                    <p style="margin-bottom: 0.25rem;"><strong>{% trans 'Video' %}</strong></p>
+                                    <video controls src="{{ application.profile_video.url }}" style="width: 100%; max-width: 300px; max-height: 200px;">
+                                        {% trans 'Your browser does not support the video element.' %}
+                                    </video>
+                                </div>
+                            {% endif %}
+                            {% if application.profile_image %}
+                                <div>
+                                    <p style="margin-bottom: 0.25rem;"><strong>{% trans 'Image' %}</strong></p>
+                                    <img src="{{ application.profile_image.url }}" alt="{% trans 'Profile image' %}" style="max-width: 200px; border-radius: 0.5rem;">
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                {% endif %}
+            </div>
+        {% endfor %}
+    </div>
+    
+    {% if selected_count > 0 %}
+        <div class="card" style="margin-top: 1.5rem; background-color: #f0fdf4; border: 2px solid #10b981;">
+            <h2>{% trans 'Pre-approve Payments' %}</h2>
+            <p>{% trans 'You have selected' %} {{ selected_count }} {% trans 'applicant(s). Click below to create pre-approved payments for them.' %}</p>
+            <form method="post" action="{% url 'jobs:pre_approve_payments' job.pk %}">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-primary">{% trans 'Create Pre-approved Payments' %}</button>
+            </form>
+            <p class="text-muted" style="margin-top: 0.5rem; font-size: 0.875rem;">
+                {% trans 'Note: This functionality is coming soon. It will allow you to create payment authorizations for selected workers.' %}
+            </p>
+        </div>
+    {% endif %}
+{% else %}
+    <div class="card">
+        <p>{% trans 'No applications yet.' %}</p>
+    </div>
+{% endif %}
+
+<style>
+.status-pill {
+    padding: 0.25rem 0.75rem;
+    border-radius: 999px;
+    font-size: 0.875rem;
+    font-weight: 600;
+    text-transform: capitalize;
+}
+.status-pending { background-color: #fef3c7; color: #92400e; }
+.status-selected { background-color: #dcfce7; color: #166534; }
+.status-rejected { background-color: #fee2e2; color: #991b1b; }
+</style>
+{% endblock %}
