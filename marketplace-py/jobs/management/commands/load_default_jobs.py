@@ -2,6 +2,7 @@ import json
 import os
 from django.core.management.base import BaseCommand
 from django.contrib.auth import get_user_model
+from django.conf import settings
 from decimal import Decimal
 from jobs.models import Job
 
@@ -43,14 +44,9 @@ class Command(BaseCommand):
         # Determine JSON file path
         json_file = options.get('json_file')
         if json_file is None:
-            # Default to data/default_jobs.json at project root
-            # Get project root (parent of marketplace-py)
-            current_file = os.path.abspath(__file__)
-            # Go up: commands -> management -> jobs -> marketplace-py -> project root
-            # __file__ is at: marketplace-py/jobs/management/commands/load_default_jobs.py
-            # Need 5 dirname calls to get to project root
-            project_root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(current_file)))))
-            json_file = os.path.join(project_root, 'data', 'default_jobs.json')
+            # Default to data/default_jobs.json in marketplace-py directory
+            # Use Django's BASE_DIR which points to marketplace-py/
+            json_file = str(settings.BASE_DIR / 'data' / 'default_jobs.json')
 
         # Load jobs from JSON file
         try:
