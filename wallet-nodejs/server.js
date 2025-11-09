@@ -69,15 +69,15 @@ app.use((err, req, res, next) => {
 // Iniciar servidor
 app.listen(PORT, () => {
   console.log('\n╔═══════════════════════════════════════════════════╗');
-  console.log('║   🚀 PAYMENTS SERVICE - OPEN PAYMENTS API       ║');
+  console.log('║    PAYMENTS SERVICE - OPEN PAYMENTS API       ║');
   console.log('╚═══════════════════════════════════════════════════╝');
-  console.log(`\n✅ Servidor corriendo en: http://localhost:${PORT}`);
-  console.log(`✅ Wallet del Marketplace: ${process.env.WALLET_ADDRESS}`);
-  console.log(`✅ Asset Code: ${process.env.ASSET_CODE}\n`);
-  console.log('📋 Endpoints disponibles:');
+  console.log(`\n Servidor corriendo en: http://localhost:${PORT}`);
+  console.log(`Wallet del Marketplace: ${process.env.WALLET_ADDRESS}`);
+  console.log(` Asset Code: ${process.env.ASSET_CODE}\n`);
+  console.log(' Endpoints disponibles:');
   console.log(`   GET  http://localhost:${PORT}/health`);
   console.log(`   POST http://localhost:${PORT}/api/payments/incoming`);
   console.log(`   POST http://localhost:${PORT}/api/payments/outgoing`);
   console.log(`   POST http://localhost:${PORT}/api/webhooks/payment-completed`);
-  console.log('\n💡 Presiona Ctrl+C para detener el servidor\n');
+  console.log('\n Presiona Ctrl+C para detener el servidor\n');
 });

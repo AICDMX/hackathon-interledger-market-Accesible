@@ -94,70 +94,22 @@ export async function createIncomingPayment(req, res) {
  */
 export async function createOutgoingPayment(req, res) {
   try {
-    const { receiverWalletAddress, amount, description } = req.body;
+    const { incomingPaymentUrl, amount, description } = req.body;
 
-    if (!receiverWalletAddress || !amount) {
+    if (!incomingPaymentUrl || !amount) {
       return res.status(400).json({
         success: false,
-        error: 'Los campos "receiverWalletAddress" y "amount" son requeridos'
+        error: 'Los campos "incomingPaymentUrl" y "amount" son requeridos'
       });
     }
 
-    console.log(`\n🔵 Creando Outgoing Payment de $${amount} a ${receiverWalletAddress}...`);
+    console.log(`\n🔵 Creando Outgoing Payment de $${amount} para ${incomingPaymentUrl}...`);
 
     // Obtener cliente autenticado
     const client = await getAuthenticatedClient();
     const walletAddress = getWalletAddress();
 
-    // Convertir payment pointer a URL si empieza con $
-    const receiverUrl = receiverWalletAddress.startsWith('$')
-      ? receiverWalletAddress.replace('$', 'https://')
-      : receiverWalletAddress;
-
-    // PASO 1: Solicitar grant para quote
-    console.log('  → Solicitando grant para quote...');
-    const quoteGrant = await client.grant.request(
-      { url: walletAddress.authServer },
-      {
-        access_token: {
-          access: [
-            {
-              type: 'quote',
-              actions: ['create']
-            }
-          ]
-        }
-      }
-    );
-
-    console.log('  → Quote grant obtenido ✅');
-
-    // PASO 2: Crear Quote
-    console.log('  → Creando quote...');
-    console.log('  → Usando debitAmount en MXN (sender currency)...');
-    const quote = await client.quote.create(
-      {
-        url: walletAddress.resourceServer,
-        accessToken: quoteGrant.access_token.value
-      },
-      {
-        walletAddress: walletAddress.id,
-        receiver: receiverUrl,
-        method: 'ilp',
-        debitAmount: {
-          value: amount,
-          assetCode: walletAddress.assetCode,
-          assetScale: walletAddress.assetScale
-        }
-      }
-    );
-
-    console.log('  → Quote creado ✅');
-    console.log('    - Quote ID:', quote.id);
-    console.log('    - Debit Amount:', quote.debitAmount);
-    console.log('    - Receive Amount:', quote.receiveAmount);
-
-    // PASO 3: Solicitar grant para outgoing payment
+    // PASO 1: Solicitar grant para outgoing payment
     console.log('  → Solicitando grant para outgoing payment...');
     const outgoingPaymentGrant = await client.grant.request(
       { url: walletAddress.authServer },
@@ -167,17 +119,32 @@ export async function createOutgoingPayment(req, res) {
             {
               identifier: walletAddress.id,
               type: 'outgoing-payment',
-              actions: ['create']
+              actions: ['create', 'read'],
+              limits: {
+                  debitAmount: {
+                      value: amount,
+                      assetCode: walletAddress.assetCode,
+                      assetScale: walletAddress.assetScale
+                  }
+              }
             }
           ]
+        },
+        interact: {
+            start: ['redirect'],
+            finish: {
+                method: 'redirect',
+                uri: 'http://localhost:3001/callback', // Placeholder callback URL
+                nonce: 'some-random-nonce' // Placeholder nonce
+            }
         }
       }
     );
 
     console.log('  → Outgoing payment grant obtenido ✅');
 
-    // PASO 4: Crear Outgoing Payment usando el quote
-    console.log('  → Creando outgoing payment...');
+    // PASO 2: Crear Outgoing Payment directamente (sin quote manual)
+    console.log('  → Creando outgoing payment directamente...');
     const outgoingPayment = await client.outgoingPayment.create(
       {
         url: walletAddress.resourceServer,
@@ -185,7 +152,12 @@ export async function createOutgoingPayment(req, res) {
       },
       {
         walletAddress: walletAddress.id,
-        quoteId: quote.id,
+        incomingPayment: incomingPaymentUrl,
+        debitAmount: {
+          value: amount,
+          assetCode: walletAddress.assetCode,
+          assetScale: walletAddress.assetScale
+        },
         metadata: {
           description: description || 'Payment from marketplace'
         }
@@ -195,16 +167,14 @@ export async function createOutgoingPayment(req, res) {
     console.log('✅ Outgoing Payment creado exitosamente!');
     console.log('  - Payment ID:', outgoingPayment.id);
     console.log('  - Sent Amount:', outgoingPayment.sentAmount);
-    console.log('  - Receiver:', outgoingPayment.receiver);
+    console.log('  - Incoming Payment URL:', outgoingPayment.incomingPayment);
 
     // Retornar respuesta exitosa
     return res.status(200).json({
       success: true,
       paymentId: outgoingPayment.id,
-      quoteId: quote.id,
       sentAmount: outgoingPayment.sentAmount,
-      receiveAmount: quote.receiveAmount,
-      receiver: outgoingPayment.receiver,
+      incomingPayment: outgoingPayment.incomingPayment,
       metadata: outgoingPayment.metadata
     });
 
