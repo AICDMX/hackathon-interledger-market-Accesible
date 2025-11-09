@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="{% trans 'Interledger-powered marketplace for native language jobs' %}">
     <title>{% block title %}{% trans 'Marketplace' %}{% endblock %}</title>
+    <link rel="icon" type="image/png" href="/media/voxvox%20%2840%20x%2040%20px%29.png">
     
     <!-- Accessibility: Ensure proper contrast and semantic HTML -->
     <style>
@@ -430,7 +431,7 @@
         <nav role="navigation" aria-label="{% trans 'Main navigation' %}">
             <div>
                 <a href="{% url 'jobs:list' %}" aria-label="{% trans 'Home' %}">
-                    <h1 style="margin: 0; display: inline;">{% trans 'MP' %}</h1>
+                    <img src="/media/logo%20letters%20white%20558x100.png" alt="{% trans 'Marketplace' %}" style="height: 40px; width: auto; max-width: 200px;" />
                 </a>
             </div>
             <button class="hamburger" aria-label="{% trans 'Toggle menu' %}" aria-expanded="false" onclick="toggleMenu()">

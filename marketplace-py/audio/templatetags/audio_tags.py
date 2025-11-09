@@ -67,6 +67,8 @@ def audio_player(context, content_object, target_field, language_code=None):
         'language_code': language_code,
         'fallback_audio_url': fallback_audio_url,
         'request': request,
+        'LANGUAGE_CODE': settings.LANGUAGE_CODE,
+        'preferred_audio_language': preferred_audio,
     }
 
 
@@ -130,6 +132,8 @@ def audio_player_static_ui(context, slug, target_field='label', language_code=No
             'language_code': language_code or preferred_audio or settings.LANGUAGE_CODE,
             'fallback_audio_url': None,
             'request': context.get('request'),
+            'LANGUAGE_CODE': settings.LANGUAGE_CODE,
+            'preferred_audio_language': preferred_audio,
         }
     
     # If language_code is explicitly provided, use it directly
@@ -162,4 +166,6 @@ def audio_player_static_ui(context, slug, target_field='label', language_code=No
         'language_code': language_code,
         'fallback_audio_url': fallback_audio_url,
         'request': request,
+        'LANGUAGE_CODE': settings.LANGUAGE_CODE,
+        'preferred_audio_language': preferred_audio,
     }

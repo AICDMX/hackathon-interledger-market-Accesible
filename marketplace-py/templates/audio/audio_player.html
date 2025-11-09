@@ -68,18 +68,12 @@ function playAudio(button) {
     const playerContainer = wrapper.querySelector('.audio-player-container');
     const audio = playerContainer.querySelector('audio');
     
-    // Hide button, show player
-    button.style.display = 'none';
-    playerContainer.style.display = 'block';
-    
-    // Play audio
+    // Just play the audio directly without showing player controls
     audio.play().catch(err => {
         console.error('Error playing audio:', err);
-        // Show error message
-        const errorMsg = document.createElement('div');
-        errorMsg.className = 'audio-error';
-        errorMsg.textContent = '{% trans "Error loading audio. Please try again." %}';
-        playerContainer.appendChild(errorMsg);
+        // If audio fails, try fallback
+        const languageCode = wrapper.dataset.language || '{{ preferred_audio_language|default:LANGUAGE_CODE }}';
+        playFallbackAudio(button, languageCode);
     });
 }
 
@@ -107,8 +101,6 @@ function requestAudio(button) {
 }
 
 function playFallbackAudio(button, languageCode) {
-    const wrapper = button.closest('.audio-player-wrapper');
-    
     // Get fallback audio URL based on language
     // Language-specific fallbacks: oto -> fallback-oto.mp3, others -> fallback.mp3
     let fallbackPath = '{% static "audio/fallback.mp3" %}';
@@ -116,38 +108,8 @@ function playFallbackAudio(button, languageCode) {
         fallbackPath = '{% static "audio/fallback-oto.mp3" %}';
     }
     
-    // Create audio element and play
+    // Create audio element and play directly (no visible player)
     const audio = new Audio(fallbackPath);
-    const playerContainer = document.createElement('div');
-    playerContainer.className = 'audio-player-container';
-    playerContainer.style.display = 'block';
-    
-    const audioElement = document.createElement('audio');
-    audioElement.controls = true;
-    audioElement.preload = 'none';
-    audioElement.setAttribute('aria-label', '{% trans "Fallback audio player" %}');
-    const source = document.createElement('source');
-    source.src = fallbackPath;
-    source.type = 'audio/mpeg';
-    audioElement.appendChild(source);
-    
-    const closeBtn = document.createElement('button');
-    closeBtn.className = 'audio-close-btn';
-    closeBtn.setAttribute('aria-label', '{% trans "Close audio player" %}');
-    closeBtn.textContent = '?';
-    closeBtn.onclick = function() {
-        audio.pause();
-        audio.currentTime = 0;
-        playerContainer.remove();
-        button.style.display = 'inline-flex';
-    };
-    
-    playerContainer.appendChild(audioElement);
-    playerContainer.appendChild(closeBtn);
-    
-    // Hide button, show player
-    button.style.display = 'none';
-    wrapper.appendChild(playerContainer);
     
     // Play audio
     audio.play().catch(err => {
@@ -156,16 +118,8 @@ function playFallbackAudio(button, languageCode) {
         if (languageCode === 'oto') {
             const genericFallback = new Audio('{% static "audio/fallback.mp3" %}');
             genericFallback.play().catch(() => {
-                const errorMsg = document.createElement('div');
-                errorMsg.className = 'audio-error';
-                errorMsg.textContent = '{% trans "Error loading audio. Please try again." %}';
-                playerContainer.appendChild(errorMsg);
+                console.error('Error playing generic fallback audio');
             });
-        } else {
-            const errorMsg = document.createElement('div');
-            errorMsg.className = 'audio-error';
-            errorMsg.textContent = '{% trans "Error loading audio. Please try again." %}';
-            playerContainer.appendChild(errorMsg);
         }
     });
 }

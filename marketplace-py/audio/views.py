@@ -340,7 +340,3 @@ def upload_audio_contribution(request):
             {'error': f'Error uploading audio: {str(e)}'},
             status=status.HTTP_500_INTERNAL_SERVER_ERROR
         )
-      return Response(
-            {'error': f'Error uploading audio: {str(e)}'},
-            status=status.HTTP_500_INTERNAL_SERVER_ERROR
-        )
