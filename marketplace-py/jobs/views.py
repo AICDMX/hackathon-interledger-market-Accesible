@@ -458,8 +458,36 @@ def create_job(request):
                 return redirect('jobs:edit', pk=job.pk)
             except ValueError as e:
                 messages.error(request, _('Invalid numeric value: {error}').format(error=str(e)))
+                return render(request, 'jobs/create_job.html', {
+                    'title': title,
+                    'description': description,
+                    'target_language': target_language,
+                    'target_dialect': target_dialect,
+                    'deliverable_types_list': deliverable_types_list,
+                    'amount_per_person': amount_per_person,
+                    'max_responses': max_responses,
+                    'recruit_limit': recruit_limit,
+                    'recruit_deadline_days': recruit_deadline_days,
+                    'submit_limit': submit_limit,
+                    'submit_deadline_days': submit_deadline_days,
+                    'expired_date_days': expired_date_days,
+                })
             except Exception as e:
                 messages.error(request, _('Error saving draft: {error}').format(error=str(e)))
+                return render(request, 'jobs/create_job.html', {
+                    'title': title,
+                    'description': description,
+                    'target_language': target_language,
+                    'target_dialect': target_dialect,
+                    'deliverable_types_list': deliverable_types_list,
+                    'amount_per_person': amount_per_person,
+                    'max_responses': max_responses,
+                    'recruit_limit': recruit_limit,
+                    'recruit_deadline_days': recruit_deadline_days,
+                    'submit_limit': submit_limit,
+                    'submit_deadline_days': submit_deadline_days,
+                    'expired_date_days': expired_date_days,
+                })
         else:
             # Publishing: require all fields
             if not deliverable_types_list:
@@ -581,10 +609,52 @@ def create_job(request):
                     return redirect('jobs:detail', pk=job.pk)
                 except ValueError:
                     messages.error(request, _('Invalid amount per person.'))
+                    return render(request, 'jobs/create_job.html', {
+                        'title': title,
+                        'description': description,
+                        'target_language': target_language,
+                        'target_dialect': target_dialect,
+                        'deliverable_types_list': deliverable_types_list,
+                        'amount_per_person': amount_per_person,
+                        'max_responses': max_responses,
+                        'recruit_limit': recruit_limit,
+                        'recruit_deadline_days': recruit_deadline_days,
+                        'submit_limit': submit_limit,
+                        'submit_deadline_days': submit_deadline_days,
+                        'expired_date_days': expired_date_days,
+                    })
                 except Exception as e:
                     messages.error(request, _('Error creating job: {error}').format(error=str(e)))
+                    return render(request, 'jobs/create_job.html', {
+                        'title': title,
+                        'description': description,
+                        'target_language': target_language,
+                        'target_dialect': target_dialect,
+                        'deliverable_types_list': deliverable_types_list,
+                        'amount_per_person': amount_per_person,
+                        'max_responses': max_responses,
+                        'recruit_limit': recruit_limit,
+                        'recruit_deadline_days': recruit_deadline_days,
+                        'submit_limit': submit_limit,
+                        'submit_deadline_days': submit_deadline_days,
+                        'expired_date_days': expired_date_days,
+                    })
             else:
                 messages.error(request, _('Please fill in all required fields.'))
+                return render(request, 'jobs/create_job.html', {
+                    'title': title,
+                    'description': description,
+                    'target_language': target_language,
+                    'target_dialect': target_dialect,
+                    'deliverable_types_list': deliverable_types_list,
+                    'amount_per_person': amount_per_person,
+                    'max_responses': max_responses,
+                    'recruit_limit': recruit_limit,
+                    'recruit_deadline_days': recruit_deadline_days,
+                    'submit_limit': submit_limit,
+                    'submit_deadline_days': submit_deadline_days,
+                    'expired_date_days': expired_date_days,
+                })
     
     return render(request, 'jobs/create_job.html')
 
@@ -713,8 +783,38 @@ def edit_job(request, pk):
                 return redirect('jobs:edit', pk=job.pk)
             except ValueError as e:
                 messages.error(request, _('Invalid numeric value: {error}').format(error=str(e)))
+                return render(request, 'jobs/edit_job.html', {
+                    'job': job,
+                    'title': title,
+                    'description': description,
+                    'target_language': target_language,
+                    'target_dialect': target_dialect,
+                    'deliverable_types_list': deliverable_types_list,
+                    'amount_per_person': amount_per_person,
+                    'max_responses': max_responses,
+                    'recruit_limit': recruit_limit,
+                    'recruit_deadline_days': recruit_deadline_days,
+                    'submit_limit': submit_limit,
+                    'submit_deadline_days': submit_deadline_days,
+                    'expired_date_days': expired_date_days,
+                })
             except Exception as e:
                 messages.error(request, _('Error saving draft: {error}').format(error=str(e)))
+                return render(request, 'jobs/edit_job.html', {
+                    'job': job,
+                    'title': title,
+                    'description': description,
+                    'target_language': target_language,
+                    'target_dialect': target_dialect,
+                    'deliverable_types_list': deliverable_types_list,
+                    'amount_per_person': amount_per_person,
+                    'max_responses': max_responses,
+                    'recruit_limit': recruit_limit,
+                    'recruit_deadline_days': recruit_deadline_days,
+                    'submit_limit': submit_limit,
+                    'submit_deadline_days': submit_deadline_days,
+                    'expired_date_days': expired_date_days,
+                })
         elif is_publish:
             # Publishing: require all fields
             if not deliverable_types_list:
@@ -804,10 +904,55 @@ def edit_job(request, pk):
                     return redirect('jobs:detail', pk=job.pk)
                 except ValueError:
                     messages.error(request, _('Invalid amount per person.'))
+                    return render(request, 'jobs/edit_job.html', {
+                        'job': job,
+                        'title': title,
+                        'description': description,
+                        'target_language': target_language,
+                        'target_dialect': target_dialect,
+                        'deliverable_types_list': deliverable_types_list,
+                        'amount_per_person': amount_per_person,
+                        'max_responses': max_responses,
+                        'recruit_limit': recruit_limit,
+                        'recruit_deadline_days': recruit_deadline_days,
+                        'submit_limit': submit_limit,
+                        'submit_deadline_days': submit_deadline_days,
+                        'expired_date_days': expired_date_days,
+                    })
                 except Exception as e:
                     messages.error(request, _('Error publishing job: {error}').format(error=str(e)))
+                    return render(request, 'jobs/edit_job.html', {
+                        'job': job,
+                        'title': title,
+                        'description': description,
+                        'target_language': target_language,
+                        'target_dialect': target_dialect,
+                        'deliverable_types_list': deliverable_types_list,
+                        'amount_per_person': amount_per_person,
+                        'max_responses': max_responses,
+                        'recruit_limit': recruit_limit,
+                        'recruit_deadline_days': recruit_deadline_days,
+                        'submit_limit': submit_limit,
+                        'submit_deadline_days': submit_deadline_days,
+                        'expired_date_days': expired_date_days,
+                    })
             else:
                 messages.error(request, _('Please fill in all required fields to publish.'))
+                return render(request, 'jobs/edit_job.html', {
+                    'job': job,
+                    'title': title,
+                    'description': description,
+                    'target_language': target_language,
+                    'target_dialect': target_dialect,
+                    'deliverable_types_list': deliverable_types_list,
+                    'amount_per_person': amount_per_person,
+                    'max_responses': max_responses,
+                    'recruit_limit': recruit_limit,
+                    'recruit_deadline_days': recruit_deadline_days,
+                    'submit_limit': submit_limit,
+                    'submit_deadline_days': submit_deadline_days,
+                    'expired_date_days': expired_date_days,
+                })
         else:
             messages.error(request, _('Invalid action.'))
     
@@ -965,8 +1110,12 @@ def submit_job(request, pk):
     if request.method == 'POST':
         note = request.POST.get('note', '')
         
-        # Check if this is a draft save or final submit
+        # Check if this is a draft save, preview, or final submit
         is_draft = 'save_draft' in request.POST
+        is_preview = 'preview' in request.POST
+        # Preview should also save as draft so it can be displayed
+        if is_preview:
+            is_draft = True
         
         # Use existing draft if available, otherwise create new submission
         if draft_submission:

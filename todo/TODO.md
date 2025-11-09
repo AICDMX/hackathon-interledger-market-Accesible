@@ -17,3 +17,4 @@ you can break things up into more tasks in this file. but only do one task at a 
     loadAudioPlayer http://127.0.0.1:8000/static/audio/audio-player.js:42
 [C] i see images that still have blank space instead of - can we get that fixed?
 [C] i cant see the the menu when i click on the hamburger in middl nerrow size
+[C] when i got this error it cleared all the feilds. maybe we save it first? or somehow not clear all my work, Please select at least one deliverable type.
