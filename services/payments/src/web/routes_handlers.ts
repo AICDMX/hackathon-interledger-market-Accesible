@@ -1,6 +1,8 @@
 import { Request, Response } from 'express';
-import { startQuoteFlow, completePayment } from '../workflow/paymentsService';
+import { startQuoteFlow, completePayment, createIncomingPaymentForJob } from '../workflow/paymentsService';
 import { sellersRepo } from '../workbench/sellersRepo';
+import { pendingRepo } from '../workbench/pendingRepo';
+import { ApiError, asyncHandler } from '../middleware/errorHandler';
 
 export async function listSellers(_req: Request, res: Response) {
   const sellers = await sellersRepo.list();
@@ -59,5 +61,79 @@ export async function finishPayment(req: Request, res: Response) {
     return res.status(500).json({ error: err?.message ?? 'internal_error' });
   }
 }
+
+export const getPaymentStatus = asyncHandler(async (req: Request, res: Response) => {
+  const { pendingId } = req.params;
+  
+  const pending = await pendingRepo.get(pendingId);
+  if (!pending) {
+    throw new ApiError('Payment not found', 404);
+  }
+  
+  return res.json({
+    pendingId: pending.id,
+    offerId: pending.offerId,
+    status: pending.status,
+    buyerWalletAddressUrl: pending.buyerWalletAddressUrl,
+    incomingPaymentId: pending.incomingPaymentId,
+    outgoingPaymentId: pending.outgoingPaymentId,
+    quoteId: pending.quoteId
+  });
+});
+
+export const listPendingPayments = asyncHandler(async (_req: Request, res: Response) => {
+  const payments = await pendingRepo.list();
+  return res.json({ 
+    payments: payments.map(p => ({
+      pendingId: p.id,
+      offerId: p.offerId,
+      status: p.status,
+      buyerWalletAddressUrl: p.buyerWalletAddressUrl,
+      incomingPaymentId: p.incomingPaymentId,
+      outgoingPaymentId: p.outgoingPaymentId
+    }))
+  });
+});
+
+export const getOfferPayments = asyncHandler(async (req: Request, res: Response) => {
+  const { offerId } = req.params;
+  const payments = await pendingRepo.findByOfferId(offerId);
+  
+  return res.json({ 
+    offerId,
+    payments: payments.map(p => ({
+      pendingId: p.id,
+      status: p.status,
+      buyerWalletAddressUrl: p.buyerWalletAddressUrl,
+      incomingPaymentId: p.incomingPaymentId,
+      outgoingPaymentId: p.outgoingPaymentId,
+      quoteId: p.quoteId
+    }))
+  });
+});
+
+export const createIncomingPayment = asyncHandler(async (req: Request, res: Response) => {
+  const { amount, description, sellerId } = req.body;
+  
+  if (!amount) {
+    throw new ApiError('Required field: amount', 400);
+  }
+  
+  // Use default seller if not specified
+  const sellerIdToUse = sellerId || process.env.SELLER_ID || 'default-seller';
+  
+  const result = await createIncomingPaymentForJob({
+    amount: String(amount),
+    description: description || 'Job funding',
+    sellerId: sellerIdToUse
+  });
+  
+  return res.json({
+    success: true,
+    paymentId: result.incomingPaymentId,
+    payment_id: result.incomingPaymentId, // Alternative key for compatibility
+    data: result
+  });
+});
 
 
