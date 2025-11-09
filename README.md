@@ -1,12 +1,12 @@
 # Native Language Market
 
-Interledger-powered marketplace focused on accessible, native-language work. Funders post briefs, creators deliver multilingual media, and escrowed payouts flow through Interledger wallets. Designed for users that have limited to no written langauge ability. Most all things have custom implementation to do sound in native language.
+Interledger-powered marketplace focused on accessible, native-language work. Funders post briefs, creators deliver multilingual media, and escrow payouts flow through Interledger wallets. Designed for users that have limited to no written langauge ability. Most all things have custom implementation to do sound in native language.
 
 Only Otomi Language voice added. We gathered during the hackathon through connections that work with indigenous populations.
 
 We have two working branches. 
 Main branch uses Contract style using python openpayments sdk
-Node.js Microservice we have a second option Uses escrow wallet solution.
+Node.js Microservice we have a second option Uses escrow wallet solution. But event though it works it would require money handler license and we dont want that to be a requirement
 
 ## Repository Layout
 
