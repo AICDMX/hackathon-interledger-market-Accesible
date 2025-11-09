@@ -11,7 +11,8 @@ FROM base AS build
 COPY package.json ./
 RUN npm install
 COPY tsconfig.json ./
-COPY . .
+COPY src ./src
+COPY private.key ./
 RUN npm run build
 
 # Runtime image
@@ -23,6 +24,6 @@ COPY --from=build /app/private.key ./private.key
 USER node
 ENV PORT=3000
 EXPOSE 3000
-CMD ["node", "dist/index.js"]
+CMD ["node", "dist/src/index.js"]
 
 
