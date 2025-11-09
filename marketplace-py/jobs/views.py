@@ -13,6 +13,8 @@ from django.utils import timezone
 from datetime import timedelta
 from django.core.files.base import ContentFile
 from django.conf import settings
+import requests
+from django.views.decorators.http import require_GET
 from audio.forms import AudioContributionForm
 from .forms import JobApplicationForm
 from .models import Job, JobSubmission, JobApplication
@@ -36,6 +38,66 @@ def _build_audio_targets():
             'support_url': reverse('jobs:audio_support', args=[slug]),
         }
     return targets
+
+
+@require_GET
+def payments_finish(request):
+    """Handle wallet redirect after interactive grant; proxy to payments service and show UX."""
+    pending_id = request.GET.get('pendingId')
+    interact_ref = request.GET.get('interact_ref')
+    received_hash = request.GET.get('hash')
+
+    if not (pending_id and interact_ref and received_hash):
+        messages.error(request, _('Missing required parameters from wallet redirect.'))
+        return render(request, 'jobs/payment_finish.html', {
+            'success': False,
+            'error': _('Missing required parameters.'),
+        })
+
+    try:
+        # 1) Ask payments service to finish the grant and create outgoing payment
+        finish_url = f"{settings.PAYMENTS_SERVICE_URL}/payments/finish"
+        resp = requests.get(finish_url, params={
+            'pendingId': pending_id,
+            'interact_ref': interact_ref,
+            'hash': received_hash,
+        }, timeout=30)
+        data = resp.json() if resp.status_code == 200 else {'error': resp.text}
+        success = resp.status_code == 200 and bool(data.get('ok'))
+
+        # 2) Fetch status to get offerId for redirect/context
+        status_url = f"{settings.PAYMENTS_SERVICE_URL}/payments/{pending_id}/status"
+        status_resp = requests.get(status_url, timeout=15)
+        status_data = status_resp.json() if status_resp.status_code == 200 else {}
+        offer_id = status_data.get('offerId')
+        payment_status = status_data.get('status')
+
+        # If we know the job, redirect to detail with a flash message
+        if offer_id:
+            try:
+                job = Job.objects.get(pk=int(offer_id))
+                if success:
+                    messages.success(request, _('Payment completed successfully.'))
+                else:
+                    messages.error(request, _('Payment could not be completed.'))
+                return redirect('jobs:detail', pk=job.pk)
+            except Exception:
+                pass
+
+        # Otherwise render a simple confirmation page
+        return render(request, 'jobs/payment_finish.html', {
+            'success': success,
+            'outgoing_payment': (data.get('outgoingPayment') if isinstance(data, dict) else None),
+            'status': payment_status,
+            'pending_id': pending_id,
+            'error': None if success else (data.get('error') if isinstance(data, dict) else 'Unknown error'),
+        })
+    except Exception as e:
+        logger.exception('Error finishing payment via payments service')
+        return render(request, 'jobs/payment_finish.html', {
+            'success': False,
+            'error': str(e),
+        })
 
 
 def home(request):
@@ -1451,9 +1513,11 @@ def select_application(request, job_pk, application_pk):
 @login_required
 @require_POST
 def pre_approve_payments(request, pk):
-    """Stub for pre-approved payments - button that doesn't work yet.
-    When called, transitions job from selecting to submitting state.
-    After this, no more applications will be accepted."""
+    """Pre-approve payments: Start quote flow and get payment approval URL.
+    User (funder) will be redirected to their wallet to approve the payment.
+    
+    This implements Interledger Open Payments step 7-8: Interactive approval flow.
+    """
     job = get_object_or_404(Job, pk=pk, funder=request.user)
     
     selected_applications = job.applications.filter(status='selected')
@@ -1462,19 +1526,75 @@ def pre_approve_payments(request, pk):
         messages.warning(request, _('You need to approve at least one applicant before starting the contract.'))
         return redirect('jobs:detail', pk=job.pk)
     
+    # Check if user has wallet address configured
+    if not request.user.wallet_address:
+        messages.error(request, _('You need to configure your wallet address in your profile before making payments.'))
+        return redirect('jobs:detail', pk=job.pk)
+    
+    # Validate wallet profile before starting payment
+    wallet_result = get_wallet_profile(request.user.wallet_address)
+    if not wallet_result.get('success'):
+        messages.error(request, _('Invalid wallet address. Please update your wallet address in your profile.'))
+        return redirect('jobs:detail', pk=job.pk)
+    
+    # Check if already has payment URL (payment in progress)
+    if job.payment_url:
+        messages.info(request, _('Payment approval is already in progress. Click the "Approve Payment" button below.'))
+        return redirect('jobs:detail', pk=job.pk)
+    
     # Transition job from selecting or recruiting to submitting state
     if job.status == 'selecting' or job.status == 'recruiting':
         job.status = 'submitting'
         job.save(update_fields=['status'])
         selected_count = selected_applications.count()
-        messages.success(request, _('Contract started! The job is now in submitting phase. {count} approved worker(s) can now submit their work. No more applications will be accepted.').format(count=selected_count))
     elif job.status != 'submitting':
         messages.warning(request, _('Job must be in selecting or recruiting state to start the contract.'))
         return redirect('jobs:detail', pk=job.pk)
     
-    # TODO: Implement actual pre-approved payment logic
-    messages.info(request, _('Pre-approved payment functionality is coming soon. This will allow you to create payment authorizations for approved workers.'))
-    return redirect('jobs:detail', pk=job.pk)
+    # Start the payment quote flow via payments service
+    # This creates incoming payment, quote, and interactive outgoing grant
+    try:
+        # Use default seller from settings
+        seller_id = getattr(settings, 'DEFAULT_SELLER_ID', 'default-seller')
+        
+        logger.info(f"Starting quote flow for job {job.pk}, amount {job.budget}, buyer wallet {request.user.wallet_address}")
+        
+        result = start_quote(
+            offer_id=str(job.pk),
+            seller_id=seller_id,
+            buyer_wallet_address_url=request.user.wallet_address,
+            amount=str(job.budget)
+        )
+        
+        if result.get('success'):
+            # Store payment information
+            job.payment_url = result.get('payment_url') or result.get('redirect_url')
+            job.payment_id = result.get('pending_id')  # Store pending ID for tracking
+            job.save(update_fields=['payment_url', 'payment_id'])
+            
+            logger.info(f"Quote started successfully for job {job.pk}. Redirect URL: {job.payment_url}")
+            
+            messages.success(
+                request, 
+                _('Payment authorization ready! You will be redirected to your wallet to approve the payment of {amount} {currency}.').format(
+                    amount=job.budget,
+                    currency=result.get('data', {}).get('assetCode', 'MXN')
+                )
+            )
+            
+            # Redirect to payment approval page (or directly to wallet)
+            # Return to job detail where there's a button to go to payment URL
+            return redirect('jobs:detail', pk=job.pk)
+        else:
+            error_msg = result.get('error', 'Unknown error')
+            logger.error(f"Failed to start quote for job {job.pk}: {error_msg}")
+            messages.error(request, _('Failed to initialize payment: {error}').format(error=error_msg))
+            return redirect('jobs:detail', pk=job.pk)
+            
+    except Exception as e:
+        logger.exception(f"Exception starting payment for job {job.pk}")
+        messages.error(request, _('An error occurred while setting up the payment. Please try again.'))
+        return redirect('jobs:detail', pk=job.pk)
 
 
 @login_required

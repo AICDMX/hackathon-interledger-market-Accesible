@@ -1,0 +1,126 @@
+{% extends 'base.html' %}
+{% load i18n static %}
+
+{% block title %}{% trans 'Payment Confirmation' %}{% endblock %}
+
+{% block extra_css %}
+<style>
+    .payment-finish-container {
+        max-width: 800px;
+        margin: 3rem auto;
+        padding: 2rem;
+        text-align: center;
+    }
+
+    .payment-status-icon {
+        font-size: 5rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .payment-status-icon.success {
+        color: #27ae60;
+    }
+
+    .payment-status-icon.error {
+        color: #e74c3c;
+    }
+
+    .payment-details {
+        background: #f8f9fa;
+        border-radius: 8px;
+        padding: 1.5rem;
+        margin-top: 2rem;
+        text-align: left;
+    }
+
+    .payment-detail-row {
+        display: flex;
+        justify-content: space-between;
+        padding: 0.75rem 0;
+        border-bottom: 1px solid #dee2e6;
+    }
+
+    .payment-detail-row:last-child {
+        border-bottom: none;
+    }
+
+    .payment-detail-label {
+        font-weight: 600;
+        color: #6c757d;
+    }
+
+    .payment-detail-value {
+        color: #212529;
+        word-break: break-all;
+    }
+
+    .btn-primary {
+        display: inline-block;
+        margin-top: 2rem;
+        padding: 0.75rem 2rem;
+        background-color: #3498db;
+        color: white;
+        text-decoration: none;
+        border-radius: 4px;
+        font-weight: 600;
+        transition: background-color 0.3s ease;
+    }
+
+    .btn-primary:hover {
+        background-color: #2980b9;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="payment-finish-container">
+    {% if success %}
+        <div class="payment-status-icon success">✓</div>
+        <h1>{% trans 'Payment Completed' %}</h1>
+        <p class="lead">{% trans 'Your payment has been processed successfully.' %}</p>
+        
+        {% if outgoing_payment %}
+        <div class="payment-details">
+            <h3>{% trans 'Payment Details' %}</h3>
+            {% if outgoing_payment.id %}
+            <div class="payment-detail-row">
+                <span class="payment-detail-label">{% trans 'Payment ID' %}:</span>
+                <span class="payment-detail-value">{{ outgoing_payment.id }}</span>
+            </div>
+            {% endif %}
+            {% if status %}
+            <div class="payment-detail-row">
+                <span class="payment-detail-label">{% trans 'Status' %}:</span>
+                <span class="payment-detail-value">{{ status }}</span>
+            </div>
+            {% endif %}
+            {% if pending_id %}
+            <div class="payment-detail-row">
+                <span class="payment-detail-label">{% trans 'Transaction ID' %}:</span>
+                <span class="payment-detail-value">{{ pending_id }}</span>
+            </div>
+            {% endif %}
+        </div>
+        {% endif %}
+        
+        <p class="mt-3">{% trans 'The contract has been completed and funds are being transferred.' %}</p>
+        
+    {% else %}
+        <div class="payment-status-icon error">✗</div>
+        <h1>{% trans 'Payment Failed' %}</h1>
+        <p class="lead">{% trans 'We could not complete your payment.' %}</p>
+        
+        {% if error %}
+        <div class="alert alert-danger mt-3">
+            <strong>{% trans 'Error' %}:</strong> {{ error }}
+        </div>
+        {% endif %}
+        
+        <p class="mt-3">{% trans 'Please try again or contact support if the problem persists.' %}</p>
+    {% endif %}
+    
+    <a href="{% url 'jobs:dashboard' %}" class="btn-primary">
+        {% trans 'Return to Dashboard' %}
+    </a>
+</div>
+{% endblock %}

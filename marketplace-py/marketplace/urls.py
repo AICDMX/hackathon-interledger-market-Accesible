@@ -7,6 +7,7 @@ from django.conf import settings
 from django.conf.urls.static import static
 from django.conf.urls.i18n import i18n_patterns
 from . import views
+from jobs.webhooks import payment_webhook
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -15,6 +16,8 @@ urlpatterns = [
     path('i18n/', include('django.conf.urls.i18n')),
     path('rosetta/', include('rosetta.urls')),
     path('api/audio/', include(('audio.urls', 'audio'), namespace='audio')),
+    # Payment webhook endpoint (must be outside i18n_patterns)
+    path('api/webhooks/payments', payment_webhook, name='payment_webhook'),
 ]
 
 # Add language prefix to URLs

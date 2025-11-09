@@ -33,6 +33,8 @@ services:
       - ./services/payments/src/privates:/app/src/privates:ro
     environment:
       - PORT=3000
+      - BASE_URL=http://localhost:8000
+      - DJANGO_BASE_URL=http://web:8000
       - SELLER_ID=seller-mvr5656
       - SELLER_WALLET_ADDRESS_URL=https://ilp.interledger-test.dev/mvr5656
       - SELLER_KEY_ID=3f722728-a2c1-44d3-add9-ad4ac3ce11b1

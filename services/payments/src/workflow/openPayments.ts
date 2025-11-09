@@ -78,9 +78,17 @@ export async function createQuote(client: any, resourceServer: string, accessTok
 export async function requestInteractiveOutgoingGrant(client: any, authServer: string, args: {
   buyerWalletAddressUrl: string;
   debitAmount: { value: string; assetCode: string; assetScale: number };
-  finish: { uri: string; nonce: string };
+  finish?: { uri: string; nonce: string }; // Optional for local testing
   clientId: string; // seller wallet id
 }) {
+  // Build interact object - finish is optional for local testing
+  const interact: any = {
+    start: ['redirect']
+  };
+  if (args.finish) {
+    interact.finish = { method: 'redirect', uri: args.finish.uri, nonce: args.finish.nonce };
+  }
+  
   const grant = await client.grant.request({ url: authServer }, {
     access_token: {
       access: [{
@@ -91,23 +99,21 @@ export async function requestInteractiveOutgoingGrant(client: any, authServer: s
       }]
     },
     client: args.clientId,
-    interact: {
-      start: ['redirect'],
-      finish: { method: 'redirect', uri: args.finish.uri, nonce: args.finish.nonce }
-    }
+    interact
   });
   
   // Debug: log the grant structure
   console.log('[requestInteractiveOutgoingGrant] grant response:', JSON.stringify(grant, null, 2));
   
   // Check for required fields (note: field is 'continue', not 'cont')
-  if (!grant?.interact?.redirect || !grant?.interact?.finish || !grant?.continue?.access_token?.value || !grant?.continue?.uri) {
+  // interact.finish is optional if we didn't provide finish in the request
+  if (!grant?.interact?.redirect || !grant?.continue?.access_token?.value || !grant?.continue?.uri) {
     console.error('[requestInteractiveOutgoingGrant] missing fields. Grant:', grant);
     throw new Error('interactive grant response missing fields');
   }
   return {
     redirect: grant.interact.redirect as string,
-    finishId: grant.interact.finish as string,
+    finishId: grant.interact?.finish as string,
     continueAccessToken: grant.continue.access_token.value as string,
     continueUri: grant.continue.uri as string
   };

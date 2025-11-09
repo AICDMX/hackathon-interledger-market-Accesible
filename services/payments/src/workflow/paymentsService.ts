@@ -55,8 +55,15 @@ export async function startQuoteFlow(args: {
   });
 
   // 3) Interactive outgoing-payment grant for buyer
-  const baseUrl = process.env.BASE_URL ?? `http://localhost:${process.env.PORT ?? 4001}`;
-  const finishUrl = `${baseUrl}/payments/finish?pendingId=${pendingId}`;
+  const baseUrl = process.env.BASE_URL;
+  let finishConfig;
+  if (baseUrl) {
+    // Production: use finish redirect for automatic completion
+    const finishUrl = `${baseUrl}/payments/finish?pendingId=${pendingId}`;
+    finishConfig = { uri: finishUrl, nonce: pendingId };
+  }
+  // If no BASE_URL, omit finish (manual grant continuation required)
+  
   const interactive = await requestInteractiveOutgoingGrant(client, buyerWallet.authServer, {
     buyerWalletAddressUrl: buyerWallet.id,
     debitAmount: {
@@ -64,7 +71,7 @@ export async function startQuoteFlow(args: {
       assetCode: quote.debitAmount.assetCode,
       assetScale: quote.debitAmount.assetScale
     },
-    finish: { uri: finishUrl, nonce: pendingId },
+    finish: finishConfig,
     clientId: sellerWallet.id
   });
 
