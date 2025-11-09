@@ -1,0 +1,390 @@
+/**
+ * Mobile-first styles for audio contribution feature
+ * Follows design tokens from docs/design.md
+ */
+
+:root {
+    /* Design tokens */
+    --color-primary: #0FBAB8;
+    --color-bg: #F5F5F0;
+    --color-surface: #1B2435;
+    --color-text: #0F172A;
+    --color-border: #E2E8F0;
+    --color-success: #22C55E;
+    --color-warning: #FFB347;
+    --color-error: #e74c3c;
+    
+    --space-2: 0.5rem;
+    --space-3: 0.75rem;
+    --space-4: 1rem;
+    --space-6: 1.5rem;
+    --space-8: 2rem;
+    
+    --radius-input: 8px;
+    --radius-card: 12px;
+    --radius-pill: 999px;
+    
+    --motion-default: 200ms ease-out;
+    --motion-fast: 120ms ease-in;
+    
+    --shadow-card: 0 8px 24px rgba(15, 23, 42, 0.08);
+}
+
+/* Audio recording section */
+.audio-recording-section {
+    margin-bottom: var(--space-6);
+    padding: var(--space-6);
+    background: var(--color-bg);
+    border-radius: var(--radius-card);
+    border: 1px solid var(--color-border);
+}
+
+.recording-controls {
+    display: flex;
+    gap: var(--space-3);
+    flex-wrap: wrap;
+    justify-content: center;
+    margin-bottom: var(--space-4);
+}
+
+/* Recording buttons - mobile-first, touch-friendly */
+.btn-record,
+.btn-retry,
+.btn-stop,
+.btn-cancel,
+.btn-upload-recording {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-2);
+    padding: var(--space-4) var(--space-6);
+    min-height: 56px; /* Touch target size */
+    min-width: 120px;
+    border: none;
+    border-radius: var(--radius-pill);
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all var(--motion-default);
+    box-shadow: var(--shadow-card);
+    position: relative;
+    overflow: hidden;
+}
+
+.btn-record {
+    background: linear-gradient(135deg, var(--color-primary), #0DA5A3);
+    color: white;
+}
+
+.btn-record:hover,
+.btn-record:focus {
+    background: linear-gradient(135deg, #0DA5A3, var(--color-primary));
+    transform: translateY(-2px);
+    box-shadow: 0 12px 32px rgba(15, 186, 184, 0.45);
+    outline: 2px solid var(--color-primary);
+    outline-offset: 2px;
+}
+
+.btn-record:active {
+    transform: translateY(0);
+}
+
+.btn-retry {
+    background: linear-gradient(135deg, var(--color-warning), #FF9500);
+    color: white;
+}
+
+.btn-retry:hover,
+.btn-retry:focus {
+    background: linear-gradient(135deg, #FF9500, var(--color-warning));
+    transform: translateY(-2px);
+    outline: 2px solid var(--color-warning);
+    outline-offset: 2px;
+}
+
+.btn-stop {
+    background: linear-gradient(135deg, var(--color-error), #c0392b);
+    color: white;
+}
+
+.btn-stop:hover,
+.btn-stop:focus {
+    background: linear-gradient(135deg, #c0392b, var(--color-error));
+    transform: translateY(-2px);
+    outline: 2px solid var(--color-error);
+    outline-offset: 2px;
+}
+
+.btn-cancel {
+    background: var(--color-surface);
+    color: white;
+}
+
+.btn-cancel:hover,
+.btn-cancel:focus {
+    background: #2A3447;
+    outline: 2px solid var(--color-surface);
+    outline-offset: 2px;
+}
+
+.btn-upload-recording {
+    background: linear-gradient(135deg, var(--color-success), #1DB954);
+    color: white;
+    width: 100%;
+    margin-top: var(--space-4);
+}
+
+.btn-upload-recording:hover,
+.btn-upload-recording:focus {
+    background: linear-gradient(135deg, #1DB954, var(--color-success));
+    transform: translateY(-2px);
+    outline: 2px solid var(--color-success);
+    outline-offset: 2px;
+}
+
+.btn-record:disabled,
+.btn-stop:disabled,
+.btn-cancel:disabled,
+.btn-upload-recording:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+}
+
+/* Recording status indicator */
+.recording-status {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-3);
+    padding: var(--space-4);
+    background: rgba(15, 186, 184, 0.1);
+    border-radius: var(--radius-input);
+    margin-bottom: var(--space-4);
+}
+
+.recording-indicator {
+    display: inline-block;
+    width: 12px;
+    height: 12px;
+    background: var(--color-error);
+    border-radius: 50%;
+    animation: pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse {
+    0%, 100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+    50% {
+        opacity: 0.5;
+        transform: scale(1.2);
+    }
+}
+
+.recording-time {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--color-text);
+    font-variant-numeric: tabular-nums;
+}
+
+/* Recording preview */
+.recording-preview {
+    margin-top: var(--space-4);
+    padding: var(--space-4);
+    background: white;
+    border-radius: var(--radius-input);
+    border: 1px solid var(--color-border);
+}
+
+.recording-preview audio {
+    width: 100%;
+    margin-bottom: var(--space-4);
+    border-radius: var(--radius-input);
+}
+
+.preview-actions {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+}
+
+.processing-message {
+    text-align: center;
+    color: var(--color-text);
+    padding: var(--space-4);
+    font-style: italic;
+    margin: 0;
+}
+
+/* Upload progress */
+.upload-progress {
+    margin-top: var(--space-4);
+    padding: var(--space-4);
+    background: white;
+    border-radius: var(--radius-input);
+    border: 1px solid var(--color-border);
+}
+
+.progress-bar {
+    width: 0%;
+    height: 8px;
+    background: linear-gradient(90deg, var(--color-primary), #0DA5A3);
+    border-radius: var(--radius-pill);
+    transition: width var(--motion-default);
+    margin-bottom: var(--space-2);
+}
+
+.progress-text {
+    display: block;
+    text-align: center;
+    font-size: 0.875rem;
+    color: var(--color-text);
+    font-weight: 600;
+}
+
+/* Messages */
+.audio-message {
+    padding: var(--space-4);
+    border-radius: var(--radius-input);
+    margin-bottom: var(--space-4);
+    font-weight: 500;
+    animation: slideIn var(--motion-default);
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.audio-message-success {
+    background: rgba(34, 197, 94, 0.1);
+    color: #155724;
+    border: 1px solid rgba(34, 197, 94, 0.3);
+}
+
+.audio-message-error {
+    background: rgba(231, 76, 60, 0.1);
+    color: #721c24;
+    border: 1px solid rgba(231, 76, 60, 0.3);
+}
+
+/* Mobile optimizations */
+@media (max-width: 480px) {
+    .recording-controls {
+        flex-direction: column;
+    }
+    
+    .btn-record,
+    .btn-retry,
+    .btn-stop,
+    .btn-cancel {
+        width: 100%;
+    }
+    
+    .audio-recording-section {
+        padding: var(--space-4);
+        margin-bottom: var(--space-4);
+    }
+    
+    .recording-time {
+        font-size: 1.125rem;
+    }
+}
+
+/* Safe area support for mobile devices */
+@supports (padding: max(0px)) {
+    .audio-recording-section {
+        padding-left: max(var(--space-6), env(safe-area-inset-left));
+        padding-right: max(var(--space-6), env(safe-area-inset-right));
+    }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+    .recording-indicator {
+        animation: none;
+    }
+    
+    .btn-record,
+    .btn-retry,
+    .btn-stop,
+    .btn-cancel,
+    .btn-upload-recording {
+        transition: none;
+    }
+    
+    .audio-message {
+        animation: none;
+    }
+    
+    .progress-bar {
+        transition: none;
+    }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+    .btn-record,
+    .btn-stop,
+    .btn-cancel,
+    .btn-upload-recording {
+        border: 2px solid currentColor;
+    }
+    
+    .recording-status {
+        border: 1px solid var(--color-text);
+    }
+}
+
+/* Focus visible for keyboard navigation */
+.btn-record:focus-visible,
+.btn-retry:focus-visible,
+.btn-stop:focus-visible,
+.btn-cancel:focus-visible,
+.btn-upload-recording:focus-visible {
+    outline: 3px solid var(--color-primary);
+    outline-offset: 3px;
+}
+
+/* Icon styles */
+.record-icon,
+.retry-icon,
+.stop-icon,
+.cancel-icon {
+    font-size: 1.25rem;
+    line-height: 1;
+}
+
+/* Loading state */
+.btn-upload-recording:disabled::after {
+    content: '';
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    margin-left: var(--space-2);
+    border: 2px solid currentColor;
+    border-top-color: transparent;
+    border-radius: 50%;
+    animation: spin 0.6s linear infinite;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .btn-upload-recording:disabled::after {
+        animation: none;
+    }
+}
