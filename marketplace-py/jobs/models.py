@@ -125,6 +125,54 @@ class Job(models.Model):
         help_text=_('Whether the contract/payment has been completed/released')
     )
     
+    # Contract and Open Payments transaction data
+    contract_id = models.CharField(
+        max_length=255,
+        blank=True,
+        null=True,
+        unique=True,
+        verbose_name=_('Contract ID'),
+        help_text=_('ULID transaction ID for Open Payments contract')
+    )
+    incoming_payment_id = models.URLField(
+        null=True,
+        blank=True,
+        verbose_name=_('Incoming Payment ID'),
+        help_text=_('Open Payments incoming payment URL')
+    )
+    quote_id = models.URLField(
+        null=True,
+        blank=True,
+        verbose_name=_('Quote ID'),
+        help_text=_('Open Payments quote URL')
+    )
+    interactive_redirect_url = models.URLField(
+        null=True,
+        blank=True,
+        verbose_name=_('Interactive Redirect URL'),
+        help_text=_('URL to redirect buyer for wallet authorization')
+    )
+    finish_id = models.CharField(
+        max_length=255,
+        null=True,
+        blank=True,
+        verbose_name=_('Finish ID'),
+        help_text=_('GNAP finish identifier')
+    )
+    continue_id = models.CharField(
+        max_length=255,
+        null=True,
+        blank=True,
+        verbose_name=_('Continue ID'),
+        help_text=_('GNAP continuation access token')
+    )
+    continue_url = models.URLField(
+        null=True,
+        blank=True,
+        verbose_name=_('Continue URL'),
+        help_text=_('GNAP continuation endpoint')
+    )
+    
     # Response limit
     max_responses = models.PositiveIntegerField(
         default=1,
@@ -501,3 +549,84 @@ class JobApplication(models.Model):
     
     def __str__(self):
         return f"{self.applicant.get_display_name()} - {self.job.title}"
+
+
+class PendingPaymentTransaction(models.Model):
+    """Stores PendingIncomingPaymentTransaction data for contract completion."""
+    contract_id = models.CharField(max_length=255, unique=True, primary_key=True)
+    job = models.OneToOneField(
+        Job,
+        on_delete=models.CASCADE,
+        related_name='pending_transaction',
+        verbose_name=_('Job')
+    )
+    
+    # Serialized wallet data (JSON)
+    buyer_wallet_data = models.JSONField(
+        verbose_name=_('Buyer Wallet Data'),
+        help_text=_('Serialized buyer wallet address data')
+    )
+    seller_wallet_data = models.JSONField(
+        verbose_name=_('Seller Wallet Data'),
+        help_text=_('Serialized seller wallet address data')
+    )
+    
+    # Transaction IDs
+    incoming_payment_id = models.URLField(
+        null=True,
+        blank=True,
+        verbose_name=_('Incoming Payment ID')
+    )
+    quote_id = models.URLField(
+        null=True,
+        blank=True,
+        verbose_name=_('Quote ID')
+    )
+    interactive_redirect = models.URLField(
+        null=True,
+        blank=True,
+        verbose_name=_('Interactive Redirect URL')
+    )
+    finish_id = models.CharField(
+        max_length=255,
+        null=True,
+        blank=True,
+        verbose_name=_('Finish ID')
+    )
+    continue_id = models.CharField(
+        max_length=255,
+        null=True,
+        blank=True,
+        verbose_name=_('Continue ID')
+    )
+    continue_url = models.URLField(
+        null=True,
+        blank=True,
+        verbose_name=_('Continue URL')
+    )
+    
+    # Authorization data (stored after wallet callback, used to complete payment)
+    interact_ref = models.CharField(
+        max_length=255,
+        null=True,
+        blank=True,
+        verbose_name=_('Interact Ref'),
+        help_text=_('GNAP interact reference from wallet authorization callback')
+    )
+    hash_value = models.CharField(
+        max_length=255,
+        null=True,
+        blank=True,
+        verbose_name=_('Hash Value'),
+        help_text=_('Hash value from wallet authorization callback for verification')
+    )
+    
+    created_at = models.DateTimeField(auto_now_add=True)
+    
+    class Meta:
+        verbose_name = _('Pending Payment Transaction')
+        verbose_name_plural = _('Pending Payment Transactions')
+        ordering = ['-created_at']
+    
+    def __str__(self):
+        return f"PendingTransaction-{self.contract_id}"

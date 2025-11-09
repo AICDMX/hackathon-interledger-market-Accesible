@@ -19,17 +19,15 @@ along with this program.  If not, see <http:#www.gnu.org/licenses/>.
 """
 
 from typing import Optional
-from typing_extensions import Self
 from ulid import ULID
 from pydantic import (
     ConfigDict,
     Field,
-    model_validator,
 )
 from datetime import datetime
 
-from app.schemas.base_schema import BaseSchema, CountryType, CurrencyType
-from app.schema_types import ProductFeeResponsibilityType, ProductType
+from schemas.base_schema import BaseSchema, CountryType, CurrencyType
+from schema_types import ProductFeeResponsibilityType, ProductType
 
 
 class OpenReceiptBase(BaseSchema):
@@ -61,12 +59,6 @@ class OpenReceiptBase(BaseSchema):
         ..., description="Number of decimal places defining the scale of the smallest divisible currency unit."
     )
     model_config = ConfigDict(from_attributes=True)
-
-    @model_validator(mode="after")
-    def validate_conditions(self) -> Self:
-        if self.renewal_periods is not None and self.renewal is None:
-            raise ValueError("Set `renewal` when setting `renewal_periods`.")
-        return self
 
 
 class OpenReceiptCreate(OpenReceiptBase):

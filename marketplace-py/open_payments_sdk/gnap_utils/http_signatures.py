@@ -16,6 +16,11 @@ class OPKeyResolver(HTTPSignatureKeyResolver):
 
     def __init__(self, keyid: str, private_key: str):
         super().__init__()
+        # Ensure private_key is a string before encoding
+        if isinstance(private_key, bytes):
+            private_key = private_key.decode("utf-8")
+        elif not isinstance(private_key, str):
+            private_key = str(private_key)
         self.keys = {keyid: private_key.encode("utf-8")}
 
     def resolve_public_key(self, key_id: str):

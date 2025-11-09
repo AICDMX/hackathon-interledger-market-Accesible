@@ -35,12 +35,25 @@ class PaymentsParser:
         Private keys must be encapsulated as a PEM block, cf https://cryptography.io/en/latest/hazmat/primitives/asymmetric/serialization/#pem
         PEM keys are recognizable because they all begin with `-----BEGIN {format}-----` and end with `-----END {format}-----`
         """
-        if self.isBase64(term=private_key):
-            private_key = b64decode(private_key)
-        if not isinstance(private_key, str):
+        # Ensure we have a string - handle memoryview first
+        if isinstance(private_key, memoryview):
+            private_key = bytes(private_key).decode("utf-8")
+        elif isinstance(private_key, bytes):
             private_key = private_key.decode("utf-8")
+        elif not isinstance(private_key, str):
+            private_key = str(private_key)
+        
+        # Check if it's base64 encoded
+        if self.isBase64(term=private_key):
+            # Decode base64 to bytes, then decode bytes to string
+            private_key_bytes = b64decode(private_key.encode("utf-8") if isinstance(private_key, str) else private_key)
+            private_key = private_key_bytes.decode("utf-8")
+        
+        # Check if it already has PEM headers
         if private_key.startswith("-----BEGIN ") and "-----END " in private_key:
             return private_key
+        
+        # Wrap in PEM format
         return f"-----BEGIN {format}-----\n{private_key}\n-----END {format}-----\n"
 
     def verify_response_hash(

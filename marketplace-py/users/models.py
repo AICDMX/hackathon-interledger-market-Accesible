@@ -19,16 +19,48 @@ class User(AbstractUser):
         help_text=_('User role: funder creates jobs, creator accepts jobs')
     )
     
-    wallet_endpoint = models.CharField(
-        max_length=255,
-        blank=True,
-        help_text=_('Interledger wallet endpoint')
-    )
-    
     wallet_address = models.TextField(
         blank=True,
         verbose_name=_('Wallet Address'),
         help_text=_('Your wallet address')
+    )
+    
+    # Seller credentials for Open Payments (for marketplace account)
+    seller_key_id = models.CharField(
+        max_length=255,
+        blank=True,
+        null=True,
+        verbose_name=_('Seller Key ID'),
+        help_text=_('Key identifier for seller wallet (marketplace account)')
+    )
+    seller_private_key = models.TextField(
+        blank=True,
+        null=True,
+        verbose_name=_('Seller Private Key'),
+        help_text=_('Private key (PEM format) for seller wallet authentication')
+    )
+    
+    def get_seller_private_key(self):
+        """Get seller_private_key as string, handling memoryview from database."""
+        private_key = self.seller_private_key
+        if private_key is None:
+            return None
+        
+        # Convert memoryview to string if needed
+        if isinstance(private_key, memoryview):
+            private_key = bytes(private_key).decode('utf-8')
+        elif isinstance(private_key, bytes):
+            private_key = private_key.decode('utf-8')
+        elif not isinstance(private_key, str):
+            private_key = str(private_key)
+        
+        return private_key.strip() if private_key else None
+    seller_wallet_address = models.URLField(
+        max_length=500,
+        blank=True,
+        null=True,
+        verbose_name=_('Seller Wallet Address'),
+        help_text=_('Open Payments wallet address for seller/marketplace account')
     )
     
     preferred_language = models.CharField(

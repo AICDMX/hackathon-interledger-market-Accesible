@@ -24,7 +24,7 @@ from ulid import ULID
 from pydantic import ConfigDict, field_validator, model_validator, HttpUrl, Field
 from datetime import datetime
 
-from app.schemas.base_schema import BaseSchema, CurrencyType
+from schemas.base_schema import BaseSchema, CurrencyType
 from utilities.openpayments import paymentsparser
 
 
@@ -52,7 +52,7 @@ class OpenWalletBase(BaseSchema):
     def validate_address(cls, v: str) -> str:
         if v is None:
             raise ValueError("A valid wallet address is required.")
-        return paymentsparser.normalise_ilp_address(wallet_address=v)
+        return paymentsparser.normalise_wallet_address(wallet_address=v)
 
     @field_validator("privateKey")
     @classmethod

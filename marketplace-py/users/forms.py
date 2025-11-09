@@ -110,10 +110,35 @@ class ProfileForm(forms.ModelForm):
         help_text=_('Optional profile image')
     )
     
+    # Seller credentials for Open Payments (for workers/creators who receive payments)
+    # Note: Uses the same wallet_address as buyer wallet, but needs seller_key_id and seller_private_key
+    seller_key_id = forms.CharField(
+        label=_('Seller Key ID'),
+        required=False,
+        max_length=255,
+        widget=forms.TextInput(attrs={
+            'class': 'form-control',
+            'placeholder': _('Your key identifier')
+        }),
+        help_text=_('Key identifier for your seller wallet (needed to receive payments as a worker/creator)')
+    )
+    
+    seller_private_key = forms.CharField(
+        label=_('Seller Private Key'),
+        required=False,
+        widget=forms.Textarea(attrs={
+            'class': 'form-control',
+            'rows': 4,
+            'placeholder': _('-----BEGIN PRIVATE KEY-----\n...\n-----END PRIVATE KEY-----')
+        }),
+        help_text=_('Private key (PEM format) for seller wallet authentication (needed to receive payments)')
+    )
+    
     class Meta:
         model = User
-        fields = ['email', 'wallet_endpoint', 'wallet_address', 'preferred_language', 'native_languages', 'pretty_name', 'role', 
-                  'profile_note', 'profile_audio', 'profile_video', 'profile_image']
+        fields = ['email', 'wallet_address', 'preferred_language', 'native_languages', 'pretty_name', 'role', 
+                  'profile_note', 'profile_audio', 'profile_video', 'profile_image',
+                  'seller_key_id', 'seller_private_key']
     
     def clean_email(self):
         """Ensure email is unique if changed."""

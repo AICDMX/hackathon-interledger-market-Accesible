@@ -42,8 +42,14 @@ class KeyManager:
         """
         Read private key from str or bytes string
         """
+        # Ensure we have proper bytes
         if isinstance(pem_bytes, str):
             pem_bytes = pem_bytes.encode("utf-8")
+        elif isinstance(pem_bytes, memoryview):
+            pem_bytes = bytes(pem_bytes)
+        elif not isinstance(pem_bytes, bytes):
+            # Convert any other type to bytes via string
+            pem_bytes = str(pem_bytes).encode("utf-8")
 
         private_key = serialization.load_pem_private_key(data=pem_bytes, password=None)
 

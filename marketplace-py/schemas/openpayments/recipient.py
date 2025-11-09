@@ -23,7 +23,7 @@ from ulid import ULID
 from pydantic import ConfigDict, Field
 from datetime import datetime
 
-from app.schemas.base_schema import BaseSchema, CurrencyType
+from schemas.base_schema import BaseSchema, CurrencyType
 
 
 class OpenRecipientBase(BaseSchema):

@@ -17,6 +17,7 @@ You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <http:#www.gnu.org/licenses/>.
 
 """
+from urllib.parse import urlparse
 
 from ulid import ULID
 from pydantic import AnyUrl
@@ -82,8 +83,36 @@ class OpenPaymentsProcessor:
         )
         # Use provided redirect_uri or fallback to a default
         if not redirect_uri:
-            redirect_uri = getattr(settings, 'DEFAULT_REDIRECT_AFTER_AUTH', '/payments/finish/')
-        self.redirect_uri = f"{redirect_uri}{self.pending_payment.id}"
+            redirect_uri = getattr(settings, 'DEFAULT_REDIRECT_AFTER_AUTH', '/contract-complete/')
+        
+        # Extract path from redirect_uri (handle both full URLs and relative paths)
+        if redirect_uri.startswith(('http://', 'https://')):
+            parsed = urlparse(redirect_uri)
+            redirect_path = parsed.path
+            base_url = f"{parsed.scheme}://{parsed.netloc}"
+        else:
+            redirect_path = redirect_uri
+            # Get the site domain from Django settings or Site framework
+            from django.contrib.sites.models import Site
+            try:
+                site = Site.objects.get_current()
+                scheme = 'https' if not settings.DEBUG else 'http'
+                base_url = f"{scheme}://{site.domain}"
+            except Exception:
+                # Fallback: use ALLOWED_HOSTS or a default
+                allowed_hosts = getattr(settings, 'ALLOWED_HOSTS', ['localhost'])
+                host = allowed_hosts[0] if allowed_hosts else 'localhost'
+                scheme = 'https' if not settings.DEBUG else 'http'
+                base_url = f"{scheme}://{host}"
+        
+        # Append payment ID to the path (ensure proper trailing slash handling)
+        if redirect_path.endswith('/'):
+            full_path = f"{redirect_path}{self.pending_payment.id}/"
+        else:
+            full_path = f"{redirect_path}/{self.pending_payment.id}/"
+        
+        # Construct full URL
+        self.redirect_uri = f"{base_url}{full_path}"
 
     ###################################################################################################
     # 1. GRANT-MAKING GENERAL UTILITY
@@ -217,7 +246,7 @@ class OpenPaymentsProcessor:
         self.pending_payment.finish_id = interactive_response.root.interact.finish
         self.pending_payment.continue_id = interactive_response.root.cont.access_token.value
         self.pending_payment.continue_url = interactive_response.root.cont.uri
-        return interactive_response.root.interact.redirect
+        return str(interactive_response.root.interact.redirect)
 
     ###################################################################################################
     # 5. COMPLETE OUTGOING PAYMENT

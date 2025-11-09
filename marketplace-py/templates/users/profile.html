@@ -77,21 +77,6 @@
         </div>
         
         <div class="form-group">
-            {% include 'components/form_label_with_audio.html' with label_text=profile_form.wallet_endpoint.label slug="form_wallet_endpoint" field_id=profile_form.wallet_endpoint.id_for_label %}
-            {{ profile_form.wallet_endpoint }}
-            {% if profile_form.wallet_endpoint.errors %}
-                <ul class="errorlist">
-                    {% for error in profile_form.wallet_endpoint.errors %}
-                        <li>{{ error }}</li>
-                    {% endfor %}
-                </ul>
-            {% endif %}
-            {% if profile_form.wallet_endpoint.help_text %}
-                <small class="text-muted">{{ profile_form.wallet_endpoint.help_text }}</small>
-            {% endif %}
-        </div>
-        
-        <div class="form-group">
             {% include 'components/form_label_with_audio.html' with label_text=profile_form.wallet_address.label slug="form_wallet_address" field_id=profile_form.wallet_address.id_for_label %}
             {{ profile_form.wallet_address }}
             {% if profile_form.wallet_address.errors %}
@@ -104,6 +89,42 @@
             {% if profile_form.wallet_address.help_text %}
                 <small class="text-muted">{{ profile_form.wallet_address.help_text }}</small>
             {% endif %}
+        </div>
+        
+        <!-- Seller Credentials Section -->
+        <div style="margin-top: 2rem; padding-top: 1.5rem; border-top: 2px solid #e5e7eb;">
+            {% include 'components/static_title_with_audio.html' with title_text="Seller Credentials (For Receiving Payments)" slug="section_seller_credentials" heading_tag="h3" %}
+            <p class="text-muted" style="margin-bottom: 1rem;">{% trans 'Configure your seller credentials if you want to receive payments as a worker/creator. Uses your wallet address above, but requires seller key ID and private key for authentication.' %}</p>
+            
+            <div class="form-group">
+                {% include 'components/form_label_with_audio.html' with label_text=profile_form.seller_key_id.label slug="form_seller_key_id" field_id=profile_form.seller_key_id.id_for_label %}
+                {{ profile_form.seller_key_id }}
+                {% if profile_form.seller_key_id.errors %}
+                    <ul class="errorlist">
+                        {% for error in profile_form.seller_key_id.errors %}
+                            <li>{{ error }}</li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+                {% if profile_form.seller_key_id.help_text %}
+                    <small class="text-muted">{{ profile_form.seller_key_id.help_text }}</small>
+                {% endif %}
+            </div>
+            
+            <div class="form-group">
+                {% include 'components/form_label_with_audio.html' with label_text=profile_form.seller_private_key.label slug="form_seller_private_key" field_id=profile_form.seller_private_key.id_for_label %}
+                {{ profile_form.seller_private_key }}
+                {% if profile_form.seller_private_key.errors %}
+                    <ul class="errorlist">
+                        {% for error in profile_form.seller_private_key.errors %}
+                            <li>{{ error }}</li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+                {% if profile_form.seller_private_key.help_text %}
+                    <small class="text-muted">{{ profile_form.seller_private_key.help_text }}</small>
+                {% endif %}
+            </div>
         </div>
         
         <div class="form-group">

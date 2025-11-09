@@ -18,8 +18,8 @@ along with this program.  If not, see <http:#www.gnu.org/licenses/>.
 
 """
 
-from typing import Optional
-from pydantic import BaseModel, Field, field_validator, AnyUrl
+from typing import Optional, Union
+from pydantic import BaseModel, Field, field_validator, AnyUrl, ConfigDict
 from ulid import ULID
 from open_payments_sdk.models.wallet import WalletAddress
 from open_payments_sdk.models.resource import Amount
@@ -31,8 +31,19 @@ class PendingIncomingPaymentTransaction(BaseModel):
     """
     References to recover and continuea pending incoming payment.
     """
+    model_config = ConfigDict(arbitrary_types_allowed=True)
 
     id: ULID = Field(..., description="Tracking key needed to recover the transaction.")
+    
+    @field_validator('id', mode='before')
+    @classmethod
+    def validate_ulid(cls, v):
+        """Convert string or ULID to ULID."""
+        if isinstance(v, ULID):
+            return v
+        if isinstance(v, str):
+            return ULID.from_str(v)
+        return v
     buyer: WalletAddress = Field(
         ...,
         description="Data for the buyer's open payments wallet",
@@ -89,5 +100,12 @@ class SellerOpenPaymentAccount(BaseModel):
     @field_validator("privateKey", mode="before")
     @classmethod
     def evaluate_private_key(cls, privateKey):
+        # Ensure we have a string
+        if isinstance(privateKey, bytes):
+            privateKey = privateKey.decode("utf-8")
+        elif isinstance(privateKey, memoryview):
+            privateKey = bytes(privateKey).decode("utf-8")
+        elif not isinstance(privateKey, str):
+            privateKey = str(privateKey)
         privateKey = paymentsparser.convert_private_key_to_PEM(private_key=privateKey)
         return privateKey

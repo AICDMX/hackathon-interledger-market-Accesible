@@ -28,8 +28,8 @@ from pydantic import (
 )
 from datetime import datetime
 
-from app.schemas.base_schema import BaseSchema, CountryType
-from app.schema_types import ProductFeeResponsibilityType, RenewalType
+from schemas.base_schema import BaseSchema, CountryType
+from schema_types import ProductFeeResponsibilityType, RenewalType
 
 
 class OpenOrderBase(BaseSchema):

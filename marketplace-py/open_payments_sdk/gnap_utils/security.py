@@ -49,5 +49,38 @@ class SecurityBase:
         """
         Compute Digest
         """
-        request.headers["Content-Digest"] = ser({"sha-512": hashlib.sha512(request.content).digest()})
+        # Ensure request.content is bytes (httpx might return memoryview in some cases)
+        # Get content and normalize to bytes immediately
+        content = request.content
+        if isinstance(content, memoryview):
+            content = bytes(content)
+        elif not isinstance(content, bytes):
+            content = bytes(content) if hasattr(content, '__bytes__') else str(content).encode('utf-8')
+        
+        # Compute digest - ensure result is bytes
+        digest_bytes = hashlib.sha512(content).digest()
+        # Explicitly convert to bytes to avoid any memoryview issues
+        if not isinstance(digest_bytes, bytes):
+            if isinstance(digest_bytes, memoryview):
+                digest_bytes = bytes(digest_bytes)
+            else:
+                digest_bytes = bytes(digest_bytes) if hasattr(digest_bytes, '__bytes__') else str(digest_bytes).encode('utf-8')
+        
+        # Pass bytes directly to ser() - it will handle base64 encoding
+        # Double-check we have bytes before passing to ser()
+        assert isinstance(digest_bytes, bytes), f"digest_bytes must be bytes, got {type(digest_bytes)}"
+        request.headers["Content-Digest"] = ser({"sha-512": digest_bytes})
+        
+        # If request.content was memoryview, rebuild request with bytes to prevent issues
+        # with http_message_signatures library accessing memoryview
+        if isinstance(request.content, memoryview):
+            content_bytes = bytes(request.content)
+            # Rebuild request with bytes content to ensure http_message_signatures gets bytes
+            request = Request(
+                method=request.method,
+                url=request.url,
+                headers=dict(request.headers),
+                content=content_bytes,
+            )
+        
         return request

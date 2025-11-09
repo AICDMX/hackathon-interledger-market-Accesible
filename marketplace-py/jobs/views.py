@@ -13,6 +13,7 @@ from django.core.files.base import ContentFile
 from audio.forms import AudioContributionForm
 from .forms import JobApplicationForm
 from .models import Job, JobSubmission, JobApplication
+from users.models import User
 from .audio_support import AUDIO_SUPPORT_OPPORTUNITIES, get_audio_support_opportunity
 
 
@@ -1359,7 +1360,6 @@ def my_money(request):
         'total_earned': total_earned,
         'total_spent': total_spent,
         'balance': balance,
-        'wallet_endpoint': request.user.wallet_endpoint,
     }
     return render(request, 'jobs/my_money.html', context)
 
@@ -1572,6 +1572,260 @@ def pre_approve_payments(request, pk):
 
 @login_required
 @require_POST
+def start_contract(request, pk):
+    """Start contract with auto-filled parameters and initiate GNAP flow."""
+    from datetime import timedelta
+    from ulid import ULID
+    from open_payments.crud_open_payments import OpenPaymentsProcessor
+    from schemas.openpayments.open_payments import SellerOpenPaymentAccount
+    from django.conf import settings
+    import logging
+    
+    logger = logging.getLogger(__name__)
+    
+    job = get_object_or_404(Job, pk=pk, funder=request.user)
+    
+    # Validate job state
+    if job.status not in ['selecting', 'recruiting']:
+        messages.warning(request, _('Contract can only be started in selecting or recruiting state.'))
+        return redirect('jobs:detail', pk=job.pk)
+    
+    # Validate selected applications exist
+    selected_applications = job.applications.filter(status='selected')
+    if not selected_applications.exists():
+        messages.warning(request, _('You need to approve at least one applicant before starting the contract.'))
+        return redirect('jobs:detail', pk=job.pk)
+    
+    # Validate expired_date exists
+    if not job.expired_date:
+        messages.error(request, _('Job must have an expired date set before starting contract.'))
+        return redirect('jobs:detail', pk=job.pk)
+    
+    # Validate contract not already started and completed
+    # Only prevent restarting if contract was actually completed (status moved to 'submitting' or beyond)
+    if job.contract_id and job.status in ['submitting', 'reviewing', 'complete']:
+        messages.info(request, _('Contract already started and completed for this job. Job is in {status} stage.').format(status=job.get_status_display()))
+        return redirect('jobs:detail', pk=job.pk)
+    
+    # If contract_id exists but contract wasn't completed, allow restarting
+    # (This handles cases where the payment authorization was never completed)
+    if job.contract_id and job.status in ['selecting', 'recruiting']:
+        # Save old contract_id before clearing for cleanup
+        old_contract_id = job.contract_id
+        # Clear old contract data to allow restarting
+        job.contract_id = None
+        job.incoming_payment_id = None
+        job.quote_id = None
+        job.interactive_redirect_url = None
+        job.finish_id = None
+        job.continue_id = None
+        job.continue_url = None
+        job.save(update_fields=[
+            'contract_id', 'incoming_payment_id', 'quote_id', 
+            'interactive_redirect_url', 'finish_id', 'continue_id', 'continue_url'
+        ])
+        # Also clean up any pending transaction records
+        from .models import PendingPaymentTransaction
+        PendingPaymentTransaction.objects.filter(contract_id=old_contract_id).delete()
+        messages.info(request, _('Previous incomplete contract cleared. Starting new contract...'))
+    
+    # Get buyer wallet (funder)
+    buyer_wallet = job.funder.wallet_address
+    if not buyer_wallet:
+        messages.error(request, _('You must configure your wallet address in your profile before starting a contract.'))
+        return redirect('jobs:detail', pk=job.pk)
+    
+    # Get seller credentials (marketplace account)
+    # For now, use the first user with seller credentials configured
+    # TODO: In production, use a dedicated marketplace/system account
+    seller_user = User.objects.filter(
+        wallet_address__isnull=False,
+        seller_key_id__isnull=False,
+        seller_private_key__isnull=False
+    ).first()
+    
+    if not seller_user:
+        messages.error(request, _('Seller account not configured. Please contact administrator.'))
+        return redirect('jobs:detail', pk=job.pk)
+    
+    try:
+        # Prepare seller account
+        # Use helper method to safely get private key as string
+        private_key_str = seller_user.get_seller_private_key()
+        if private_key_str is None:
+            messages.error(request, _('Seller private key is not configured.'))
+            return redirect('jobs:detail', pk=job.pk)
+        
+        seller_account = SellerOpenPaymentAccount(
+            walletAddressUrl=seller_user.wallet_address,
+            privateKey=private_key_str,
+            keyId=seller_user.seller_key_id
+        )
+        
+        # Initialize processor
+        # Build full URL for redirect_uri (required by Pydantic AnyUrl)
+        redirect_path = getattr(settings, 'DEFAULT_REDIRECT_AFTER_AUTH', '/contract-complete/')
+        redirect_uri = request.build_absolute_uri(redirect_path)
+        processor = OpenPaymentsProcessor(
+            seller=seller_account,
+            buyer=buyer_wallet,
+            redirect_uri=redirect_uri
+        )
+        
+        # Calculate total amount (budget in smallest currency unit)
+        # Assuming pesos with 2 decimal places, convert to smallest unit
+        total_amount = str(int(job.budget * 100))
+        
+        # Get purchase endpoint (triggers incoming payment, quote, and interactive grant)
+        redirect_url = processor.get_purchase_endpoint(amount=total_amount)
+        
+        # Store contract_id and transaction data in Job
+        contract_id = str(processor.pending_payment.id)
+        job.contract_id = contract_id
+        job.incoming_payment_id = str(processor.pending_payment.incoming_payment_id) if processor.pending_payment.incoming_payment_id else None
+        job.quote_id = str(processor.pending_payment.quote_id) if processor.pending_payment.quote_id else None
+        job.interactive_redirect_url = str(redirect_url)
+        job.finish_id = processor.pending_payment.finish_id
+        job.continue_id = processor.pending_payment.continue_id
+        job.continue_url = str(processor.pending_payment.continue_url) if processor.pending_payment.continue_url else None
+        job.save()
+        
+        # Store PendingIncomingPaymentTransaction data
+        from .models import PendingPaymentTransaction
+        PendingPaymentTransaction.objects.create(
+            contract_id=contract_id,
+            job=job,
+            buyer_wallet_data=processor.buyer_wallet.model_dump(mode='json'),
+            seller_wallet_data=processor.seller_wallet.model_dump(mode='json'),
+            incoming_payment_id=str(processor.pending_payment.incoming_payment_id) if processor.pending_payment.incoming_payment_id else None,
+            quote_id=str(processor.pending_payment.quote_id) if processor.pending_payment.quote_id else None,
+            interactive_redirect=str(redirect_url),
+            finish_id=processor.pending_payment.finish_id,
+            continue_id=processor.pending_payment.continue_id,
+            continue_url=str(processor.pending_payment.continue_url) if processor.pending_payment.continue_url else None,
+        )
+        
+        # Redirect buyer to wallet for authorization
+        return redirect(str(redirect_url))
+        
+    except Exception as e:
+        import traceback
+        logger.error(f"Failed to start contract: {str(e)}\n{traceback.format_exc()}")
+        messages.error(request, _('Failed to start contract: {error}').format(error=str(e)))
+        return redirect('jobs:detail', pk=job.pk)
+
+
+@login_required
+def complete_contract_payment(request, contract_id=None):
+    """Handle callback from buyer wallet after authorization."""
+    from open_payments.crud_open_payments import OpenPaymentsProcessor
+    from schemas.openpayments.open_payments import SellerOpenPaymentAccount, PendingIncomingPaymentTransaction
+    from open_payments_sdk.models.wallet import WalletAddress
+    from ulid import ULID
+    from django.conf import settings
+    import logging
+    
+    logger = logging.getLogger(__name__)
+    
+    # Get contract_id from URL path or query params
+    if not contract_id:
+        # Try to extract from redirect URI
+        # The redirect URI format is: /contract-complete/{contract_id}
+        path_parts = request.path.strip('/').split('/')
+        if len(path_parts) >= 2 and path_parts[-2] == 'contract-complete':
+            contract_id = path_parts[-1]
+        else:
+            contract_id = request.GET.get('contract_id')
+    
+    interact_ref = request.GET.get('interact_ref')
+    hash_value = request.GET.get('hash')
+    
+    if not contract_id or not interact_ref or not hash_value:
+        messages.error(request, _('Invalid callback parameters.'))
+        return redirect('jobs:list')
+    
+    # Retrieve job by contract_id
+    try:
+        job = Job.objects.get(contract_id=contract_id)
+    except Job.DoesNotExist:
+        messages.error(request, _('Contract not found.'))
+        return redirect('jobs:list')
+    
+    # Verify user is the funder
+    if request.user != job.funder:
+        messages.error(request, _('You are not authorized to complete this contract.'))
+        return redirect('jobs:detail', pk=job.pk)
+    
+    # Get seller credentials
+    seller_user = User.objects.filter(
+        wallet_address__isnull=False,
+        seller_key_id__isnull=False,
+        seller_private_key__isnull=False
+    ).first()
+    
+    if not seller_user:
+        messages.error(request, _('Seller account not configured.'))
+        return redirect('jobs:detail', pk=job.pk)
+    
+    try:
+        # Retrieve pending transaction
+        from .models import PendingPaymentTransaction
+        try:
+            pending_txn = PendingPaymentTransaction.objects.get(contract_id=contract_id)
+        except PendingPaymentTransaction.DoesNotExist:
+            messages.error(request, _('Pending transaction not found.'))
+            return redirect('jobs:detail', pk=job.pk)
+        
+        # Prepare seller account
+        # Use helper method to safely get private key as string
+        private_key_str = seller_user.get_seller_private_key()
+        if private_key_str is None:
+            messages.error(request, _('Seller private key is not configured.'))
+            return redirect('jobs:detail', pk=job.pk)
+        
+        seller_account = SellerOpenPaymentAccount(
+            walletAddressUrl=seller_user.wallet_address,
+            privateKey=private_key_str,
+            keyId=seller_user.seller_key_id
+        )
+        
+        # Reconstruct wallet addresses from stored data
+        buyer_wallet = WalletAddress(**pending_txn.buyer_wallet_data)
+        seller_wallet = WalletAddress(**pending_txn.seller_wallet_data)
+        
+        # Verify the authorization hash (but don't complete payment yet)
+        from utilities.openpayments import paymentsparser
+        if not paymentsparser.verify_response_hash(
+            incoming_payment_id=contract_id,
+            finish_id=pending_txn.finish_id,
+            interact_ref=interact_ref,
+            auth_server_url=str(buyer_wallet.authServer),
+            received_hash=hash_value,
+        ):
+            messages.error(request, _('Invalid authorization hash. Please try again.'))
+            return redirect('jobs:detail', pk=job.pk)
+        
+        # Store authorization data for later payment completion
+        pending_txn.interact_ref = interact_ref
+        pending_txn.hash_value = hash_value
+        pending_txn.save(update_fields=['interact_ref', 'hash_value'])
+        
+        # Update job status to submitting (authorization successful, but payment not yet completed)
+        job.status = 'submitting'
+        job.save(update_fields=['status'])
+        
+        messages.success(request, _('Contract authorized! Job is now in submitting phase. Approved workers can now submit their work. You can complete the contract payment after reviewing submissions.'))
+        return redirect('jobs:detail', pk=job.pk)
+        
+    except Exception as e:
+        import traceback
+        logger.error(f"Failed to complete contract payment: {str(e)}\n{traceback.format_exc()}")
+        messages.error(request, _('Failed to complete contract: {error}').format(error=str(e)))
+        return redirect('jobs:detail', pk=job.pk)
+
+
+@login_required
+@require_POST
 def mark_submission_complete(request, job_pk, submission_pk):
     """Allow workers to mark their submission as complete."""
     job = get_object_or_404(Job, pk=job_pk)
@@ -1593,8 +1847,16 @@ def mark_submission_complete(request, job_pk, submission_pk):
 @login_required
 @require_POST
 def complete_contract(request, pk):
-    """Complete/release the contract and payments for accepted work.
-    This is a stub - actual payment release functionality is not implemented yet."""
+    """Complete/release the contract and payments for accepted work."""
+    from open_payments.crud_open_payments import OpenPaymentsProcessor
+    from schemas.openpayments.open_payments import SellerOpenPaymentAccount, PendingIncomingPaymentTransaction
+    from open_payments_sdk.models.wallet import WalletAddress
+    from ulid import ULID
+    from django.conf import settings
+    import logging
+    
+    logger = logging.getLogger(__name__)
+    
     job = get_object_or_404(Job, pk=pk, funder=request.user)
     
     if job.contract_completed:
@@ -1606,17 +1868,93 @@ def complete_contract(request, pk):
         messages.warning(request, _('You need at least one accepted submission before completing the contract.'))
         return redirect('jobs:detail', pk=job.pk)
     
-    # Warn if completing contract with fewer accepted submissions than requested
-    # Note: The warning is shown via JavaScript confirmation popup in the template
-    # No need to show a message here since user already confirmed
+    # Check that contract was authorized
+    if not job.contract_id:
+        messages.error(request, _('Contract has not been started yet.'))
+        return redirect('jobs:detail', pk=job.pk)
     
-    # Mark contract as completed and mark job as complete
-    job.contract_completed = True
-    job.status = 'complete'
-    job.save(update_fields=['contract_completed', 'status'])
+    # Retrieve pending transaction with authorization data
+    from .models import PendingPaymentTransaction
+    try:
+        pending_txn = PendingPaymentTransaction.objects.get(contract_id=job.contract_id)
+    except PendingPaymentTransaction.DoesNotExist:
+        messages.error(request, _('Pending transaction not found. Please contact support.'))
+        return redirect('jobs:detail', pk=job.pk)
     
-    messages.success(request, _('Contract completed! Job has been marked as complete. Payments will be released to workers. (Note: Payment release functionality is coming soon.)'))
-    return redirect('jobs:detail', pk=job.pk)
+    # Check that authorization data exists
+    if not pending_txn.interact_ref or not pending_txn.hash_value:
+        messages.error(request, _('Contract authorization not completed. Please complete the wallet authorization first.'))
+        return redirect('jobs:detail', pk=job.pk)
+    
+    try:
+        # Get seller credentials
+        seller_user = User.objects.filter(
+            wallet_address__isnull=False,
+            seller_key_id__isnull=False,
+            seller_private_key__isnull=False
+        ).first()
+        
+        if not seller_user:
+            messages.error(request, _('Seller account not configured.'))
+            return redirect('jobs:detail', pk=job.pk)
+        
+        # Prepare seller account
+        private_key_str = seller_user.get_seller_private_key()
+        if private_key_str is None:
+            messages.error(request, _('Seller private key is not configured.'))
+            return redirect('jobs:detail', pk=job.pk)
+        
+        seller_account = SellerOpenPaymentAccount(
+            walletAddressUrl=seller_user.wallet_address,
+            privateKey=private_key_str,
+            keyId=seller_user.seller_key_id
+        )
+        
+        # Reconstruct wallet addresses from stored data
+        buyer_wallet = WalletAddress(**pending_txn.buyer_wallet_data)
+        seller_wallet = WalletAddress(**pending_txn.seller_wallet_data)
+        
+        # Reconstruct pending payment transaction
+        pending_payment = PendingIncomingPaymentTransaction(
+            id=ULID.from_str(job.contract_id),
+            buyer=buyer_wallet,
+            seller=seller_wallet,
+            incoming_payment_id=pending_txn.incoming_payment_id,
+            quote_id=pending_txn.quote_id,
+            finish_id=pending_txn.finish_id,
+            continue_id=pending_txn.continue_id,
+            continue_url=pending_txn.continue_url,
+        )
+        
+        # Initialize processor (needed for complete_payment method)
+        redirect_path = getattr(settings, 'DEFAULT_REDIRECT_AFTER_AUTH', '/contract-complete/')
+        redirect_uri = request.build_absolute_uri(redirect_path)
+        processor = OpenPaymentsProcessor(
+            seller=seller_account,
+            buyer=job.funder.wallet_address,
+            redirect_uri=redirect_uri
+        )
+        
+        # Complete payment using stored authorization data
+        outgoing_payment = processor.complete_payment(
+            interact_ref=pending_txn.interact_ref,
+            received_hash=pending_txn.hash_value,
+            pending_payment=pending_payment
+        )
+        
+        # Mark contract as completed and mark job as complete
+        job.contract_completed = True
+        job.status = 'complete'
+        job.save(update_fields=['contract_completed', 'status'])
+        
+        messages.success(request, _('Contract completed! Job has been marked as complete. Payments have been released to workers.'))
+        return redirect('jobs:detail', pk=job.pk)
+        
+    except Exception as e:
+        import traceback
+        logger.error(f"Failed to complete contract: {str(e)}\n{traceback.format_exc()}")
+        messages.error(request, _('Failed to complete contract: {error}').format(error=str(e)))
+        return redirect('jobs:detail', pk=job.pk)
 
 
 @login_required

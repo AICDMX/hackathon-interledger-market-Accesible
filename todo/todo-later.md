@@ -11,3 +11,6 @@
 - [ ] Send notifications to workers when payments are released
 
 Note: Currently `complete_contract` is a stub that only marks `contract_completed=True`. The actual payment release functionality needs to be implemented.
+
+
+[] add validation for the payments on contract creation and compleation that the seller gets the money using their key
