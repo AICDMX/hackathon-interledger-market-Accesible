@@ -21,7 +21,7 @@ echo "Step 2: Adding seller-aicdmx..."
 
 SELLER_ID="seller-aicdmx"
 WALLET_ADDRESS="https://ilp.interledger-test.dev/aicdmx"
-KEY_ID="d405beb8-f84a-4449-b989-93d0c7e38f02"
+KEY_ID="0227b90b-ee4d-4184-b8a9-6befcc9fa812"
 PRIVATE_KEY_PATH="private.key"
 
 curl -sS -X POST "${BASE_URL}/sellers" \
