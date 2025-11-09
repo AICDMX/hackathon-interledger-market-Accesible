@@ -80,7 +80,7 @@
                 <button class="audio-play-btn" 
                         aria-label="Play audio for ${targetField} in ${languageCode}"
                         onclick="window.audioPlayerModule.playAudio(this)">
-                    <span class="audio-icon" aria-hidden="true">??</span>
+                    <span class="audio-icon" aria-hidden="true"></span>
                     <span class="audio-label">Listen</span>
                 </button>
                 <div class="audio-player-container" style="display: none;">
@@ -102,7 +102,7 @@
                 <button class="audio-request-btn" 
                         aria-label="Request audio for ${targetField} in ${languageCode}"
                         onclick="window.audioPlayerModule.requestAudio(this)">
-                    <span class="audio-icon" aria-hidden="true">??</span>
+                    <span class="audio-icon" aria-hidden="true"></span>
                     <span class="audio-label">Request audio</span>
                 </button>
                 <div class="audio-request-message" style="display: none;" role="alert"></div>

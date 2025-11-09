@@ -6,7 +6,7 @@ Only Otomi Language voice added. We gathered during the hackathon through connec
 
 We have two working branches. 
 Main branch uses Contract style using python openpayments sdk
-Node.js Microservice is on node-js-api. Uses escrow wallet solution.
+Node.js Microservice we have a second option Uses escrow wallet solution.
 
 ## Repository Layout
 
