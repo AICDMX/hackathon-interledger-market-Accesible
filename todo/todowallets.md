@@ -15,3 +15,4 @@ a way to transfer to money for a wallet to another wallet .
 
 endpoint to make a automated transaction to another wallet :
 
+wallet contract expiration: when a job expires (expired_date passes with no applications in recruiting or no submissions in submitting), the wallet contract should expire 7 days after the job's expired_date. this needs to be implemented in the wallet service.

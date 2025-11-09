@@ -50,6 +50,10 @@ Developers consume these via utility classes (`p-6`, `bg-surface`, `rounded-card
 4. **Support**: list of contact methods with large icons; tapping opens chat/voice while keeping the background context.
 5. **Notifications & Alerts**: toast stack that summarises actions (offer approved, payment received) with one-tap shortcuts to view details; never hijack the full viewport.
 
+## Job States
+
+See [job-states.md](job-states.md) for complete documentation of job state definitions and transitions.
+
 ## Component System
 - **Tokens**: spacing (4/8/16 base), colours (off-white background, charcoal text, teal primary, amber warning), radii (12 px), and shadow presets.
 - **Atoms**: icon button, chips, badges, toggles; each shares the same elevation and motion curves (200 ms ease-out).

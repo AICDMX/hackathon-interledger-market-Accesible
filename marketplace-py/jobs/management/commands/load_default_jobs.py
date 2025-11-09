@@ -1,7 +1,7 @@
 from django.core.management.base import BaseCommand
 from django.contrib.auth import get_user_model
 from decimal import Decimal
-from jobs.models import Job, JobFunding
+from jobs.models import Job
 
 User = get_user_model()
 
@@ -78,7 +78,6 @@ class Command(BaseCommand):
                 'deliverable_types': 'audio',
                 'amount_per_person': Decimal('75.00'),
                 'max_responses': 1,
-                'start_funded': True,  # This job should start as funded
             },
         ]
 
@@ -93,27 +92,11 @@ class Command(BaseCommand):
             ).first()
 
             if existing_job:
-                # If this job should be funded but isn't, fund it
-                if job_data.get('start_funded', False) and not existing_job.is_funded:
-                    budget_total = existing_job.budget
-                    JobFunding.objects.create(
-                        job=existing_job,
-                        funder=default_funder,
-                        amount=budget_total,
-                        note='Default funding'
+                self.stdout.write(
+                    self.style.WARNING(
+                        f'Skipped: Job "{job_data["title"]}" already exists'
                     )
-                    existing_job.refresh_funding_snapshot()
-                    self.stdout.write(
-                        self.style.SUCCESS(
-                            f'Funded existing job: "{existing_job.title}" ({existing_job.target_language}) - {budget_total} ILP'
-                        )
-                    )
-                else:
-                    self.stdout.write(
-                        self.style.WARNING(
-                            f'Skipped: Job "{job_data["title"]}" already exists'
-                        )
-                    )
+                )
                 skipped_count += 1
                 continue
 
@@ -132,29 +115,14 @@ class Command(BaseCommand):
                 budget=budget_total,
                 max_responses=max_responses,
                 funder=default_funder,
-                status='open',
+                status='recruiting',
             )
 
-            # If this job should start as funded, create a funding record
-            if job_data.get('start_funded', False):
-                JobFunding.objects.create(
-                    job=job,
-                    funder=default_funder,
-                    amount=budget_total,
-                    note='Default funding'
+            self.stdout.write(
+                self.style.SUCCESS(
+                    f'Created job: "{job.title}" ({job.target_language}) - {job.budget} ILP'
                 )
-                job.refresh_funding_snapshot()
-                self.stdout.write(
-                    self.style.SUCCESS(
-                        f'Created and funded job: "{job.title}" ({job.target_language}) - {job.budget} ILP'
-                    )
-                )
-            else:
-                self.stdout.write(
-                    self.style.SUCCESS(
-                        f'Created job: "{job.title}" ({job.target_language}) - {job.budget} ILP'
-                    )
-                )
+            )
             created_count += 1
 
         self.stdout.write(

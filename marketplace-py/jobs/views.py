@@ -1,3 +1,4 @@
+from decimal import Decimal
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
@@ -6,10 +7,11 @@ from django.db.models import Q, Count, Prefetch
 from django.urls import reverse
 from django.http import Http404
 from django.views.decorators.http import require_POST
-from decimal import Decimal
+from django.utils import timezone
+from datetime import timedelta
 from audio.forms import AudioContributionForm
-from .forms import JobFundingForm, JobApplicationForm
-from .models import Job, JobSubmission, JobFunding, JobApplication
+from .forms import JobApplicationForm
+from .models import Job, JobSubmission, JobApplication
 from .audio_support import AUDIO_SUPPORT_OPPORTUNITIES, get_audio_support_opportunity
 from .payments_utils import create_incoming_payment
 
@@ -33,33 +35,22 @@ def _build_audio_targets():
 
 def job_list(request):
     """List all available jobs."""
-    jobs = Job.objects.all().order_by('-created_at')
-    
-    # Filter by funding status - default to showing funded jobs
-    show_funded = request.GET.get('show_funded', 'on') == 'on'
-    show_unfunded = request.GET.get('show_unfunded', '') == 'on'
-    
-    funding_filters = Q()
-    if show_funded:
-        funding_filters |= Q(is_funded=True)
-    if show_unfunded:
-        funding_filters |= Q(is_funded=False)
-    
-    if funding_filters:
-        jobs = jobs.filter(funding_filters)
-    else:
-        # If neither is checked, show nothing (edge case)
-        jobs = jobs.none()
-    
-    # Filter by status - exclude completed by default
-    show_completed = request.GET.get('show_completed', '') == 'on'
-    if not show_completed:
-        jobs = jobs.exclude(status='completed')
+    # Show only jobs that are recruiting (available for applications)
+    # Include both 'recruiting' and legacy 'open' status for backward compatibility
+    jobs = Job.objects.filter(status__in=['recruiting', 'open']).order_by('-created_at')
     
     # Filter by language if provided
     language_filter = request.GET.get('language')
     if language_filter:
         jobs = jobs.filter(target_language=language_filter)
+    
+    # Filter out jobs user has already applied to (default behavior)
+    hide_applied = request.GET.get('hide_applied', 'on') == 'on'
+    if request.user.is_authenticated and hide_applied:
+        applied_job_ids = JobApplication.objects.filter(
+            applicant=request.user
+        ).values_list('job_id', flat=True)
+        jobs = jobs.exclude(pk__in=applied_job_ids)
     
     # Search functionality
     search_query = request.GET.get('search', '')
@@ -69,13 +60,28 @@ def job_list(request):
             Q(description__icontains=search_query)
         )
     
+    # Get jobs waiting for user's submission (if authenticated)
+    waiting_for_submission = []
+    if request.user.is_authenticated:
+        # Jobs in 'submitting' state where user has selected application but no submission
+        selected_applications = JobApplication.objects.filter(
+            applicant=request.user,
+            status='selected'
+        ).select_related('job')
+        
+        for application in selected_applications:
+            job = application.job
+            if job.status == 'submitting':
+                # Check if user hasn't submitted yet
+                if not job.submissions.filter(creator=request.user).exists():
+                    waiting_for_submission.append(job)
+    
     context = {
         'jobs': jobs,
         'language_filter': language_filter,
         'search_query': search_query,
-        'show_funded': show_funded,
-        'show_unfunded': show_unfunded,
-        'show_completed': show_completed,
+        'hide_applied': hide_applied,
+        'waiting_for_submission': waiting_for_submission,
     }
     return render(request, 'jobs/job_list.html', context)
 
@@ -83,7 +89,21 @@ def job_list(request):
 def job_detail(request, pk):
     """View job details."""
     job = get_object_or_404(Job, pk=pk)
-    job.refresh_funding_snapshot()
+    
+    # If job is a draft, only allow the owner to view it
+    if job.status == 'draft' and (not request.user.is_authenticated or request.user != job.funder):
+        raise Http404("Job not found")
+    
+    # Check if job should auto-transition (e.g., deadline passed)
+    if job.should_transition_to_selecting():
+        job.status = 'selecting'
+        job.save(update_fields=['status'])
+    
+    # Check if job should expire
+    if job.should_expire():
+        job.status = 'expired'
+        job.save(update_fields=['status'])
+    
     user_submissions = None
     user_application = None
     
@@ -95,62 +115,17 @@ def job_detail(request, pk):
         'job': job,
         'user_submissions': user_submissions,
         'user_application': user_application,
-        'fundings': job.fundings.select_related('funder').order_by('-created_at')[:5],
     }
     return render(request, 'jobs/job_detail.html', context)
 
 
 @login_required
-def pledge_job(request, pk):
-    """Allow authenticated users to pledge funds toward a job budget."""
-    job = get_object_or_404(Job, pk=pk)
-    
-    if request.user == job.funder:
-        messages.info(request, _('You already created this job; use the fund button on your dashboard.'))
-        return redirect('jobs:detail', pk=job.pk)
-    
-    remaining_amount = job.remaining_budget()
-    existing_total = job.budget - remaining_amount
-    
-    if remaining_amount <= Decimal('0.00'):
-        job.refresh_funding_snapshot()
-        messages.info(request, _('This job is already fully funded.'))
-        return redirect('jobs:detail', pk=job.pk)
-    
-    if job.is_funded:
-        messages.info(request, _('This job is already fully funded.'))
-        return redirect('jobs:detail', pk=job.pk)
-    
-    if job.status != 'open':
-        messages.warning(request, _('This job is no longer accepting funding.'))
-        return redirect('jobs:detail', pk=job.pk)
-    
-    if request.method == 'POST':
-        form = JobFundingForm(request.POST, job=job)
-        if form.is_valid():
-            funding = form.save(commit=False)
-            funding.job = job
-            funding.funder = request.user
-            funding.save()
-            job.refresh_funding_snapshot()
-            messages.success(request, _('Thank you! Your pledge was recorded.'))
-            return redirect('jobs:detail', pk=job.pk)
-    else:
-        suggested_amount = remaining_amount if remaining_amount > Decimal('0.00') else job.budget
-        form = JobFundingForm(initial={'amount': suggested_amount}, job=job)
-    
-    context = {
-        'job': job,
-        'form': form,
-        'remaining_amount': remaining_amount,
-        'existing_total': existing_total,
-    }
-    return render(request, 'jobs/pledge_job.html', context)
-
-
-@login_required
 def my_jobs(request):
     """View jobs posted by the current user."""
+    if not request.user.is_funder():
+        messages.error(request, _('You do not have permission to view this page.'))
+        return redirect('jobs:list')
+    
     jobs = Job.objects.filter(funder=request.user).order_by('-created_at')
     
     status_filter = request.GET.get('status')
@@ -205,56 +180,453 @@ def accepted_jobs(request):
 @login_required
 def create_job(request):
     """Create a new job."""
+    if not request.user.is_funder():
+        messages.error(request, _('You do not have permission to create jobs.'))
+        return redirect('jobs:list')
+    
     if request.method == 'POST':
-        title = request.POST.get('title')
-        description = request.POST.get('description')
-        target_language = request.POST.get('target_language')
+        title = request.POST.get('title', '')
+        description = request.POST.get('description', '')
+        target_language = request.POST.get('target_language', '')
         target_dialect = request.POST.get('target_dialect', '')
         deliverable_types_list = request.POST.getlist('deliverable_types')
         deliverable_types = ','.join(deliverable_types_list) if deliverable_types_list else ''
-        amount_per_person = request.POST.get('amount_per_person')
+        amount_per_person = request.POST.get('amount_per_person', '')
         max_responses = request.POST.get('max_responses', '1')
+        recruit_limit = request.POST.get('recruit_limit', '10')
+        recruit_deadline_days = request.POST.get('recruit_deadline_days', '7')
+        submit_limit = request.POST.get('submit_limit', '10')
+        submit_deadline_days = request.POST.get('submit_deadline_days', '7')
+        expired_date_days = request.POST.get('expired_date_days', '14')
         reference_audio = request.FILES.get('reference_audio')
         reference_video = request.FILES.get('reference_video')
         reference_image = request.FILES.get('reference_image')
         
-        # Validate that at least one deliverable type is selected
-        if not deliverable_types_list:
-            messages.error(request, _('Please select at least one deliverable type.'))
-            return render(request, 'jobs/create_job.html')
+        # Check if this is a draft save
+        is_draft = 'save_draft' in request.POST
         
-        if title and description and target_language and deliverable_types and budget:
+        # For drafts, allow saving with minimal data (just title)
+        # For publishing, require all fields
+        if is_draft:
+            # Draft: only require title, allow partial data
+            if not title:
+                messages.error(request, _('Please provide at least a title for the draft.'))
+                return render(request, 'jobs/create_job.html', {
+                    'title': title,
+                    'description': description,
+                    'target_language': target_language,
+                    'target_dialect': target_dialect,
+                    'deliverable_types_list': deliverable_types_list,
+                    'amount_per_person': amount_per_person,
+                    'max_responses': max_responses,
+                    'recruit_limit': recruit_limit,
+                    'recruit_deadline_days': recruit_deadline_days,
+                    'submit_limit': submit_limit,
+                    'submit_deadline_days': submit_deadline_days,
+                    'expired_date_days': expired_date_days,
+                })
+            
             try:
-                budget_decimal = Decimal(budget)
-                max_responses_int = int(max_responses)
+                # Parse numeric fields with defaults for drafts
+                amount_per_person_decimal = Decimal(amount_per_person) if amount_per_person else Decimal('0.00')
+                max_responses_int = int(max_responses) if max_responses else 1
                 if max_responses_int < 1:
                     max_responses_int = 1
                 
+                # Calculate budget
+                budget_decimal = amount_per_person_decimal * max_responses_int
+                
+                # Parse recruit_limit
+                recruit_limit_int = int(recruit_limit) if recruit_limit else 10
+                if recruit_limit_int < 1:
+                    recruit_limit_int = 1
+                
+                # Parse submit_limit
+                submit_limit_int = int(submit_limit) if submit_limit else 10
+                if submit_limit_int < 1:
+                    submit_limit_int = 1
+                
+                # Calculate deadlines
+                recruit_deadline_days_int = int(recruit_deadline_days) if recruit_deadline_days else 7
+                if recruit_deadline_days_int < 1:
+                    recruit_deadline_days_int = 7
+                
+                submit_deadline_days_int = int(submit_deadline_days) if submit_deadline_days else 7
+                if submit_deadline_days_int < 1:
+                    submit_deadline_days_int = 7
+                
+                expired_date_days_int = int(expired_date_days) if expired_date_days else 14
+                if expired_date_days_int < 1:
+                    expired_date_days_int = 14
+                
+                now = timezone.now()
+                recruit_deadline = now + timedelta(days=recruit_deadline_days_int) if recruit_deadline_days_int else None
+                expired_date = now + timedelta(days=expired_date_days_int) if expired_date_days_int else None
+                
                 job = Job.objects.create(
                     title=title,
-                    description=description,
-                    target_language=target_language,
+                    description=description or '',
+                    target_language=target_language or 'en',
                     target_dialect=target_dialect,
-                    deliverable_types=deliverable_types,
+                    deliverable_types=deliverable_types or 'text',
+                    amount_per_person=amount_per_person_decimal,
                     budget=budget_decimal,
                     max_responses=max_responses_int,
+                    recruit_limit=recruit_limit_int,
+                    recruit_deadline=recruit_deadline,
+                    submit_limit=submit_limit_int,
+                    submit_deadline_days=submit_deadline_days_int,
+                    expired_date=expired_date,
                     funder=request.user,
+                    status='draft',
                     reference_audio=reference_audio,
                     reference_video=reference_video,
                     reference_image=reference_image
                 )
                 
-                messages.success(request, _('Job created successfully! You can fund it later from the job detail page.'))
-                
-                return redirect('jobs:detail', pk=job.pk)
-            except ValueError:
-                messages.error(request, _('Invalid amount per person.'))
+                messages.success(request, _('Draft saved successfully! You can edit and publish it later.'))
+                return redirect('jobs:edit', pk=job.pk)
+            except ValueError as e:
+                messages.error(request, _('Invalid numeric value: {error}').format(error=str(e)))
             except Exception as e:
-                messages.error(request, _('Error creating job: {error}').format(error=str(e)))
+                messages.error(request, _('Error saving draft: {error}').format(error=str(e)))
         else:
-            messages.error(request, _('Please fill in all required fields.'))
+            # Publishing: require all fields
+            if not deliverable_types_list:
+                messages.error(request, _('Please select at least one deliverable type.'))
+                return render(request, 'jobs/create_job.html', {
+                    'title': title,
+                    'description': description,
+                    'target_language': target_language,
+                    'target_dialect': target_dialect,
+                    'deliverable_types_list': deliverable_types_list,
+                    'amount_per_person': amount_per_person,
+                    'max_responses': max_responses,
+                    'recruit_limit': recruit_limit,
+                    'recruit_deadline_days': recruit_deadline_days,
+                    'submit_limit': submit_limit,
+                    'submit_deadline_days': submit_deadline_days,
+                    'expired_date_days': expired_date_days,
+                })
+            
+            if title and description and target_language and deliverable_types and amount_per_person:
+                try:
+                    amount_per_person_decimal = Decimal(amount_per_person)
+                    max_responses_int = int(max_responses)
+                    if max_responses_int < 1:
+                        max_responses_int = 1
+                    
+                    # Calculate budget
+                    budget_decimal = amount_per_person_decimal * max_responses_int
+                    
+                    # Parse recruit_limit
+                    recruit_limit_int = int(recruit_limit)
+                    if recruit_limit_int < 1:
+                        recruit_limit_int = 1
+                    
+                    # Parse submit_limit
+                    submit_limit_int = int(submit_limit)
+                    if submit_limit_int < 1:
+                        submit_limit_int = 1
+                    
+                    # Calculate deadlines
+                    recruit_deadline_days_int = int(recruit_deadline_days)
+                    if recruit_deadline_days_int < 1:
+                        recruit_deadline_days_int = 7
+                    
+                    submit_deadline_days_int = int(submit_deadline_days)
+                    if submit_deadline_days_int < 1:
+                        submit_deadline_days_int = 7
+                    
+                    expired_date_days_int = int(expired_date_days)
+                    if expired_date_days_int < 1:
+                        expired_date_days_int = 14
+                    
+                    now = timezone.now()
+                    recruit_deadline = now + timedelta(days=recruit_deadline_days_int)
+                    expired_date = now + timedelta(days=expired_date_days_int)
+                    
+                    job = Job.objects.create(
+                        title=title,
+                        description=description,
+                        target_language=target_language,
+                        target_dialect=target_dialect,
+                        deliverable_types=deliverable_types,
+                        amount_per_person=amount_per_person_decimal,
+                        budget=budget_decimal,
+                        max_responses=max_responses_int,
+                        recruit_limit=recruit_limit_int,
+                        recruit_deadline=recruit_deadline,
+                        submit_limit=submit_limit_int,
+                        submit_deadline_days=submit_deadline_days_int,
+                        expired_date=expired_date,
+                        funder=request.user,
+                        status='recruiting',
+                        reference_audio=reference_audio,
+                        reference_video=reference_video,
+                        reference_image=reference_image
+                    )
+                    
+                    messages.success(request, _('Job created successfully! It will be published for recruiting.'))
+                    return redirect('jobs:detail', pk=job.pk)
+                except ValueError:
+                    messages.error(request, _('Invalid amount per person.'))
+                except Exception as e:
+                    messages.error(request, _('Error creating job: {error}').format(error=str(e)))
+            else:
+                messages.error(request, _('Please fill in all required fields.'))
     
     return render(request, 'jobs/create_job.html')
+
+
+@login_required
+def edit_job(request, pk):
+    """Edit a draft job or update an existing job."""
+    job = get_object_or_404(Job, pk=pk, funder=request.user)
+    
+    # Only allow editing drafts or jobs that haven't started recruiting yet
+    if job.status not in ['draft', 'recruiting']:
+        messages.warning(request, _('This job cannot be edited in its current state.'))
+        return redirect('jobs:detail', pk=job.pk)
+    
+    if request.method == 'POST':
+        title = request.POST.get('title', '')
+        description = request.POST.get('description', '')
+        target_language = request.POST.get('target_language', '')
+        target_dialect = request.POST.get('target_dialect', '')
+        deliverable_types_list = request.POST.getlist('deliverable_types')
+        deliverable_types = ','.join(deliverable_types_list) if deliverable_types_list else ''
+        amount_per_person = request.POST.get('amount_per_person', '')
+        max_responses = request.POST.get('max_responses', '1')
+        recruit_limit = request.POST.get('recruit_limit', '10')
+        recruit_deadline_days = request.POST.get('recruit_deadline_days', '7')
+        submit_limit = request.POST.get('submit_limit', '10')
+        submit_deadline_days = request.POST.get('submit_deadline_days', '7')
+        expired_date_days = request.POST.get('expired_date_days', '14')
+        reference_audio = request.FILES.get('reference_audio')
+        reference_video = request.FILES.get('reference_video')
+        reference_image = request.FILES.get('reference_image')
+        
+        # Check if this is a draft save or publish
+        is_draft = 'save_draft' in request.POST
+        is_publish = 'publish' in request.POST
+        
+        # For drafts, allow saving with minimal data (just title)
+        # For publishing, require all fields
+        if is_draft:
+            # Draft: only require title, allow partial data
+            if not title:
+                messages.error(request, _('Please provide at least a title for the draft.'))
+                return render(request, 'jobs/edit_job.html', {
+                    'job': job,
+                    'title': title,
+                    'description': description,
+                    'target_language': target_language,
+                    'target_dialect': target_dialect,
+                    'deliverable_types_list': deliverable_types_list,
+                    'amount_per_person': amount_per_person,
+                    'max_responses': max_responses,
+                    'recruit_limit': recruit_limit,
+                    'recruit_deadline_days': recruit_deadline_days,
+                    'submit_limit': submit_limit,
+                    'submit_deadline_days': submit_deadline_days,
+                    'expired_date_days': expired_date_days,
+                })
+            
+            try:
+                # Parse numeric fields with defaults for drafts
+                amount_per_person_decimal = Decimal(amount_per_person) if amount_per_person else Decimal('0.00')
+                max_responses_int = int(max_responses) if max_responses else 1
+                if max_responses_int < 1:
+                    max_responses_int = 1
+                
+                # Calculate budget
+                budget_decimal = amount_per_person_decimal * max_responses_int
+                
+                # Parse recruit_limit
+                recruit_limit_int = int(recruit_limit) if recruit_limit else 10
+                if recruit_limit_int < 1:
+                    recruit_limit_int = 1
+                
+                # Parse submit_limit
+                submit_limit_int = int(submit_limit) if submit_limit else 10
+                if submit_limit_int < 1:
+                    submit_limit_int = 1
+                
+                # Calculate deadlines
+                recruit_deadline_days_int = int(recruit_deadline_days) if recruit_deadline_days else 7
+                if recruit_deadline_days_int < 1:
+                    recruit_deadline_days_int = 7
+                
+                submit_deadline_days_int = int(submit_deadline_days) if submit_deadline_days else 7
+                if submit_deadline_days_int < 1:
+                    submit_deadline_days_int = 7
+                
+                expired_date_days_int = int(expired_date_days) if expired_date_days else 14
+                if expired_date_days_int < 1:
+                    expired_date_days_int = 14
+                
+                now = timezone.now()
+                recruit_deadline = now + timedelta(days=recruit_deadline_days_int) if recruit_deadline_days_int else None
+                expired_date = now + timedelta(days=expired_date_days_int) if expired_date_days_int else None
+                
+                # Update job fields
+                job.title = title
+                job.description = description or ''
+                job.target_language = target_language or 'en'
+                job.target_dialect = target_dialect
+                job.deliverable_types = deliverable_types or 'text'
+                job.amount_per_person = amount_per_person_decimal
+                job.budget = budget_decimal
+                job.max_responses = max_responses_int
+                job.recruit_limit = recruit_limit_int
+                job.recruit_deadline = recruit_deadline
+                job.submit_limit = submit_limit_int
+                job.submit_deadline_days = submit_deadline_days_int
+                job.expired_date = expired_date
+                
+                # Update file fields only if new files are provided
+                if reference_audio:
+                    job.reference_audio = reference_audio
+                if reference_video:
+                    job.reference_video = reference_video
+                if reference_image:
+                    job.reference_image = reference_image
+                
+                job.status = 'draft'
+                job.save()
+                
+                messages.success(request, _('Draft saved successfully!'))
+                return redirect('jobs:edit', pk=job.pk)
+            except ValueError as e:
+                messages.error(request, _('Invalid numeric value: {error}').format(error=str(e)))
+            except Exception as e:
+                messages.error(request, _('Error saving draft: {error}').format(error=str(e)))
+        elif is_publish:
+            # Publishing: require all fields
+            if not deliverable_types_list:
+                messages.error(request, _('Please select at least one deliverable type.'))
+                return render(request, 'jobs/edit_job.html', {
+                    'job': job,
+                    'title': title,
+                    'description': description,
+                    'target_language': target_language,
+                    'target_dialect': target_dialect,
+                    'deliverable_types_list': deliverable_types_list,
+                    'amount_per_person': amount_per_person,
+                    'max_responses': max_responses,
+                    'recruit_limit': recruit_limit,
+                    'recruit_deadline_days': recruit_deadline_days,
+                    'submit_limit': submit_limit,
+                    'submit_deadline_days': submit_deadline_days,
+                    'expired_date_days': expired_date_days,
+                })
+            
+            if title and description and target_language and deliverable_types and amount_per_person:
+                try:
+                    amount_per_person_decimal = Decimal(amount_per_person)
+                    max_responses_int = int(max_responses)
+                    if max_responses_int < 1:
+                        max_responses_int = 1
+                    
+                    # Calculate budget
+                    budget_decimal = amount_per_person_decimal * max_responses_int
+                    
+                    # Parse recruit_limit
+                    recruit_limit_int = int(recruit_limit)
+                    if recruit_limit_int < 1:
+                        recruit_limit_int = 1
+                    
+                    # Parse submit_limit
+                    submit_limit_int = int(submit_limit)
+                    if submit_limit_int < 1:
+                        submit_limit_int = 1
+                    
+                    # Calculate deadlines
+                    recruit_deadline_days_int = int(recruit_deadline_days)
+                    if recruit_deadline_days_int < 1:
+                        recruit_deadline_days_int = 7
+                    
+                    submit_deadline_days_int = int(submit_deadline_days)
+                    if submit_deadline_days_int < 1:
+                        submit_deadline_days_int = 7
+                    
+                    expired_date_days_int = int(expired_date_days)
+                    if expired_date_days_int < 1:
+                        expired_date_days_int = 14
+                    
+                    now = timezone.now()
+                    recruit_deadline = now + timedelta(days=recruit_deadline_days_int)
+                    expired_date = now + timedelta(days=expired_date_days_int)
+                    
+                    # Update job fields
+                    job.title = title
+                    job.description = description
+                    job.target_language = target_language
+                    job.target_dialect = target_dialect
+                    job.deliverable_types = deliverable_types
+                    job.amount_per_person = amount_per_person_decimal
+                    job.budget = budget_decimal
+                    job.max_responses = max_responses_int
+                    job.recruit_limit = recruit_limit_int
+                    job.recruit_deadline = recruit_deadline
+                    job.submit_limit = submit_limit_int
+                    job.submit_deadline_days = submit_deadline_days_int
+                    job.expired_date = expired_date
+                    
+                    # Update file fields only if new files are provided
+                    if reference_audio:
+                        job.reference_audio = reference_audio
+                    if reference_video:
+                        job.reference_video = reference_video
+                    if reference_image:
+                        job.reference_image = reference_image
+                    
+                    job.status = 'recruiting'
+                    job.save()
+                    
+                    messages.success(request, _('Job published successfully! It is now available for recruiting.'))
+                    return redirect('jobs:detail', pk=job.pk)
+                except ValueError:
+                    messages.error(request, _('Invalid amount per person.'))
+                except Exception as e:
+                    messages.error(request, _('Error publishing job: {error}').format(error=str(e)))
+            else:
+                messages.error(request, _('Please fill in all required fields to publish.'))
+        else:
+            messages.error(request, _('Invalid action.'))
+    
+    # GET request - show edit form
+    # Calculate days from now for deadlines, or use defaults
+    now = timezone.now()
+    recruit_deadline_days_value = 7
+    if job.recruit_deadline:
+        days_diff = (job.recruit_deadline - now).days
+        if days_diff > 0:
+            recruit_deadline_days_value = days_diff
+    
+    expired_date_days_value = 14
+    if job.expired_date:
+        days_diff = (job.expired_date - now).days
+        if days_diff > 0:
+            expired_date_days_value = days_diff
+    
+    context = {
+        'job': job,
+        'title': job.title,
+        'description': job.description,
+        'target_language': job.target_language,
+        'target_dialect': job.target_dialect,
+        'deliverable_types_list': job.get_deliverable_types_list(),
+        'amount_per_person': str(job.amount_per_person) if job.amount_per_person else '',
+        'max_responses': job.max_responses,
+        'recruit_limit': job.recruit_limit,
+        'recruit_deadline_days': recruit_deadline_days_value,
+        'submit_limit': job.submit_limit,
+        'submit_deadline_days': job.submit_deadline_days,
+        'expired_date_days': expired_date_days_value,
+    }
+    return render(request, 'jobs/edit_job.html', context)
 
 
 @login_required
@@ -263,16 +635,18 @@ def submit_job(request, pk):
     job = get_object_or_404(Job, pk=pk)
     
     # Check if job is already completed
-    if job.status == 'completed':
+    if job.status == 'complete':
         messages.error(request, _('This job has been completed and is no longer accepting submissions.'))
         return redirect('jobs:detail', pk=job.pk)
     
-    if job.status != 'open':
-        messages.error(request, _('This job is no longer accepting submissions.'))
+    # Only allow submissions when job is in submitting state
+    if job.status != 'submitting':
+        messages.error(request, _('This job is not currently accepting submissions.'))
         return redirect('jobs:detail', pk=job.pk)
     
-    if not job.is_funded:
-        messages.error(request, _('This job is not yet funded. Please wait for the funder to fund it.'))
+    # Check if submit limit or deadline has been reached
+    if job.should_transition_to_reviewing():
+        messages.error(request, _('This job has reached its submission limit or deadline. Submissions are no longer being accepted.'))
         return redirect('jobs:detail', pk=job.pk)
     
     # Check if user has already submitted to this job
@@ -308,53 +682,18 @@ def submit_job(request, pk):
             submission.image_file = request.FILES['image_file']
         
         submission.save()
+        
+        # Refresh job to check if it should transition to reviewing
+        # Need to refresh to get updated submission count
+        job.refresh_from_db()
+        if job.should_transition_to_reviewing():
+            job.status = 'reviewing'
+            job.save(update_fields=['status'])
+        
         messages.success(request, _('Submission created successfully!'))
         return redirect('jobs:detail', pk=job.pk)
     
     return render(request, 'jobs/submit_job.html', {'job': job})
-
-
-@login_required
-def fund_job(request, pk):
-    """Fund a job by creating an escrow payment."""
-    job = get_object_or_404(Job, pk=pk, funder=request.user)
-    
-    remaining_amount = job.remaining_budget()
-    if remaining_amount <= Decimal('0.00'):
-        job.refresh_funding_snapshot()
-        messages.warning(request, _('This job is already funded.'))
-        return redirect('jobs:detail', pk=job.pk)
-    
-    if request.method == 'POST':
-        # Create incoming payment for the remaining budget
-        payment_result = create_incoming_payment(
-            amount=remaining_amount,
-            description=f"Funding for job: {job.title}"
-        )
-        
-        if payment_result['success']:
-            job.payment_id = payment_result.get('payment_id', '')
-            job.save(update_fields=['payment_id'])
-            JobFunding.objects.create(
-                job=job,
-                funder=request.user,
-                amount=remaining_amount,
-                note=_('Owner funding')
-            )
-            job.refresh_funding_snapshot()
-            messages.success(request, _('Job funded successfully!'))
-        else:
-            messages.error(
-                request,
-                _('Failed to fund job: {error}').format(
-                    error=payment_result.get('error', 'Unknown error')
-                )
-            )
-        
-        return redirect('jobs:detail', pk=job.pk)
-    
-    # GET request - show confirmation page or redirect to detail
-    return redirect('jobs:detail', pk=job.pk)
 
 
 @login_required
@@ -382,11 +721,18 @@ def accept_submission(request, job_pk, submission_pk):
     submission.save()
     
     # Update job status based on progress
+    # If we've reached max responses, move to reviewing (or complete if all are already reviewed)
     new_status = None
     if job.has_reached_max_responses():
-        new_status = 'waiting_completion'
-    elif not job.is_funded:
-        new_status = 'funded'
+        # Check if we have submissions that need review
+        if job.submissions.filter(status='pending').exists():
+            new_status = 'reviewing'
+        else:
+            # All submissions are accepted/rejected, job is complete
+            new_status = 'complete'
+    elif job.status == 'submitting':
+        # First submission received, move to reviewing
+        new_status = 'reviewing'
     
     if new_status and job.status != new_status:
         job.status = new_status
@@ -422,7 +768,7 @@ def my_money(request):
     posted_jobs = Job.objects.filter(funder=request.user)
     total_spent = sum(
         job.budget for job in posted_jobs
-        if job.is_funded or job.status in ['funded', 'completed']
+        if job.status in ['submitting', 'reviewing', 'complete', 'completed']
     )
     
     balance = total_earned - total_spent
@@ -440,6 +786,10 @@ def my_money(request):
 @login_required
 def pending_jobs(request):
     """View jobs that need to be finished (accepted submissions)."""
+    if not request.user.is_creator():
+        messages.error(request, _('You do not have permission to view this page.'))
+        return redirect('jobs:list')
+    
     # Get jobs where user has accepted submissions that aren't completed
     accepted_submissions = JobSubmission.objects.filter(
         creator=request.user,
@@ -489,7 +839,7 @@ def mark_job_completed(request, pk):
     """Allow funders to mark a job as completed after reviewing submissions."""
     job = get_object_or_404(Job, pk=pk, funder=request.user)
     
-    if job.status == 'completed':
+    if job.status == 'complete':
         messages.info(request, _('This job is already marked as completed.'))
         return redirect('jobs:owner_dashboard')
     
@@ -497,7 +847,7 @@ def mark_job_completed(request, pk):
         messages.warning(request, _('You need at least one accepted submission before completing a job.'))
         return redirect('jobs:owner_dashboard')
     
-    job.status = 'completed'
+    job.status = 'complete'
     job.save(update_fields=['status'])
     messages.success(request, _('Job marked as completed.'))
     return redirect('jobs:owner_dashboard')
@@ -519,6 +869,11 @@ def apply_to_job(request, pk):
         messages.warning(request, _('You cannot apply to your own job.'))
         return redirect('jobs:detail', pk=job.pk)
     
+    # Only allow applications when job is in recruiting state
+    if job.status != 'recruiting':
+        messages.warning(request, _('This job is not currently accepting applications.'))
+        return redirect('jobs:detail', pk=job.pk)
+    
     if request.method == 'POST':
         form = JobApplicationForm(request.POST, request.FILES)
         if form.is_valid():
@@ -526,7 +881,15 @@ def apply_to_job(request, pk):
             application.job = job
             application.applicant = request.user
             application.save()
-            messages.success(request, _('Your application has been submitted! The job owner will review it.'))
+            
+            # Check if job should auto-transition to selecting
+            job.refresh_from_db()
+            if job.should_transition_to_selecting():
+                job.status = 'selecting'
+                job.save(update_fields=['status'])
+                messages.success(request, _('Your application has been submitted! The job has reached its recruit limit and moved to selection phase.'))
+            else:
+                messages.success(request, _('Your application has been submitted! The job owner will review it.'))
             return redirect('jobs:detail', pk=job.pk)
     else:
         form = JobApplicationForm()

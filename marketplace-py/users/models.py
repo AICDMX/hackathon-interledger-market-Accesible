@@ -52,6 +52,14 @@ class User(AbstractUser):
         if self.native_languages:
             return [lang.strip() for lang in self.native_languages.split(',')]
         return []
+    
+    def is_funder(self):
+        """Check if user can create jobs (funder or both)."""
+        return self.role in ['funder', 'both']
+    
+    def is_creator(self):
+        """Check if user can accept jobs (creator or both)."""
+        return self.role in ['creator', 'both']
 
     def save(self, *args, **kwargs):
         """

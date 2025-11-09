@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 {% load i18n static %}
 
-{% block title %}{% trans 'Create Job' %} - {{ block.super }}{% endblock %}
+{% block title %}{% trans 'Edit Job' %} - {{ block.super }}{% endblock %}
 
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'audio/audio-contribution.css' %}">
@@ -46,11 +46,26 @@
     .audio-recording-section {
         margin-bottom: 0.5rem;
     }
+    
+    .draft-badge {
+        display: inline-block;
+        padding: 0.25rem 0.75rem;
+        background-color: #fef3c7;
+        color: #92400e;
+        border-radius: 999px;
+        font-size: 0.875rem;
+        font-weight: 600;
+        margin-bottom: 1rem;
+    }
 </style>
 {% endblock %}
 
 {% block content %}
-<h1>{% trans 'Create New Job' %}</h1>
+<h1>{% trans 'Edit Job' %}</h1>
+
+{% if job.status == 'draft' %}
+    <div class="draft-badge">{% trans 'Draft' %}</div>
+{% endif %}
 
 <div class="card">
     <form method="post" enctype="multipart/form-data">
@@ -58,48 +73,48 @@
         
         <div class="form-group">
             <label for="title">{% trans 'Title' %} *</label>
-            <input type="text" id="title" name="title" required aria-required="true">
+            <input type="text" id="title" name="title" value="{{ title|default:job.title }}" required aria-required="true">
         </div>
         
         <div class="form-group">
             <label for="description">{% trans 'Description' %} *</label>
-            <textarea id="description" name="description" rows="5" required aria-required="true"></textarea>
+            <textarea id="description" name="description" rows="5" required aria-required="true">{{ description|default:job.description }}</textarea>
         </div>
         
         <div class="form-group">
             <label for="target_language">{% trans 'Target Language' %} *</label>
             <select id="target_language" name="target_language" required aria-required="true">
-                <option value="en">English</option>
-                <option value="es">Spanish</option>
-                <option value="nah">Nahuatl</option>
-                <option value="oto">Otomi</option>
-                <option value="maz">Mazahua</option>
-                <option value="que">Quechua</option>
+                <option value="en" {% if target_language == 'en' or job.target_language == 'en' %}selected{% endif %}>English</option>
+                <option value="es" {% if target_language == 'es' or job.target_language == 'es' %}selected{% endif %}>Spanish</option>
+                <option value="nah" {% if target_language == 'nah' or job.target_language == 'nah' %}selected{% endif %}>Nahuatl</option>
+                <option value="oto" {% if target_language == 'oto' or job.target_language == 'oto' %}selected{% endif %}>Otomi</option>
+                <option value="maz" {% if target_language == 'maz' or job.target_language == 'maz' %}selected{% endif %}>Mazahua</option>
+                <option value="que" {% if target_language == 'que' or job.target_language == 'que' %}selected{% endif %}>Quechua</option>
             </select>
         </div>
         
         <div class="form-group">
             <label for="target_dialect">{% trans 'Target Dialect' %}</label>
-            <input type="text" id="target_dialect" name="target_dialect">
+            <input type="text" id="target_dialect" name="target_dialect" value="{{ target_dialect|default:job.target_dialect }}">
         </div>
         
         <div class="form-group">
             <label>{% trans 'Deliverable Types' %} *</label>
             <div class="checkbox-group">
                 <label>
-                    <input type="checkbox" name="deliverable_types" value="text">
+                    <input type="checkbox" name="deliverable_types" value="text" {% if 'text' in deliverable_types_list %}checked{% endif %}>
                     {% trans 'Text' %}
                 </label>
                 <label>
-                    <input type="checkbox" name="deliverable_types" value="video">
+                    <input type="checkbox" name="deliverable_types" value="video" {% if 'video' in deliverable_types_list %}checked{% endif %}>
                     {% trans 'Video' %}
                 </label>
                 <label>
-                    <input type="checkbox" name="deliverable_types" value="audio">
+                    <input type="checkbox" name="deliverable_types" value="audio" {% if 'audio' in deliverable_types_list %}checked{% endif %}>
                     {% trans 'Audio' %}
                 </label>
                 <label>
-                    <input type="checkbox" name="deliverable_types" value="image">
+                    <input type="checkbox" name="deliverable_types" value="image" {% if 'image' in deliverable_types_list %}checked{% endif %}>
                     {% trans 'Image' %}
                 </label>
             </div>
@@ -108,57 +123,72 @@
         
         <div class="form-group">
             <label for="amount_per_person">{% trans 'Amount Per Person (ILP)' %} *</label>
-            <input type="number" id="amount_per_person" name="amount_per_person" step="0.01" min="0" required aria-required="true">
+            <input type="number" id="amount_per_person" name="amount_per_person" step="0.01" min="0" value="{{ amount_per_person|default:job.amount_per_person }}" required aria-required="true">
             <small class="form-text text-muted">{% trans 'How much you will pay each person who completes this job' %}</small>
         </div>
         
         <div class="form-group">
             <label for="max_responses">{% trans 'Number of Responses Needed' %} *</label>
-            <input type="number" id="max_responses" name="max_responses" min="1" value="1" required aria-required="true">
+            <input type="number" id="max_responses" name="max_responses" min="1" value="{{ max_responses|default:job.max_responses }}" required aria-required="true">
             <small class="form-text text-muted">{% trans 'How many people should submit work for this job? (e.g., if you want 20 people to do the same voice or picture set, enter 20)' %}</small>
         </div>
         
         <div class="form-group">
             <label>{% trans 'Total Budget' %}</label>
             <div id="total-budget-display" class="total-budget-display">
-                <strong>0.00 ILP</strong>
+                <strong>{{ job.budget|default:"0.00" }} ILP</strong>
             </div>
             <small class="form-text text-muted">{% trans 'Total amount needed: Amount per person ? Number of responses' %}</small>
         </div>
         
         <div class="form-group">
             <label for="recruit_limit">{% trans 'Recruit Limit' %} *</label>
-            <input type="number" id="recruit_limit" name="recruit_limit" min="1" value="10" required aria-required="true">
+            <input type="number" id="recruit_limit" name="recruit_limit" min="1" value="{{ recruit_limit|default:job.recruit_limit }}" required aria-required="true">
             <small class="form-text text-muted">{% trans 'Maximum number of applications to accept before automatically moving to selection phase' %}</small>
         </div>
         
         <div class="form-group">
             <label for="recruit_deadline_days">{% trans 'Recruit Deadline (Days)' %} *</label>
-            <input type="number" id="recruit_deadline_days" name="recruit_deadline_days" min="1" value="7" required aria-required="true">
+            <input type="number" id="recruit_deadline_days" name="recruit_deadline_days" min="1" value="{{ recruit_deadline_days|default:job.recruit_deadline_days }}" required aria-required="true">
             <small class="form-text text-muted">{% trans 'Number of days from now when recruiting will automatically end and move to selection phase' %}</small>
         </div>
         
         <div class="form-group">
             <label for="submit_limit">{% trans 'Submit Limit' %} *</label>
-            <input type="number" id="submit_limit" name="submit_limit" min="1" value="10" required aria-required="true">
+            <input type="number" id="submit_limit" name="submit_limit" min="1" value="{{ submit_limit|default:job.submit_limit }}" required aria-required="true">
             <small class="form-text text-muted">{% trans 'Maximum number of submissions to accept before automatically moving to review phase' %}</small>
         </div>
         
         <div class="form-group">
             <label for="submit_deadline_days">{% trans 'Submit Deadline (Days)' %} *</label>
-            <input type="number" id="submit_deadline_days" name="submit_deadline_days" min="1" value="7" required aria-required="true">
+            <input type="number" id="submit_deadline_days" name="submit_deadline_days" min="1" value="{{ submit_deadline_days|default:job.submit_deadline_days }}" required aria-required="true">
             <small class="form-text text-muted">{% trans 'Number of days from when submitting phase starts until deadline (when job transitions to submitting state)' %}</small>
         </div>
         
         <div class="form-group">
             <label for="expired_date_days">{% trans 'Expired Date (Days)' %} *</label>
-            <input type="number" id="expired_date_days" name="expired_date_days" min="1" value="14" required aria-required="true">
+            <input type="number" id="expired_date_days" name="expired_date_days" min="1" value="{{ expired_date_days|default:job.expired_date_days }}" required aria-required="true">
             <small class="form-text text-muted">{% trans 'Number of days from now when the job will expire if no applications (in recruiting) or no submissions (in submitting) are received. Wallet contracts expire 7 days after this date.' %}</small>
         </div>
         
         <div class="form-group">
             <label>{% trans 'Optional reference media' %}</label>
             <p class="muted-text">{% trans 'Record audio or upload photos/videos so creators understand what you need even if they do not read the description.' %}</p>
+            {% if job.reference_audio or job.reference_video or job.reference_image %}
+                <p class="text-muted">{% trans 'Current files:' %}</p>
+                <ul class="text-muted">
+                    {% if job.reference_audio %}
+                        <li>{% trans 'Audio' %}: <a href="{{ job.reference_audio.url }}" target="_blank">{% trans 'View' %}</a></li>
+                    {% endif %}
+                    {% if job.reference_video %}
+                        <li>{% trans 'Video' %}: <a href="{{ job.reference_video.url }}" target="_blank">{% trans 'View' %}</a></li>
+                    {% endif %}
+                    {% if job.reference_image %}
+                        <li>{% trans 'Image' %}: <a href="{{ job.reference_image.url }}" target="_blank">{% trans 'View' %}</a></li>
+                    {% endif %}
+                </ul>
+                <p class="text-muted">{% trans 'Upload new files to replace existing ones.' %}</p>
+            {% endif %}
         </div>
         
         <div class="reference-media-grid">
@@ -211,8 +241,13 @@
         </div>
         
         <div style="display: flex; gap: 1rem; flex-wrap: wrap; margin-top: 1.5rem;">
-            <button type="submit" name="save_draft" class="btn btn-secondary">{% trans 'Save as Draft' %}</button>
-            <button type="submit" class="btn btn-primary">{% trans 'Create Job' %}</button>
+            <button type="submit" name="save_draft" class="btn btn-secondary">{% trans 'Save Draft' %}</button>
+            {% if job.status == 'draft' %}
+                <button type="submit" name="publish" class="btn btn-primary">{% trans 'Publish Job' %}</button>
+            {% else %}
+                <button type="submit" name="publish" class="btn btn-primary">{% trans 'Update Job' %}</button>
+            {% endif %}
+            <a href="{% url 'jobs:owner_dashboard' %}" class="btn btn-secondary">{% trans 'Cancel' %}</a>
         </div>
     </form>
 </div>

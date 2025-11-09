@@ -107,6 +107,13 @@
     .status-pending { background-color: #fef3c7; color: #92400e; }
     .status-accepted { background-color: #dcfce7; color: #166534; }
     .status-rejected { background-color: #fee2e2; color: #991b1b; }
+    .status-draft { background-color: #fef3c7; color: #92400e; }
+    .status-recruiting { background-color: #dbeafe; color: #1d4ed8; }
+    .status-selecting { background-color: #f3e8ff; color: #6d28d9; }
+    .status-submitting { background-color: #fef3c7; color: #b45309; }
+    .status-reviewing { background-color: #fef3c7; color: #b45309; }
+    .status-expired { background-color: #fee2e2; color: #b91c1c; }
+    .status-complete { background-color: #dcfce7; color: #15803d; }
 </style>
 {% endblock %}
 
@@ -120,100 +127,133 @@
         <a href="{% url 'jobs:create' %}" class="btn btn-primary">{% trans 'Create a Job' %}</a>
     </div>
 {% else %}
-    <div class="job-owner-wrapper">
-        {% for job in jobs %}
-            <section class="card job-owner-card" aria-labelledby="job-{{ job.pk }}">
-                <div class="job-owner-header">
-                    <div>
-                        <h2 id="job-{{ job.pk }}"><a href="{% url 'jobs:detail' job.pk %}">{{ job.title }}</a></h2>
-                        <p class="text-muted" style="margin: 0;">{% trans 'Created' %}: {{ job.created_at|date:"F d, Y" }}</p>
+    {% if drafts %}
+        <h2>{% trans 'Drafts' %}</h2>
+        <div class="job-owner-wrapper">
+            {% for job in drafts %}
+                <section class="card job-owner-card" aria-labelledby="job-{{ job.pk }}">
+                    <div class="job-owner-header">
+                        <div>
+                            <h2 id="job-{{ job.pk }}">{{ job.title }}</h2>
+                            <p class="text-muted" style="margin: 0;">{% trans 'Created' %}: {{ job.created_at|date:"F d, Y" }}</p>
+                        </div>
+                        <span class="status-pill status-{{ job.status }}">
+                            {{ job.get_status_display }}
+                        </span>
                     </div>
-                    <span class="status-pill status-{{ job.status }}">
-                        {{ job.get_status_display }}
-                    </span>
-                </div>
 
-                <div class="job-grid">
-                    <div>
-                        <p><strong>{% trans 'Funding' %}:</strong> {{ job.funded_amount }} / {{ job.budget }} ILP</p>
-                        {% if job.remaining_budget > 0 %}
-                            <p class="text-warning">{% blocktrans with amount=job.remaining_budget %}{{ amount }} ILP still needed{% endblocktrans %}</p>
-                        {% else %}
-                            <p class="text-success">{% trans 'Fully funded' %}</p>
+                    <div class="job-grid">
+                        <div>
+                            <p><strong>{% trans 'Budget' %}:</strong> {{ job.budget }} ILP</p>
+                            <p><strong>{% trans 'Amount Per Person' %}:</strong> {{ job.amount_per_person }} ILP</p>
+                        </div>
+                    </div>
+
+                    <div class="job-actions">
+                        <a href="{% url 'jobs:edit' job.pk %}" class="btn btn-primary">{% trans 'Edit Draft' %}</a>
+                        <a href="{% url 'jobs:detail' job.pk %}" class="btn btn-secondary">{% trans 'Preview' %}</a>
+                    </div>
+                </section>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    {% if published_jobs %}
+        <h2 style="margin-top: 2rem;">{% trans 'Published Jobs' %}</h2>
+        <div class="job-owner-wrapper">
+            {% for job in published_jobs %}
+                <section class="card job-owner-card" aria-labelledby="job-{{ job.pk }}">
+                    <div class="job-owner-header">
+                        <div>
+                            <h2 id="job-{{ job.pk }}"><a href="{% url 'jobs:detail' job.pk %}">{{ job.title }}</a></h2>
+                            <p class="text-muted" style="margin: 0;">{% trans 'Created' %}: {{ job.created_at|date:"F d, Y" }}</p>
+                        </div>
+                        <span class="status-pill status-{{ job.status }}">
+                            {{ job.get_status_display }}
+                        </span>
+                    </div>
+
+                    <div class="job-grid">
+                        <div>
+                            <p><strong>{% trans 'Budget' %}:</strong> {{ job.budget }} ILP</p>
+                            <p><strong>{% trans 'Amount Per Person' %}:</strong> {{ job.amount_per_person }} ILP</p>
+                        </div>
+                        <div>
+                            <p><strong>{% trans 'Progress' %}:</strong> {{ job.accepted_submissions }} / {{ job.max_responses }} {% trans 'accepted' %}</p>
+                            <p><strong>{% trans 'Pending reviews' %}:</strong> {{ job.pending_submissions }}</p>
+                            <p><strong>{% trans 'Total submissions' %}:</strong> {{ job.total_submissions }}</p>
+                        </div>
+                    </div>
+
+                    <div class="job-actions">
+                        <a href="{% url 'jobs:detail' job.pk %}" class="btn btn-primary">{% trans 'View public page' %}</a>
+                        {% if job.status == 'recruiting' %}
+                            <a href="{% url 'jobs:edit' job.pk %}" class="btn btn-secondary">{% trans 'Edit' %}</a>
+                        {% endif %}
+                        {% if job.status != 'complete' and job.accepted_submissions > 0 %}
+                            <form method="post" action="{% url 'jobs:mark_job_completed' job.pk %}">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-primary">{% trans 'Mark job completed' %}</button>
+                            </form>
+                        {% elif job.status == 'complete' %}
+                            <span class="text-success">{% trans 'Job is completed' %}</span>
                         {% endif %}
                     </div>
-                    <div>
-                        <p><strong>{% trans 'Progress' %}:</strong> {{ job.accepted_submissions }} / {{ job.max_responses }} {% trans 'accepted' %}</p>
-                        <p><strong>{% trans 'Pending reviews' %}:</strong> {{ job.pending_submissions }}</p>
-                        <p><strong>{% trans 'Total submissions' %}:</strong> {{ job.total_submissions }}</p>
-                    </div>
-                </div>
 
-                <div class="job-actions">
-                    <a href="{% url 'jobs:detail' job.pk %}" class="btn btn-primary">{% trans 'View public page' %}</a>
-                    {% if job.status != 'completed' and job.accepted_submissions > 0 %}
-                        <form method="post" action="{% url 'jobs:mark_job_completed' job.pk %}">
-                            {% csrf_token %}
-                            <button type="submit" class="btn btn-primary">{% trans 'Mark job completed' %}</button>
-                        </form>
-                    {% elif job.status == 'completed' %}
-                        <span class="text-success">{% trans 'Job is completed' %}</span>
-                    {% endif %}
-                </div>
-
-                <div class="submission-list">
-                    <h3>{% trans 'Submissions' %}</h3>
-                    {% if job.submissions.all %}
-                        {% for submission in job.submissions.all %}
-                            <div class="submission-card {{ submission.status }}">
-                                <div style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:0.5rem;">
-                                    <div>
-                                        <strong>{{ submission.creator.username }}</strong>
-                                        <p class="text-muted" style="margin:0;">{{ submission.created_at|date:"F d, Y H:i" }}</p>
+                    <div class="submission-list">
+                        <h3>{% trans 'Submissions' %}</h3>
+                        {% if job.submissions.all %}
+                            {% for submission in job.submissions.all %}
+                                <div class="submission-card {{ submission.status }}">
+                                    <div style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:0.5rem;">
+                                        <div>
+                                            <strong>{{ submission.creator.username }}</strong>
+                                            <p class="text-muted" style="margin:0;">{{ submission.created_at|date:"F d, Y H:i" }}</p>
+                                        </div>
+                                        <span class="status-pill status-{{ submission.status }}">
+                                            {{ submission.get_status_display }}
+                                        </span>
                                     </div>
-                                    <span class="status-pill status-{{ submission.status }}">
-                                        {{ submission.get_status_display }}
-                                    </span>
+                                    {% if submission.note %}
+                                        <p style="margin-top:0.5rem;">{{ submission.note }}</p>
+                                    {% endif %}
+                                    {% if submission.text_file or submission.audio_file or submission.video_file or submission.image_file %}
+                                        <div class="submission-files">
+                                            {% if submission.text_file %}
+                                                <a href="{{ submission.text_file.url }}" class="download-chip" download>
+                                                    {% trans 'Download text' %}
+                                                </a>
+                                            {% endif %}
+                                            {% if submission.audio_file %}
+                                                <a href="{{ submission.audio_file.url }}" class="download-chip" download>
+                                                    {% trans 'Download audio' %}
+                                                </a>
+                                            {% endif %}
+                                            {% if submission.video_file %}
+                                                <a href="{{ submission.video_file.url }}" class="download-chip" download>
+                                                    {% trans 'Download video' %}
+                                                </a>
+                                            {% endif %}
+                                            {% if submission.image_file %}
+                                                <a href="{{ submission.image_file.url }}" class="download-chip" download>
+                                                    {% trans 'Download image' %}
+                                                </a>
+                                            {% endif %}
+                                        </div>
+                                    {% else %}
+                                        <p class="text-muted" style="margin-top:0.5rem;">{% trans 'No files attached.' %}</p>
+                                    {% endif %}
                                 </div>
-                                {% if submission.note %}
-                                    <p style="margin-top:0.5rem;">{{ submission.note }}</p>
-                                {% endif %}
-                                {% if submission.text_file or submission.audio_file or submission.video_file or submission.image_file %}
-                                    <div class="submission-files">
-                                        {% if submission.text_file %}
-                                            <a href="{{ submission.text_file.url }}" class="download-chip" download>
-                                                {% trans 'Download text' %}
-                                            </a>
-                                        {% endif %}
-                                        {% if submission.audio_file %}
-                                            <a href="{{ submission.audio_file.url }}" class="download-chip" download>
-                                                {% trans 'Download audio' %}
-                                            </a>
-                                        {% endif %}
-                                        {% if submission.video_file %}
-                                            <a href="{{ submission.video_file.url }}" class="download-chip" download>
-                                                {% trans 'Download video' %}
-                                            </a>
-                                        {% endif %}
-                                        {% if submission.image_file %}
-                                            <a href="{{ submission.image_file.url }}" class="download-chip" download>
-                                                {% trans 'Download image' %}
-                                            </a>
-                                        {% endif %}
-                                    </div>
-                                {% else %}
-                                    <p class="text-muted" style="margin-top:0.5rem;">{% trans 'No files attached.' %}</p>
-                                {% endif %}
-                            </div>
-                        {% empty %}
+                            {% empty %}
+                                <p class="text-muted">{% trans 'No submissions yet.' %}</p>
+                            {% endfor %}
+                        {% else %}
                             <p class="text-muted">{% trans 'No submissions yet.' %}</p>
-                        {% endfor %}
-                    {% else %}
-                        <p class="text-muted">{% trans 'No submissions yet.' %}</p>
-                    {% endif %}
-                </div>
-            </section>
-        {% endfor %}
-    </div>
+                        {% endif %}
+                    </div>
+                </section>
+            {% endfor %}
+        </div>
+    {% endif %}
 {% endif %}
 {% endblock %}

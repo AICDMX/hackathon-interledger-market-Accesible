@@ -21,7 +21,11 @@
         </div>
         
         <button type="submit" class="btn btn-primary">{% trans 'Login' %}</button>
-        <p><a href="{% url 'users:register' %}">{% trans 'Don\'t have an account? Register here.' %}</a></p>
+        <p>
+            {% trans 'Don\'t have an account?' %}<br>
+            <a href="{% url 'users:register_creator' %}">{% trans 'Register as Job Creator' %}</a> | 
+            <a href="{% url 'users:register_doer' %}">{% trans 'Register as Job Doer' %}</a>
+        </p>
     </form>
 </div>
 {% endblock %}

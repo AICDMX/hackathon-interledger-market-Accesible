@@ -45,6 +45,24 @@
 {% block content %}
 <h1>{% trans 'Available Jobs' %}</h1>
 
+{% if user.is_authenticated and waiting_for_submission %}
+    <div class="card" style="border-left: 4px solid #f59e0b; margin-bottom: 1.5rem;">
+        <h2 style="margin-top: 0; color: #b45309;">{% trans 'Jobs Waiting for Your Submission' %}</h2>
+        <p>{% trans 'You\'ve been selected for these jobs. Submit your work now!' %}</p>
+        <div role="list" aria-label="{% trans 'Jobs waiting for submission' %}">
+            {% for job in waiting_for_submission %}
+                <article class="card" role="listitem" style="margin-top: 1rem;">
+                    <h3><a href="{% url 'jobs:detail' job.pk %}">{{ job.title }}</a></h3>
+                    <p><strong>{% trans 'Language' %}:</strong> {{ job.target_language }}</p>
+                    <p><strong>{% trans 'Amount Per Person' %}:</strong> {{ job.amount_per_person }} ILP</p>
+                    <p>{{ job.description|truncatewords:30 }}</p>
+                    <a href="{% url 'jobs:submit' job.pk %}" class="btn btn-primary">{% trans 'Submit Work Now' %}</a>
+                </article>
+            {% endfor %}
+        </div>
+    </div>
+{% endif %}
+
 <div class="card">
     <form method="get" action="{% url 'jobs:list' %}" role="search">
         <div class="form-group">
@@ -63,25 +81,19 @@
                 <option value="que" {% if language_filter == 'que' %}selected{% endif %}>Quechua</option>
             </select>
         </div>
+        {% if user.is_authenticated %}
         <div class="form-group">
             <fieldset class="filter-options">
                 <legend>{% trans 'Filter Options' %}</legend>
                 <div class="checkbox-group">
                     <label>
-                        <input type="checkbox" name="show_funded" {% if show_funded %}checked{% endif %}>
-                        {% trans 'Show funded jobs' %}
-                    </label>
-                    <label>
-                        <input type="checkbox" name="show_unfunded" {% if show_unfunded %}checked{% endif %}>
-                        {% trans 'Show unfunded jobs' %}
-                    </label>
-                    <label>
-                        <input type="checkbox" name="show_completed" {% if show_completed %}checked{% endif %}>
-                        {% trans 'Show completed jobs' %}
+                        <input type="checkbox" name="hide_applied" {% if hide_applied %}checked{% endif %}>
+                        {% trans 'Hide jobs I\'ve applied to' %}
                     </label>
                 </div>
             </fieldset>
         </div>
+        {% endif %}
         <button type="submit" class="btn btn-primary">{% trans 'Filter' %}</button>
     </form>
 </div>
@@ -97,13 +109,6 @@
                 {% endif %}
                 <p><strong>{% trans 'Amount Per Person' %}:</strong> {{ job.amount_per_person }} ILP</p>
                 <p><strong>{% trans 'Total Budget' %}:</strong> {{ job.budget }} ILP</p>
-                {% if job.is_funded %}
-                    <p><strong>{% trans 'Funding Status' %}:</strong> <span class="text-success">{% trans 'Funded' %} - {{ job.funded_amount }} ILP</span></p>
-                {% elif job.funded_amount > 0 %}
-                    <p><strong>{% trans 'Funding Status' %}:</strong> <span class="text-warning">{% trans 'Partially Funded' %} - {{ job.funded_amount }} ILP / {{ job.budget }} ILP</span></p>
-                {% else %}
-                    <p><strong>{% trans 'Funding Status' %}:</strong> <span class="text-muted">{% trans 'Not Funded' %}</span></p>
-                {% endif %}
                 <p><strong>{% trans 'Status' %}:</strong> {{ job.get_status_display }}</p>
                 <p><strong>{% trans 'Deliverables' %}:</strong> {{ job.get_deliverable_types_display }}</p>
                 <p>{{ job.description|truncatewords:30 }}</p>

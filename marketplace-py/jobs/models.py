@@ -1,8 +1,10 @@
 from decimal import Decimal
+from datetime import timedelta
 
 from django.db import models
 from django.db.models import Sum
 from django.utils.translation import gettext_lazy as _
+from django.utils import timezone
 from django.urls import reverse
 from users.models import User
 
@@ -11,9 +13,16 @@ class Job(models.Model):
     """Job/Brief model for funders to post work."""
     
     STATUS_CHOICES = [
+        ('draft', _('Draft')),
+        ('recruiting', _('Recruiting')),
+        ('selecting', _('Selecting')),
+        ('submitting', _('Submitting')),
+        ('reviewing', _('Reviewing')),
+        ('expired', _('Expired')),
+        ('complete', _('Complete')),
+        # Legacy statuses kept for backward compatibility
         ('open', _('Open')),
         ('in_review', _('In Review')),
-        ('funded', _('Funded')),
         ('rejected', _('Rejected')),
         ('waiting_completion', _('Waiting Completion')),
         ('completed', _('Completed')),
@@ -96,29 +105,16 @@ class Job(models.Model):
     status = models.CharField(
         max_length=20,
         choices=STATUS_CHOICES,
-        default='open',
+        default='draft',
         verbose_name=_('Status')
     )
     
-    # Funding information
-    funded_amount = models.DecimalField(
-        max_digits=10,
-        decimal_places=2,
-        default=0,
-        verbose_name=_('Funded Amount'),
-        help_text=_('Amount that has been funded in ILP')
-    )
     payment_id = models.CharField(
         max_length=255,
         blank=True,
         null=True,
         verbose_name=_('Payment ID'),
-        help_text=_('Interledger payment ID for escrow')
-    )
-    is_funded = models.BooleanField(
-        default=False,
-        verbose_name=_('Is Funded'),
-        help_text=_('Whether the job has been fully funded')
+        help_text=_('Interledger payment ID for contract/escrow')
     )
     
     # Response limit
@@ -126,6 +122,44 @@ class Job(models.Model):
         default=1,
         verbose_name=_('Maximum Responses'),
         help_text=_('Number of responses/submissions needed for this job (e.g., if you want 20 people to do the same voice or picture set)')
+    )
+    
+    # Recruiting limits
+    recruit_limit = models.PositiveIntegerField(
+        default=10,
+        verbose_name=_('Recruit Limit'),
+        help_text=_('Maximum number of applications to accept before automatically moving to selection phase')
+    )
+    recruit_deadline = models.DateTimeField(
+        null=True,
+        blank=True,
+        verbose_name=_('Recruit Deadline'),
+        help_text=_('Date and time when recruiting will automatically end and move to selection phase (default: 7 days from creation)')
+    )
+    
+    # Submitting limits
+    submit_limit = models.PositiveIntegerField(
+        default=10,
+        verbose_name=_('Submit Limit'),
+        help_text=_('Maximum number of submissions to accept before automatically moving to review phase')
+    )
+    submit_deadline = models.DateTimeField(
+        null=True,
+        blank=True,
+        verbose_name=_('Submit Deadline'),
+        help_text=_('Date and time when submitting will automatically end and move to review phase (default: 7 days from when submitting phase starts)')
+    )
+    submit_deadline_days = models.PositiveIntegerField(
+        default=7,
+        verbose_name=_('Submit Deadline Days'),
+        help_text=_('Number of days from when submitting phase starts until deadline (used to calculate submit_deadline when job transitions to submitting state)')
+    )
+    
+    expired_date = models.DateTimeField(
+        null=True,
+        blank=True,
+        verbose_name=_('Expired Date'),
+        help_text=_('Date and time when the job will expire if no applications (in recruiting) or no submissions (in submitting) are received. Wallet contracts expire 7 days after this date.')
     )
     
     created_at = models.DateTimeField(auto_now_add=True)
@@ -177,34 +211,6 @@ class Job(models.Model):
         remaining = self.max_responses - accepted
         return max(0, remaining)
     
-    def get_funded_amount(self):
-        """Return total amount pledged toward this job."""
-        total = self.fundings.aggregate(total=Sum('amount'))['total']
-        return total or Decimal('0.00')
-    
-    def is_fully_funded(self):
-        """Convenience flag to indicate the budget has been met."""
-        try:
-            return self.get_funded_amount() >= self.budget
-        except TypeError:
-            return False
-    
-    def remaining_budget(self):
-        """Return how much budget is still unfunded."""
-        cached_value = getattr(self, '_remaining_budget_cache', None)
-        if cached_value is not None:
-            return cached_value
-        total = self.get_funded_amount()
-        remaining = self.budget - total
-        if remaining <= Decimal('0.00'):
-            remaining = Decimal('0.00')
-        self._remaining_budget_cache = remaining
-        return remaining
-    
-    def has_remaining_budget(self):
-        """Check if the job can still accept additional funding."""
-        return self.remaining_budget() > Decimal('0.00')
-    
     def has_reference_media(self):
         """Return True if funder added any supporting media."""
         return any([
@@ -213,61 +219,110 @@ class Job(models.Model):
             self.reference_image,
         ])
     
-    def refresh_funding_snapshot(self):
-        """Sync stored funded amount + flag with recorded pledges."""
-        total = self.get_funded_amount()
-        fields_to_update = []
-        if self.funded_amount != total:
-            self.funded_amount = total
-            fields_to_update.append('funded_amount')
-        is_fully_funded = total >= self.budget
-        if self.is_funded != is_fully_funded:
-            self.is_funded = is_fully_funded
-            fields_to_update.append('is_funded')
-        if fields_to_update:
-            self.save(update_fields=fields_to_update)
-
-
-class JobFunding(models.Model):
-    """Tracks pledges made toward a job budget."""
+    def get_applications_count(self):
+        """Get count of all applications for this job."""
+        return self.applications.count()
     
-    job = models.ForeignKey(
-        Job,
-        on_delete=models.CASCADE,
-        related_name='fundings',
-        verbose_name=_('Job')
-    )
+    def has_reached_recruit_limit(self):
+        """Check if the job has reached its recruit limit."""
+        return self.get_applications_count() >= self.recruit_limit
     
-    funder = models.ForeignKey(
-        User,
-        on_delete=models.CASCADE,
-        related_name='job_fundings',
-        verbose_name=_('Funder')
-    )
+    def has_passed_recruit_deadline(self):
+        """Check if the recruit deadline has passed."""
+        if not self.recruit_deadline:
+            return False
+        return timezone.now() >= self.recruit_deadline
     
-    amount = models.DecimalField(
-        max_digits=10,
-        decimal_places=2,
-        verbose_name=_('Amount'),
-        help_text=_('Amount pledged in ILP tokens')
-    )
+    def should_transition_to_selecting(self):
+        """Check if job should automatically transition from recruiting to selecting."""
+        if self.status != 'recruiting':
+            return False
+        return self.has_reached_recruit_limit() or self.has_passed_recruit_deadline()
     
-    note = models.CharField(
-        max_length=255,
-        blank=True,
-        verbose_name=_('Note'),
-        help_text=_('Optional note for context (shown on job page)')
-    )
+    def get_submissions_count(self):
+        """Get count of all submissions for this job."""
+        return self.submissions.count()
     
-    created_at = models.DateTimeField(auto_now_add=True)
+    def has_reached_submit_limit(self):
+        """Check if the job has reached its submit limit."""
+        return self.get_submissions_count() >= self.submit_limit
     
-    class Meta:
-        verbose_name = _('Job Funding')
-        verbose_name_plural = _('Job Fundings')
-        ordering = ['-created_at']
+    def has_passed_submit_deadline(self):
+        """Check if the submit deadline has passed."""
+        if not self.submit_deadline:
+            return False
+        return timezone.now() >= self.submit_deadline
     
-    def __str__(self):
-        return f"{self.funder.username} -> {self.job.title} ({self.amount})"
+    def should_transition_to_reviewing(self):
+        """Check if job should automatically transition from submitting to reviewing."""
+        if self.status != 'submitting':
+            return False
+        return self.has_reached_submit_limit() or self.has_passed_submit_deadline()
+    
+    def has_passed_expired_date(self):
+        """Check if the expired date has passed."""
+        if not self.expired_date:
+            return False
+        return timezone.now() >= self.expired_date
+    
+    def should_expire(self):
+        """Check if job should expire based on expired_date and current state."""
+        if not self.has_passed_expired_date():
+            return False
+        
+        # If in recruiting state and no applications, expire
+        if self.status == 'recruiting':
+            return self.get_applications_count() == 0
+        
+        # If in submitting state and no submissions, expire
+        if self.status == 'submitting':
+            return self.get_submissions_count() == 0
+        
+        return False
+    
+    def save(self, *args, **kwargs):
+        """Override save to set default deadlines if not provided."""
+        # Set default recruit_deadline to 7 days from creation if not set and this is a new job
+        is_new = not self.pk
+        if is_new and not self.recruit_deadline:
+            self.recruit_deadline = timezone.now() + timedelta(days=7)
+        
+        # Set default submit_deadline when transitioning to submitting state
+        # Check if status is being changed to 'submitting'
+        if self.pk:
+            old_job = Job.objects.filter(pk=self.pk).first()
+            if old_job and old_job.status != 'submitting' and self.status == 'submitting':
+                # Transitioning to submitting state - set deadline if not already set
+                if not self.submit_deadline:
+                    # Use submit_deadline_days to calculate the deadline
+                    days = self.submit_deadline_days if self.submit_deadline_days else 7
+                    self.submit_deadline = timezone.now() + timedelta(days=days)
+        elif self.status == 'submitting' and not self.submit_deadline:
+            # New job created directly in submitting state
+            days = self.submit_deadline_days if self.submit_deadline_days else 7
+            self.submit_deadline = timezone.now() + timedelta(days=days)
+        
+        # Save the job first
+        super().save(*args, **kwargs)
+        
+        # Auto-transition from recruiting to selecting if conditions are met
+        # Only check after initial save to avoid recursion
+        if self.should_transition_to_selecting():
+            # Use update to avoid recursion
+            Job.objects.filter(pk=self.pk).update(status='selecting')
+            self.status = 'selecting'
+        
+        # Auto-transition from submitting to reviewing if conditions are met
+        if self.should_transition_to_reviewing():
+            # Use update to avoid recursion
+            Job.objects.filter(pk=self.pk).update(status='reviewing')
+            self.status = 'reviewing'
+        
+        # Auto-transition to expired if conditions are met
+        if self.should_expire():
+            # Use update to avoid recursion
+            Job.objects.filter(pk=self.pk).update(status='expired')
+            self.status = 'expired'
 
 
 class JobSubmission(models.Model):

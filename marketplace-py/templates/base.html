@@ -408,14 +408,19 @@
             <ul class="nav-links" id="nav-links">
                 <li><a href="{% url 'jobs:list' %}">{% trans 'Browse Jobs' %}</a></li>
                 {% if user.is_authenticated %}
-                    <li><a href="{% url 'jobs:create' %}">{% trans 'Create Job' %}</a></li>
-                    <li><a href="{% url 'jobs:my_jobs' %}">{% trans 'My Jobs' %}</a></li>
-                    <li><a href="{% url 'jobs:accepted' %}">{% trans 'Accepted Jobs' %}</a></li>
+                    {% if user.is_funder %}
+                        <li><a href="{% url 'jobs:create' %}">{% trans 'Create Job' %}</a></li>
+                        <li><a href="{% url 'jobs:my_jobs' %}">{% trans 'My Jobs' %}</a></li>
+                    {% endif %}
+                    {% if user.is_creator %}
+                        <li><a href="{% url 'jobs:accepted' %}">{% trans 'Accepted Jobs' %}</a></li>
+                    {% endif %}
                     <li><a href="{% url 'users:profile' %}">{% trans 'Profile' %}</a></li>
                     <li><a href="{% url 'users:logout' %}">{% trans 'Logout' %}</a></li>
                 {% else %}
                     <li><a href="{% url 'users:login' %}">{% trans 'Login' %}</a></li>
-                    <li><a href="{% url 'users:register' %}">{% trans 'Register' %}</a></li>
+                    <li><a href="{% url 'users:register_creator' %}">{% trans 'Register as Creator' %}</a></li>
+                    <li><a href="{% url 'users:register_doer' %}">{% trans 'Register as Doer' %}</a></li>
                 {% endif %}
             </ul>
             <div class="language-selector">
