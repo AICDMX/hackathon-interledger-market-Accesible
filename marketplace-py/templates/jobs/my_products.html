@@ -1,11 +1,11 @@
 {% extends 'base.html' %}
-{% load i18n %}
+{% load i18n audio_tags %}
 
 {% block title %}{% trans 'My Products' %}{% endblock %}
 
 {% block content %}
 <div class="card">
-    <h2>{% trans 'My Products' %}</h2>
+    {% include 'components/static_title_with_audio.html' with title_text="My Products" slug="page_my_products" heading_tag="h2" %}
     <p>{% trans 'This page will display your products and services.' %}</p>
     <p>{% trans 'Coming soon...' %}</p>
 </div>

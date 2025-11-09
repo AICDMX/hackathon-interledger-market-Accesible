@@ -47,6 +47,21 @@
         </div>
         
         <div class="form-group">
+            {% include 'components/form_label_with_audio.html' with label_text=profile_form.pretty_name.label slug="form_pretty_name" field_id=profile_form.pretty_name.id_for_label %}
+            {{ profile_form.pretty_name }}
+            {% if profile_form.pretty_name.errors %}
+                <ul class="errorlist">
+                    {% for error in profile_form.pretty_name.errors %}
+                        <li>{{ error }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+            {% if profile_form.pretty_name.help_text %}
+                <small class="text-muted">{{ profile_form.pretty_name.help_text }}</small>
+            {% endif %}
+        </div>
+        
+        <div class="form-group">
             {% include 'components/form_label_with_audio.html' with label_text=profile_form.role.label slug="form_role" field_id=profile_form.role.id_for_label %}
             {{ profile_form.role }}
             {% if profile_form.role.errors %}
@@ -114,7 +129,10 @@
             </ul>
         {% endif %}
         
-        <button type="submit" class="btn btn-primary">{% trans 'Update Profile' %}</button>
+        <div style="display: flex; align-items: center; gap: 0.5rem;">
+            <button type="submit" class="btn btn-primary">{% trans 'Update Profile' %}</button>
+            {% audio_player_static_ui "button_update_profile" "label" %}
+        </div>
     </form>
 </div>
 

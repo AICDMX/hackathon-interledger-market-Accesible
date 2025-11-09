@@ -12,20 +12,32 @@
         {% for submission in accepted_submissions %}
             <article class="card" role="listitem">
                 {% include 'components/title_with_audio.html' with title=submission.job.title content_object=submission.job field_name="title" heading_tag="h2" link_url_name="jobs:detail" link_url_arg=submission.job.pk %}
-                <p><strong>{% trans 'Funder' %}:</strong> {{ submission.job.funder.username }}</p>
-                <p><strong>{% trans 'Budget' %}:</strong> {{ submission.job.budget }} ILP</p>
+                <p><strong>{% trans 'Funder' %}:</strong> {{ submission.job.funder.get_display_name }}</p>
+                <p><strong>{% trans 'Budget' %}:</strong> {{ submission.job.budget }} pesos</p>
                 <p><strong>{% trans 'Accepted' %}:</strong> {{ submission.created_at|date:"F d, Y" }}</p>
                 {% if submission.note %}
                     <p><strong>{% trans 'Your Note' %}:</strong> {{ submission.note }}</p>
                 {% endif %}
-                <a href="{% url 'jobs:detail' submission.job.pk %}" class="btn btn-primary">{% trans 'View Job' %}</a>
+                {% if submission.text_content %}
+                    <div style="margin-top:0.5rem;">
+                        <p><strong>{% trans 'Text Content' %}:</strong></p>
+                        <div style="background-color: #f5f5f5; padding: 1rem; border-radius: 0.5rem; white-space: pre-wrap;">{{ submission.text_content }}</div>
+                    </div>
+                {% endif %}
+                <div style="display: flex; align-items: center; gap: 0.5rem;">
+                    <a href="{% url 'jobs:detail' submission.job.pk %}" class="btn btn-primary">{% trans 'View Job' %}</a>
+                    {% audio_player_static_ui "button_view_job" "label" %}
+                </div>
             </article>
         {% endfor %}
     </div>
 {% else %}
     <div class="card">
         <p>{% trans 'You have no accepted jobs yet.' %}</p>
-        <a href="{% url 'jobs:list' %}" class="btn btn-primary">{% trans 'Browse Available Jobs' %}</a>
+        <div style="display: flex; align-items: center; gap: 0.5rem;">
+            <a href="{% url 'jobs:list' %}" class="btn btn-primary">{% trans 'Browse Available Jobs' %}</a>
+            {% audio_player_static_ui "button_browse_available_jobs" "label" %}
+        </div>
     </div>
 {% endif %}
 {% endblock %}

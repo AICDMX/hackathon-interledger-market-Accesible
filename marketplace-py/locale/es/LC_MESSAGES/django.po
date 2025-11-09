@@ -525,7 +525,7 @@ msgstr "Creador"
 
 #: jobs/models.py:347 templates/jobs/submit_job.html:53
 msgid "Note"
-msgstr ""
+msgstr "Nota"
 
 #: jobs/models.py:348
 msgid "Additional notes about the submission"
@@ -533,7 +533,7 @@ msgstr ""
 
 #: jobs/models.py:356 templates/jobs/submit_job.html:60
 msgid "Text File"
-msgstr ""
+msgstr "Archivo de Texto"
 
 #: jobs/models.py:362 templates/jobs/submit_job.html:63
 msgid "Video File"
@@ -1488,9 +1488,9 @@ msgstr "Todos los Idiomas"
 msgid "Filter Options"
 msgstr "Opciones de Filtro"
 
-#: templates/jobs/job_list.html:125
-msgid "Hide jobs I\\"
-msgstr ""
+#: templates/jobs/job_list.html:141
+msgid "Hide jobs I've applied to"
+msgstr "Ocultar trabajos a los que he aplicado"
 
 #: templates/jobs/job_list.html:131 templates/jobs/my_jobs.html:24
 msgid "Filter"

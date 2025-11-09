@@ -8,8 +8,8 @@
 {% endblock %}
 
 {% block content %}
-<div class="title-with-audio" style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
-    <h1 style="margin: 0; flex: 1; display: flex; align-items: center; gap: 0.5rem;">
+<div class="title-with-audio" style="display: flex; align-items: center; gap: 0.125rem; flex-wrap: wrap;">
+    <h1 style="margin: 0; display: flex; align-items: center; gap: 0.5rem;">
         <span>{% trans 'Submit Work for' %}: {{ job.title }}</span>
         {% load audio_tags %}
         {% audio_player job "title" %}
@@ -18,7 +18,7 @@
 
 <div class="card">
     <p><strong>{% trans 'Target Language' %}:</strong> {{ job.target_language }}</p>
-    <p><strong>{% trans 'Budget' %}:</strong> {{ job.budget }} ILP</p>
+    <p><strong>{% trans 'Budget' %}:</strong> {{ job.budget }} pesos</p>
     <p><strong>{% trans 'Required Deliverables' %}:</strong> {{ job.get_deliverable_types_display }}</p>
 </div>
 
@@ -66,6 +66,11 @@
                 {% if deliverable_type == 'text' %}
                     {% include 'components/form_label_with_audio.html' with label_text="Text File" slug="form_text_file" field_id="text_file" %}
                     <input type="file" id="text_file" name="text_file" accept=".txt,.doc,.docx,.pdf">
+                    <p class="muted-text" style="font-size: 0.875rem; margin-top: 0.5rem; margin-bottom: 0.5rem;">
+                        {% trans 'Or enter text directly:' %}
+                    </p>
+                    {% include 'components/form_label_with_audio.html' with label_text="Text Content" slug="form_text_content" field_id="text_content" %}
+                    <textarea id="text_content" name="text_content" rows="6" placeholder="{% trans 'Enter your text content here...' %}"></textarea>
                 {% elif deliverable_type == 'video' %}
                     {% include 'components/form_label_with_audio.html' with label_text="Video File" slug="form_video_file" field_id="video_file" %}
                     <input type="file" id="video_file" name="video_file" accept="video/*" capture="environment">
@@ -115,8 +120,12 @@
             </div>
         {% endfor %}
         
-        <button type="submit" class="btn btn-primary">{% trans 'Submit' %}</button>
-        <a href="{% url 'jobs:detail' job.pk %}" class="btn">{% trans 'Cancel' %}</a>
+        <div style="display: flex; align-items: center; gap: 1rem; flex-wrap: wrap;">
+            <button type="submit" class="btn btn-primary">{% trans 'Submit' %}</button>
+            {% audio_player_static_ui "button_submit" "label" %}
+            <a href="{% url 'jobs:detail' job.pk %}" class="btn">{% trans 'Cancel' %}</a>
+            {% audio_player_static_ui "button_cancel" "label" %}
+        </div>
     </form>
 </div>
 {% endblock %}

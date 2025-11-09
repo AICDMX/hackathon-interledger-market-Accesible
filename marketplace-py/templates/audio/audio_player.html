@@ -24,9 +24,9 @@ window.AUDIO_CONFIG = {
     
     {% if audio_snippet and audio_snippet.file %}
         {# Audio available - show player #}
-        <button class="audio-play-btn" 
+        <button type="button" class="audio-play-btn" 
                 aria-label="{% blocktrans with field=target_field lang=language_code %}Play audio for {{ field }} in {{ lang }}{% endblocktrans %}"
-                onclick="playAudio(this)">
+                onclick="playAudio(this, event)">
             <img src="{{ audio_config.icon_inactive }}" alt="{% trans 'Listen' %}" class="audio-icon" aria-hidden="true">
         </button>
         
@@ -38,14 +38,14 @@ window.AUDIO_CONFIG = {
                 <source src="{{ audio_snippet.file.url }}" type="audio/ogg">
                 {% trans "Your browser does not support the audio element." %}
             </audio>
-            <button class="audio-close-btn" onclick="closeAudioPlayer(this)" aria-label="{% trans 'Close audio player' %}">?</button>
+            <button type="button" class="audio-close-btn" onclick="closeAudioPlayer(this, event); return false;" aria-label="{% trans 'Close audio player' %}">?</button>
         </div>
     {% else %}
         {# Audio not available - try fallback #}
         {% if fallback_audio_url %}
-            <button class="audio-play-btn audio-fallback-btn" 
+            <button type="button" class="audio-play-btn audio-fallback-btn" 
                     aria-label="{% blocktrans with field=target_field lang=language_code %}Play fallback audio for {{ field }} in {{ lang }}{% endblocktrans %}"
-                    onclick="playAudio(this)">
+                    onclick="playAudio(this, event); return false;">
                 <img src="{{ audio_config.icon_inactive }}" alt="{% trans 'Listen (Fallback)' %}" class="audio-icon" aria-hidden="true">
             </button>
             
@@ -58,13 +58,13 @@ window.AUDIO_CONFIG = {
                     <source src="{{ fallback_audio_url }}" type="audio/ogg">
                     {% trans "Your browser does not support the audio element." %}
                 </audio>
-                <button class="audio-close-btn" onclick="closeAudioPlayer(this)" aria-label="{% trans 'Close audio player' %}">?</button>
+                <button type="button" class="audio-close-btn" onclick="closeAudioPlayer(this, event); return false;" aria-label="{% trans 'Close audio player' %}">?</button>
             </div>
         {% else %}
             {# No fallback - show request button #}
-            <button class="audio-request-btn" 
+            <button type="button" class="audio-request-btn" 
                     aria-label="{% blocktrans with field=target_field lang=language_code %}Request audio for {{ field }} in {{ lang }}{% endblocktrans %}"
-                    onclick="requestAudio(this)">
+                    onclick="requestAudio(this, event)">
                 <img src="{{ audio_config.icon_inactive }}" alt="{% trans 'Request audio' %}" class="audio-icon" aria-hidden="true">
             </button>
             
@@ -75,7 +75,29 @@ window.AUDIO_CONFIG = {
 
 <script>
 // Audio player functionality - uses centralized module
-function playAudio(button) {
+function playAudio(button, event) {
+    // Prevent form submission if button is inside a form
+    if (event) {
+        event.preventDefault();
+        event.stopPropagation();
+    } else {
+        // If event not passed, try to get it from window.event (for inline handlers)
+        const evt = window.event || arguments[1];
+        if (evt) {
+            evt.preventDefault();
+            evt.stopPropagation();
+        }
+    }
+    
+    // Ensure button doesn't submit form
+    if (button.form) {
+        button.form.addEventListener('submit', function(e) {
+            if (e.submitter === button) {
+                e.preventDefault();
+            }
+        }, { once: true });
+    }
+    
     const wrapper = button.closest('.audio-player-wrapper');
     const playerContainer = wrapper.querySelector('.audio-player-container');
     const audio = playerContainer ? playerContainer.querySelector('audio') : null;
@@ -85,7 +107,7 @@ function playAudio(button) {
         // No audio element found - use fallback
         const languageCode = wrapper.dataset.language || '{{ preferred_audio_language|default:LANGUAGE_CODE }}';
         playFallbackAudio(button, languageCode);
-        return;
+        return false;
     }
     
     // Use centralized module to play with icon management
@@ -95,9 +117,24 @@ function playAudio(button) {
         const languageCode = wrapper.dataset.language || '{{ preferred_audio_language|default:LANGUAGE_CODE }}';
         playFallbackAudio(button, languageCode);
     });
+    
+    return false;
 }
 
-function closeAudioPlayer(button) {
+function closeAudioPlayer(button, event) {
+    // Prevent form submission if button is inside a form
+    if (event) {
+        event.preventDefault();
+        event.stopPropagation();
+    } else {
+        // If event not passed, try to get it from window.event (for inline handlers)
+        const evt = window.event || arguments[1];
+        if (evt) {
+            evt.preventDefault();
+            evt.stopPropagation();
+        }
+    }
+    
     const container = button.closest('.audio-player-container');
     const wrapper = container.closest('.audio-player-wrapper');
     const playBtn = wrapper.querySelector('.audio-play-btn');
@@ -118,14 +155,40 @@ function closeAudioPlayer(button) {
     if (playBtn) {
         playBtn.style.display = 'inline-flex';
     }
+    
+    return false;
 }
 
-function requestAudio(button) {
+function requestAudio(button, event) {
+    // Prevent form submission if button is inside a form
+    if (event) {
+        event.preventDefault();
+        event.stopPropagation();
+    } else {
+        // If event not passed, try to get it from window.event (for inline handlers)
+        const evt = window.event || arguments[1];
+        if (evt) {
+            evt.preventDefault();
+            evt.stopPropagation();
+        }
+    }
+    
+    // Ensure button doesn't submit form
+    if (button.form) {
+        button.form.addEventListener('submit', function(e) {
+            if (e.submitter === button) {
+                e.preventDefault();
+            }
+        }, { once: true });
+    }
+    
     const wrapper = button.closest('.audio-player-wrapper');
     const languageCode = wrapper.dataset.language || '{{ preferred_audio_language|default:LANGUAGE_CODE }}';
     
     // Instead of requesting, play fallback audio
     playFallbackAudio(button, languageCode);
+    
+    return false;
 }
 
 function playFallbackAudio(button, languageCode) {

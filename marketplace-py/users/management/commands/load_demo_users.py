@@ -74,6 +74,7 @@ class Command(BaseCommand):
                     password=user_data.get('password', 'demo123'),
                     first_name=user_data.get('first_name', ''),
                     last_name=user_data.get('last_name', ''),
+                    pretty_name=user_data.get('pretty_name', ''),
                     role=user_data.get('role', 'both'),
                     preferred_language=user_data.get('preferred_language', 'en'),
                     native_languages=user_data.get('native_languages', ''),

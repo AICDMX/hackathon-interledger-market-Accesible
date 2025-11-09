@@ -507,6 +507,7 @@ document.addEventListener('DOMContentLoaded', function() {
         
         // Create audio player button
         const audioBtn = document.createElement('button');
+        audioBtn.type = 'button';
         audioBtn.className = 'audio-play-btn';
         audioBtn.style.cssText = 'display: inline-flex; align-items: center; justify-content: center; padding: 0.25rem; background-color: transparent; border: none; cursor: pointer; transition: opacity 0.2s;';
         const audioIcon = document.createElement('img');

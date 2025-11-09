@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-{% load i18n static %}
+{% load i18n static audio_tags %}
 
 {% block title %}{% trans 'Edit Job' %} - {{ block.super }}{% endblock %}
 
@@ -73,17 +73,28 @@
         {% csrf_token %}
         
         <div class="form-group">
-            <label for="title">{% trans 'Title' %} *</label>
+            {% include 'components/form_label_with_audio.html' with label_text="Title" slug="form_title" field_id="title" required=True %}
             <input type="text" id="title" name="title" value="{{ title|default:job.title }}" required aria-required="true">
         </div>
         
         <div class="form-group">
-            <label for="description">{% trans 'Description' %} *</label>
+            {% include 'components/form_label_with_audio.html' with label_text="Title Audio (Optional)" slug="form_title_audio" field_id="title_audio" %}
+            {% if job.title_audio %}
+                <p class="text-muted">{% trans 'Current audio:' %} <a href="{{ job.title_audio.url }}" target="_blank">{% trans 'Listen' %}</a></p>
+                <p class="text-muted">{% trans 'Upload a new file to replace the existing one.' %}</p>
+            {% endif %}
+            <p class="muted-text" style="font-size: 0.875rem;">{% trans 'Upload an audio file for the title in the target language' %}</p>
+            <input type="file" id="title_audio" name="title_audio" accept="audio/*">
+            <small class="form-text text-muted">{% trans 'Optional: Audio pronunciation of the title in the target language' %}</small>
+        </div>
+        
+        <div class="form-group">
+            {% include 'components/form_label_with_audio.html' with label_text="Description" slug="form_description" field_id="description" required=True %}
             <textarea id="description" name="description" rows="5" required aria-required="true">{{ description|default:job.description }}</textarea>
         </div>
         
         <div class="form-group">
-            <label for="target_language">{% trans 'Target Language' %} *</label>
+            {% include 'components/form_label_with_audio.html' with label_text="Target Language" slug="form_target_language" field_id="target_language" required=True %}
             <select id="target_language" name="target_language" required aria-required="true">
                 <option value="en" {% if target_language == 'en' or job.target_language == 'en' %}selected{% endif %}>English</option>
                 <option value="es" {% if target_language == 'es' or job.target_language == 'es' %}selected{% endif %}>Spanish</option>
@@ -123,13 +134,13 @@
         </div>
         
         <div class="form-group">
-            <label for="amount_per_person">{% trans 'Amount Per Person (ILP)' %} *</label>
+            {% include 'components/form_label_with_audio.html' with label_text="Amount Per Person (pesos)" slug="form_amount_per_person" field_id="amount_per_person" required=True %}
             <input type="number" id="amount_per_person" name="amount_per_person" step="0.01" min="0" value="{{ amount_per_person|default:job.amount_per_person }}" required aria-required="true">
             <small class="form-text text-muted">{% trans 'How much you will pay each person who completes this job' %}</small>
         </div>
         
         <div class="form-group">
-            <label for="max_responses">{% trans 'Number of Responses Needed' %} *</label>
+            {% include 'components/form_label_with_audio.html' with label_text="Number of Responses Needed" slug="form_max_responses" field_id="max_responses" required=True %}
             <input type="number" id="max_responses" name="max_responses" min="1" value="{{ max_responses|default:job.max_responses }}" required aria-required="true">
             <small class="form-text text-muted">{% trans 'How many people should submit work for this job? (e.g., if you want 20 people to do the same voice or picture set, enter 20)' %}</small>
         </div>
@@ -137,7 +148,7 @@
         <div class="form-group">
             <label>{% trans 'Total Budget' %}</label>
             <div id="total-budget-display" class="total-budget-display">
-                <strong>{{ job.budget|default:"0.00" }} ILP</strong>
+                <strong>{{ job.budget|default:"0.00" }} pesos</strong>
             </div>
             <small class="form-text text-muted">{% trans 'Total amount needed: Amount per person ? Number of responses' %}</small>
         </div>
@@ -149,19 +160,19 @@
         </div>
         
         <div class="form-group">
-            <label for="recruit_deadline_days">{% trans 'Recruit Deadline (Days)' %} *</label>
+            {% include 'components/form_label_with_audio.html' with label_text="Recruit Deadline (Days)" slug="form_recruit_deadline_days" field_id="recruit_deadline_days" required=True %}
             <input type="number" id="recruit_deadline_days" name="recruit_deadline_days" min="1" value="{{ recruit_deadline_days|default:job.recruit_deadline_days }}" required aria-required="true">
             <small class="form-text text-muted">{% trans 'Number of days from now when recruiting will automatically end and move to selection phase' %}</small>
         </div>
         
         <div class="form-group">
-            <label for="submit_limit">{% trans 'Submit Limit' %} *</label>
+            {% include 'components/form_label_with_audio.html' with label_text="Submit Limit" slug="form_submit_limit" field_id="submit_limit" required=True %}
             <input type="number" id="submit_limit" name="submit_limit" min="1" value="{{ submit_limit|default:job.submit_limit }}" required aria-required="true">
             <small class="form-text text-muted">{% trans 'Maximum number of submissions to accept before automatically moving to review phase' %}</small>
         </div>
         
         <div class="form-group">
-            <label for="submit_deadline_days">{% trans 'Submit Deadline (Days)' %} *</label>
+            {% include 'components/form_label_with_audio.html' with label_text="Submit Deadline (Days)" slug="form_submit_deadline_days" field_id="submit_deadline_days" required=True %}
             <input type="number" id="submit_deadline_days" name="submit_deadline_days" min="1" value="{{ submit_deadline_days|default:job.submit_deadline_days }}" required aria-required="true">
             <small class="form-text text-muted">{% trans 'Number of days from when submitting phase starts until deadline (when job transitions to submitting state)' %}</small>
         </div>
@@ -173,7 +184,7 @@
         </div>
         
         <div class="form-group">
-            <label>{% trans 'Optional reference media' %}</label>
+            {% include 'components/form_label_with_audio.html' with label_text="Optional reference media" slug="form_reference_media" field_id="reference_media" %}
             <p class="muted-text">{% trans 'Record audio or upload photos/videos so creators understand what you need even if they do not read the description.' %}</p>
             {% if job.reference_audio or job.reference_video or job.reference_image %}
                 <p class="text-muted">{% trans 'Current files:' %}</p>
@@ -241,14 +252,18 @@
             </div>
         </div>
         
-        <div style="display: flex; gap: 1rem; flex-wrap: wrap; margin-top: 1.5rem;">
+        <div style="display: flex; gap: 1rem; flex-wrap: wrap; margin-top: 1.5rem; align-items: center;">
             <button type="submit" name="save_draft" class="btn btn-secondary">{% trans 'Save Draft' %}</button>
+            {% audio_player_static_ui "button_save_draft" "label" %}
             {% if job.status == 'draft' %}
                 <button type="submit" name="publish" class="btn btn-primary">{% trans 'Publish Job' %}</button>
+                {% audio_player_static_ui "button_publish_job" "label" %}
             {% else %}
                 <button type="submit" name="publish" class="btn btn-primary">{% trans 'Update Job' %}</button>
+                {% audio_player_static_ui "button_update_job" "label" %}
             {% endif %}
             <a href="{% url 'jobs:owner_dashboard' %}" class="btn btn-secondary">{% trans 'Cancel' %}</a>
+            {% audio_player_static_ui "button_cancel" "label" %}
         </div>
     </form>
 </div>
@@ -265,7 +280,7 @@
         const total = amountPerPerson * maxResponses;
         const display = document.getElementById('total-budget-display');
         if (display) {
-            display.innerHTML = '<strong>' + total.toFixed(2) + ' ILP</strong>';
+            display.innerHTML = '<strong>' + total.toFixed(2) + ' pesos</strong>';
         }
     }
     

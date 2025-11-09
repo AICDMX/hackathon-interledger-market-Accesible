@@ -96,9 +96,12 @@
                 <article class="card" role="listitem" style="margin-top: 1rem;">
                     {% include 'components/title_with_audio.html' with title=job.title content_object=job field_name="title" heading_tag="h3" link_url_name="jobs:detail" link_url_arg=job.pk %}
                     <p><strong>{% trans 'Language' %}:</strong> {{ job.target_language }}</p>
-                    <p><strong>{% trans 'Amount Per Person' %}:</strong> {{ job.amount_per_person }} ILP</p>
+                    <p><strong>{% trans 'Amount Per Person' %}:</strong> {{ job.amount_per_person }} pesos</p>
                     <p>{{ job.description|truncatewords:30 }}</p>
-                    <a href="{% url 'jobs:submit' job.pk %}" class="btn btn-primary">{% trans 'Submit Work Now' %}</a>
+                    <div style="display: flex; align-items: center; gap: 0.5rem;">
+                        <a href="{% url 'jobs:submit' job.pk %}" class="btn btn-primary">{% trans 'Submit Work Now' %}</a>
+                        {% audio_player_static_ui "button_submit_work_now" "label" %}
+                    </div>
                 </article>
             {% endfor %}
         </div>
@@ -126,20 +129,34 @@
         {% if user.is_authenticated %}
         <div class="form-group">
             <fieldset class="filter-options">
-                <legend style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+                <legend style="display: flex; align-items: center; gap: 0.125rem; flex-wrap: wrap;">
                     {% trans 'Filter Options' %}
                     {% audio_player_static_ui "section_filter_options" "label" %}
                 </legend>
+                <style>
+                .filter-options legend .audio-player-wrapper {
+                    margin-left: 0 !important;
+                }
+                </style>
                 <div class="checkbox-group">
-                    <label>
+                    <label style="display: flex; align-items: center; gap: 0.125rem; flex-wrap: wrap;">
                         <input type="checkbox" name="hide_applied" {% if hide_applied %}checked{% endif %}>
-                        {% trans 'Hide jobs I\'ve applied to' %}
+                        <span>{% trans 'Hide jobs I\'ve applied to' %}</span>
+                        {% audio_player_static_ui "checkbox_hide_applied" "label" %}
                     </label>
+                    <style>
+                    .checkbox-group label .audio-player-wrapper {
+                        margin-left: 0 !important;
+                    }
+                    </style>
                 </div>
             </fieldset>
         </div>
         {% endif %}
-        <button type="submit" class="btn btn-primary">{% trans 'Filter' %}</button>
+        <div style="display: flex; align-items: center; gap: 0.5rem;">
+            <button type="submit" class="btn btn-primary">{% trans 'Filter' %}</button>
+            {% audio_player_static_ui "button_filter" "label" %}
+        </div>
     </form>
 </div>
 
@@ -162,8 +179,8 @@
                 {% if job.target_dialect %}
                     <p><strong>{% trans 'Dialect' %}:</strong> {{ job.target_dialect }}</p>
                 {% endif %}
-                <p><strong>{% trans 'Amount Per Person' %}:</strong> {{ job.amount_per_person }} ILP</p>
-                <p><strong>{% trans 'Total Budget' %}:</strong> {{ job.budget }} ILP</p>
+                <p><strong>{% trans 'Amount Per Person' %}:</strong> {{ job.amount_per_person }} pesos</p>
+                <p><strong>{% trans 'Total Budget' %}:</strong> {{ job.budget }} pesos</p>
                 <p><strong>{% trans 'Status' %}:</strong> {{ job.get_status_display }}</p>
                 
                 {% if job.status == 'recruiting' or job.status == 'open' %}
@@ -178,7 +195,10 @@
                 
                 <p><strong>{% trans 'Deliverables' %}:</strong> {{ job.get_deliverable_types_display }}</p>
                 <p>{{ job.description|truncatewords:30 }}</p>
-                <a href="{% url 'jobs:detail' job.pk %}" class="btn btn-primary">{% trans 'View Details' %}</a>
+                <div style="display: flex; align-items: center; gap: 0.5rem;">
+                    <a href="{% url 'jobs:detail' job.pk %}" class="btn btn-primary">{% trans 'View Details' %}</a>
+                    {% audio_player_static_ui "button_view_details" "label" %}
+                </div>
             </article>
             {% endwith %}
         {% endfor %}

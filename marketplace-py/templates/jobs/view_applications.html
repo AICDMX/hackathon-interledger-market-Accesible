@@ -5,7 +5,7 @@
 
 {% block content %}
 {% load audio_tags %}
-<div class="title-with-audio" style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+<div class="title-with-audio" style="display: flex; align-items: center; gap: 0.125rem; flex-wrap: wrap;">
     {% include 'components/static_title_with_audio.html' with title_text="Applications for" slug="page_view_applications" heading_tag="h1" %}
     <div style="display: flex; align-items: center; gap: 0.5rem;">
         <span>{{ job.title }}</span>
@@ -17,7 +17,10 @@
     <p><strong>{% trans 'Status' %}:</strong> {{ job.get_status_display }}</p>
     <p><strong>{% trans 'Selected Applicants' %}:</strong> {{ selected_count }}</p>
     <p><strong>{% trans 'Total Applications' %}:</strong> {{ applications.count }}</p>
-    <a href="{% url 'jobs:detail' job.pk %}" class="btn">{% trans 'View Job' %}</a>
+        <div style="display: flex; align-items: center; gap: 0.5rem;">
+            <a href="{% url 'jobs:detail' job.pk %}" class="btn">{% trans 'View Job' %}</a>
+            {% audio_player_static_ui "button_view_job" "label" %}
+        </div>
 </div>
 
 {% if applications %}
@@ -28,7 +31,7 @@
             <div class="card" style="margin-top: 1rem; border-left: 4px solid {% if application.status == 'selected' %}#10b981{% elif application.status == 'rejected' %}#ef4444{% else %}#f59e0b{% endif %};">
                 <div style="display: flex; justify-content: space-between; align-items: start; flex-wrap: wrap; gap: 1rem;">
                     <div style="flex: 1;">
-                        <h3>{{ application.applicant.username }}</h3>
+                        <h3>{{ application.applicant.get_display_name }}</h3>
                         <p class="text-muted" style="margin: 0;">
                             {% trans 'Applied' %}: {{ application.created_at|date:"F d, Y H:i" }}
                         </p>
@@ -44,24 +47,36 @@
                             <form method="post" action="{% url 'jobs:select_application' job.pk application.pk %}" style="display: inline;">
                                 {% csrf_token %}
                                 <input type="hidden" name="action" value="select">
-                                <button type="submit" class="btn btn-success">{% trans 'Select' %}</button>
+                                <div style="display: inline-flex; align-items: center; gap: 0.5rem;">
+                                    <button type="submit" class="btn btn-success">{% trans 'Select' %}</button>
+                                    {% audio_player_static_ui "button_select" "label" %}
+                                </div>
                             </form>
                             <form method="post" action="{% url 'jobs:select_application' job.pk application.pk %}" style="display: inline;">
                                 {% csrf_token %}
                                 <input type="hidden" name="action" value="reject">
-                                <button type="submit" class="btn btn-danger">{% trans 'Reject' %}</button>
+                                <div style="display: inline-flex; align-items: center; gap: 0.5rem;">
+                                    <button type="submit" class="btn btn-danger">{% trans 'Reject' %}</button>
+                                    {% audio_player_static_ui "button_reject" "label" %}
+                                </div>
                             </form>
                         {% elif application.status == 'selected' %}
                             <form method="post" action="{% url 'jobs:select_application' job.pk application.pk %}" style="display: inline;">
                                 {% csrf_token %}
                                 <input type="hidden" name="action" value="pending">
-                                <button type="submit" class="btn">{% trans 'Reset to Pending' %}</button>
+                                <div style="display: inline-flex; align-items: center; gap: 0.5rem;">
+                                    <button type="submit" class="btn">{% trans 'Reset to Pending' %}</button>
+                                    {% audio_player_static_ui "button_reset_to_pending" "label" %}
+                                </div>
                             </form>
                         {% elif application.status == 'rejected' %}
                             <form method="post" action="{% url 'jobs:select_application' job.pk application.pk %}" style="display: inline;">
                                 {% csrf_token %}
                                 <input type="hidden" name="action" value="pending">
-                                <button type="submit" class="btn">{% trans 'Reset to Pending' %}</button>
+                                <div style="display: inline-flex; align-items: center; gap: 0.5rem;">
+                                    <button type="submit" class="btn">{% trans 'Reset to Pending' %}</button>
+                                    {% audio_player_static_ui "button_reset_to_pending" "label" %}
+                                </div>
                             </form>
                         {% endif %}
                     </div>
@@ -114,7 +129,10 @@
             <p>{% trans 'You have selected' %} {{ selected_count }} {% trans 'applicant(s). Click below to create pre-approved payments for them.' %}</p>
             <form method="post" action="{% url 'jobs:pre_approve_payments' job.pk %}">
                 {% csrf_token %}
-                <button type="submit" class="btn btn-primary">{% trans 'Create Pre-approved Payments' %}</button>
+                <div style="display: flex; align-items: center; gap: 0.5rem;">
+                    <button type="submit" class="btn btn-primary">{% trans 'Create Pre-approved Payments' %}</button>
+                    {% audio_player_static_ui "button_create_pre_approved_payments" "label" %}
+                </div>
             </form>
             <p class="text-muted" style="margin-top: 0.5rem; font-size: 0.875rem;">
                 {% trans 'Note: This functionality is coming soon. It will allow you to create payment authorizations for selected workers.' %}

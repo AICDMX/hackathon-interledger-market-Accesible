@@ -45,3 +45,6 @@
 [x] use the listen.png for all the audio buttons. we dont need the plain text just the icon
 [x] grab the fave icon/tiny logo from the top level media file. and any others from there like logo and add them were expected
 [x] fromat the liten buttons so they are next to the text they belong too.
+[x] copy Perd?n-esto-a?n-no-se-ha-traducido.mp3 to be the defualt for fallback-oto.mp3 instead
+[x] users should have a pretty name and that should be used on the site front end like in dashboards and job pages. like Financiador. in data dir update the default users to have a pretty name that goes with the username. uploaders should have names as well.
+[x] if i submit a job. if i dont have profile defualts already set. then make those my profile defualts

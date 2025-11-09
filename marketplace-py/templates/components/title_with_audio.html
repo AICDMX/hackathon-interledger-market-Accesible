@@ -16,8 +16,8 @@ Parameters:
 {% endcomment %}
 
 {% with heading_tag=heading_tag|default:"h1" field_name=field_name|default:"title" %}
-<div class="title-with-audio" style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
-    <{{ heading_tag }}{% if heading_id %} id="{{ heading_id }}"{% endif %} style="margin: 0; flex: 1;">
+<div class="title-with-audio" style="display: flex; align-items: center; gap: 0.125rem; flex-wrap: wrap;">
+    <{{ heading_tag }}{% if heading_id %} id="{{ heading_id }}"{% endif %} style="margin: 0;">
         {% if link_url %}
             <a href="{{ link_url }}">{{ title }}</a>
         {% elif link_url_name %}
@@ -30,4 +30,9 @@ Parameters:
         {% audio_player content_object field_name language_code %}
     {% endif %}
 </div>
+<style>
+.title-with-audio .audio-player-wrapper {
+    margin-left: 0 !important;
+}
+</style>
 {% endwith %}

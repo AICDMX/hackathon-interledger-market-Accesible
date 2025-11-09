@@ -32,7 +32,10 @@
             <input type="password" id="password2" name="password2" required aria-required="true">
         </div>
         
-        <button type="submit" class="btn btn-primary">{% trans 'Register as Job Creator' %}</button>
+        <div style="display: flex; align-items: center; gap: 0.5rem;">
+            <button type="submit" class="btn btn-primary">{% trans 'Register as Job Creator' %}</button>
+            {% audio_player_static_ui "button_register_job_creator" "label" %}
+        </div>
         <p>
             <a href="{% url 'users:login' %}">{% trans 'Already have an account? Login here.' %}</a><br>
             <a href="{% url 'users:register_doer' %}">{% trans 'Looking to do jobs instead? Register as Job Doer' %}</a>

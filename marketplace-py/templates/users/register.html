@@ -1,10 +1,10 @@
 {% extends 'base.html' %}
-{% load i18n %}
+{% load i18n audio_tags %}
 
 {% block title %}{% trans 'Register' %} - {{ block.super }}{% endblock %}
 
 {% block content %}
-<h1>{% trans 'Register' %}</h1>
+{% include 'components/static_title_with_audio.html' with title_text="Register" slug="page_register" heading_tag="h1" %}
 
 <div class="card">
     <form method="post">
@@ -39,7 +39,10 @@
             </select>
         </div>
         
-        <button type="submit" class="btn btn-primary">{% trans 'Register' %}</button>
+        <div style="display: flex; align-items: center; gap: 0.5rem;">
+            <button type="submit" class="btn btn-primary">{% trans 'Register' %}</button>
+            {% audio_player_static_ui "button_register" "label" %}
+        </div>
         <p><a href="{% url 'users:login' %}">{% trans 'Already have an account? Login here.' %}</a></p>
     </form>
 </div>

@@ -30,6 +30,13 @@ class Job(models.Model):
     ]
     
     title = models.CharField(max_length=200, verbose_name=_('Title'))
+    title_audio = models.FileField(
+        upload_to='jobs/title_audio/',
+        blank=True,
+        null=True,
+        verbose_name=_('Title Audio'),
+        help_text=_('Optional audio file for the title in the target language')
+    )
     description = models.TextField(verbose_name=_('Description'))
     
     # Language information
@@ -79,14 +86,14 @@ class Job(models.Model):
         null=True,
         blank=True,
         verbose_name=_('Amount Per Person'),
-        help_text=_('Amount in ILP to pay each person who completes this job')
+        help_text=_('Amount in pesos to pay each person who completes this job')
     )
     
     budget = models.DecimalField(
         max_digits=10,
         decimal_places=2,
         verbose_name=_('Budget'),
-        help_text=_('Total amount in ILP (calculated as amount_per_person ? max_responses)')
+        help_text=_('Total amount in pesos (calculated as amount_per_person ? max_responses)')
     )
     
     funder = models.ForeignKey(
@@ -109,6 +116,12 @@ class Job(models.Model):
         null=True,
         verbose_name=_('Payment ID'),
         help_text=_('Interledger payment ID for contract/escrow')
+    )
+    
+    contract_completed = models.BooleanField(
+        default=False,
+        verbose_name=_('Contract Completed'),
+        help_text=_('Whether the contract/payment has been completed/released')
     )
     
     # Response limit
@@ -355,6 +368,11 @@ class JobSubmission(models.Model):
         null=True,
         verbose_name=_('Text File')
     )
+    text_content = models.TextField(
+        blank=True,
+        verbose_name=_('Text Content'),
+        help_text=_('Text content entered directly (alternative to file upload)')
+    )
     video_file = models.FileField(
         upload_to='submissions/video/',
         blank=True,
@@ -475,4 +493,4 @@ class JobApplication(models.Model):
         unique_together = [['job', 'applicant']]
     
     def __str__(self):
-        return f"{self.applicant.username} - {self.job.title}"
+        return f"{self.applicant.get_display_name()} - {self.job.title}"

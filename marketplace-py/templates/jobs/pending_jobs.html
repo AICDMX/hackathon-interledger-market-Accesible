@@ -14,7 +14,7 @@
         <li class="card" style="margin-bottom: 1rem;">
             {% include 'components/title_with_audio.html' with title=submission.job.title content_object=submission.job field_name="title" heading_tag="h3" link_url_name="jobs:detail" link_url_arg=submission.job.pk %}
             <p>{{ submission.job.description|truncatewords:30 }}</p>
-            <p><strong>{% trans 'Budget' %}:</strong> {{ submission.job.budget|floatformat:2 }} ILP</p>
+            <p><strong>{% trans 'Budget' %}:</strong> {{ submission.job.budget|floatformat:2 }} pesos</p>
             <p><strong>{% trans 'Status' %}:</strong> {{ submission.job.get_status_display }}</p>
             <p><strong>{% trans 'Target Language' %}:</strong> {{ submission.job.get_target_language_display|default:submission.job.target_language }}</p>
         </li>

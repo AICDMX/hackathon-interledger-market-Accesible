@@ -74,7 +74,10 @@
                     <div class="form-error">{{ contribution_form.notes.errors }}</div>
                 {% endif %}
             </div>
-            <button type="submit" class="btn btn-primary">{% trans 'Enviar audio' %}</button>
+            <div style="display: flex; align-items: center; gap: 0.5rem;">
+                <button type="submit" class="btn btn-primary">{% trans 'Enviar audio' %}</button>
+                {% audio_player_static_ui "button_send_audio" "label" %}
+            </div>
         </form>
     </div>
 </section>

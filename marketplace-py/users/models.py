@@ -37,6 +37,13 @@ class User(AbstractUser):
         help_text=_('Comma-separated list of native languages (e.g., nahuatl, otomi)')
     )
     
+    pretty_name = models.CharField(
+        max_length=255,
+        blank=True,
+        verbose_name=_('Pretty Name'),
+        help_text=_('Display name shown on the site frontend (e.g., Financiador, Creador)')
+    )
+    
     # Profile fields for job applications
     profile_note = models.TextField(
         blank=True,
@@ -133,7 +140,11 @@ class User(AbstractUser):
         verbose_name_plural = _('Users')
     
     def __str__(self):
-        return self.username
+        return self.get_display_name()
+    
+    def get_display_name(self):
+        """Return pretty_name if set, otherwise username."""
+        return self.pretty_name if self.pretty_name else self.username
     
     def get_native_languages_list(self):
         """Return native languages as a list."""

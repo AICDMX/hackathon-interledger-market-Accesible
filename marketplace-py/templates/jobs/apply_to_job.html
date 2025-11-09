@@ -9,7 +9,7 @@
 
 {% block content %}
 {% load audio_tags %}
-<div class="title-with-audio" style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+<div class="title-with-audio" style="display: flex; align-items: center; gap: 0.125rem; flex-wrap: wrap;">
     {% include 'components/static_title_with_audio.html' with title_text="Apply to Job" slug="page_apply_to_job" heading_tag="h1" %}
     <div style="display: flex; align-items: center; gap: 0.5rem;">
         <span>{{ job.title }}</span>
@@ -19,8 +19,8 @@
 
 <div class="card">
     <p><strong>{% trans 'Target Language' %}:</strong> {{ job.target_language }}</p>
-    <p><strong>{% trans 'Budget' %}:</strong> {{ job.budget }} ILP</p>
-    <p><strong>{% trans 'Amount Per Person' %}:</strong> {{ job.amount_per_person }} ILP</p>
+    <p><strong>{% trans 'Budget' %}:</strong> {{ job.budget }} pesos</p>
+    <p><strong>{% trans 'Amount Per Person' %}:</strong> {{ job.amount_per_person }} pesos</p>
     <p><strong>{% trans 'Required Deliverables' %}:</strong> {{ job.get_deliverable_types_display }}</p>
     <p>{{ job.description|linebreaks }}</p>
 </div>

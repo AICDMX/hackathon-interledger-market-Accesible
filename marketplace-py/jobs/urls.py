@@ -20,6 +20,7 @@ urlpatterns = [
     path('<int:pk>/applications/', views.view_applications, name='view_applications'),
     path('<int:job_pk>/applications/<int:application_pk>/select/', views.select_application, name='select_application'),
     path('<int:pk>/pre-approve-payments/', views.pre_approve_payments, name='pre_approve_payments'),
+    path('<int:pk>/complete-contract/', views.complete_contract, name='complete_contract'),
     path('my-products/', views.my_products, name='my_products'),
     path('my-money/', views.my_money, name='my_money'),
     path('pending/', views.pending_jobs, name='pending_jobs'),

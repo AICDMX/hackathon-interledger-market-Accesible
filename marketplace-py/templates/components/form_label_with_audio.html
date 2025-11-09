@@ -11,11 +11,16 @@ Parameters:
 - required: Optional boolean to add required indicator
 {% endcomment %}
 
-<div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
-    <label for="{{ field_id }}" style="margin: 0; flex: 1;">
+<div class="form-label-with-audio" style="display: flex; align-items: center; gap: 0.125rem; flex-wrap: wrap;">
+    <label for="{{ field_id }}" style="margin: 0;">
         {% trans label_text %}{% if required %} *{% endif %}
     </label>
     {% if slug %}
         {% audio_player_static_ui slug "label" %}
     {% endif %}
 </div>
+<style>
+.form-label-with-audio .audio-player-wrapper {
+    margin-left: 0 !important;
+}
+</style>

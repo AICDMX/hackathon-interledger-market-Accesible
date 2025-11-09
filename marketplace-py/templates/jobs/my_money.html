@@ -1,41 +1,53 @@
 {% extends 'base.html' %}
-{% load i18n %}
+{% load i18n audio_tags %}
 
 {% block title %}{% trans 'My Money' %}{% endblock %}
 
 {% block content %}
 <div class="card">
-    <h2>{% trans 'My Money' %}</h2>
+    {% include 'components/static_title_with_audio.html' with title_text="My Money" slug="page_my_money" heading_tag="h2" %}
     
     {% if wallet_endpoint %}
     <div class="form-group">
-        <label>{% trans 'Wallet Endpoint' %}:</label>
+        <div style="display: flex; align-items: center; gap: 0.5rem;">
+            <label>{% trans 'Wallet Endpoint' %}:</label>
+            {% audio_player_static_ui "label_wallet_endpoint" "label" %}
+        </div>
         <p>{{ wallet_endpoint }}</p>
     </div>
     {% endif %}
     
     <div class="form-group">
-        <label>{% trans 'Total Earned' %}:</label>
-        <p style="font-size: 1.5rem; color: #27ae60; font-weight: bold;">{{ total_earned|floatformat:2 }} ILP</p>
+        <div style="display: flex; align-items: center; gap: 0.5rem;">
+            <label>{% trans 'Total Earned' %}:</label>
+            {% audio_player_static_ui "label_total_earned" "label" %}
+        </div>
+        <p style="font-size: 1.5rem; color: #27ae60; font-weight: bold;">{{ total_earned|floatformat:2 }} pesos</p>
     </div>
     
     <div class="form-group">
-        <label>{% trans 'Total Spent' %}:</label>
-        <p style="font-size: 1.5rem; color: #e74c3c; font-weight: bold;">{{ total_spent|floatformat:2 }} ILP</p>
+        <div style="display: flex; align-items: center; gap: 0.5rem;">
+            <label>{% trans 'Total Spent' %}:</label>
+            {% audio_player_static_ui "label_total_spent" "label" %}
+        </div>
+        <p style="font-size: 1.5rem; color: #e74c3c; font-weight: bold;">{{ total_spent|floatformat:2 }} pesos</p>
     </div>
     
     <div class="form-group">
-        <label>{% trans 'Balance' %}:</label>
-        <p style="font-size: 1.5rem; font-weight: bold; color: {% if balance >= 0 %}#27ae60{% else %}#e74c3c{% endif %};">{{ balance|floatformat:2 }} ILP</p>
+        <div style="display: flex; align-items: center; gap: 0.5rem;">
+            <label>{% trans 'Balance' %}:</label>
+            {% audio_player_static_ui "label_balance" "label" %}
+        </div>
+        <p style="font-size: 1.5rem; font-weight: bold; color: {% if balance >= 0 %}#27ae60{% else %}#e74c3c{% endif %};">{{ balance|floatformat:2 }} pesos</p>
     </div>
     
     {% if accepted_submissions %}
-    <h3>{% trans 'Accepted Jobs' %}</h3>
+    {% include 'components/static_title_with_audio.html' with title_text="Accepted Jobs" slug="section_accepted_jobs_money" heading_tag="h3" %}
     <ul>
         {% for submission in accepted_submissions %}
         <li>
             <a href="{% url 'jobs:detail' pk=submission.job.pk %}">{{ submission.job.title }}</a>
-            - {{ submission.job.budget|floatformat:2 }} ILP
+            - {{ submission.job.budget|floatformat:2 }} pesos
         </li>
         {% endfor %}
     </ul>

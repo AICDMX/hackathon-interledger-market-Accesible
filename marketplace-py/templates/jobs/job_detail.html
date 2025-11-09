@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-{% load i18n %}
+{% load i18n audio_tags %}
 
 {% block title %}{{ job.title }} - {{ block.super }}{% endblock %}
 
@@ -8,14 +8,14 @@
     {% include 'components/title_with_audio.html' with title=job.title content_object=job field_name="title" heading_tag="h1" %}
     
     <div>
-        <p><strong>{% trans 'Funder' %}:</strong> {{ job.funder.username }}</p>
+        <p><strong>{% trans 'Funder' %}:</strong> {{ job.funder.get_display_name }}</p>
         <p><strong>{% trans 'Status' %}:</strong> {{ job.get_status_display }}</p>
         <p><strong>{% trans 'Target Language' %}:</strong> {{ job.target_language }}</p>
         {% if job.target_dialect %}
             <p><strong>{% trans 'Dialect' %}:</strong> {{ job.target_dialect }}</p>
         {% endif %}
-        <p><strong>{% trans 'Amount Per Person' %}:</strong> {{ job.amount_per_person }} ILP</p>
-        <p><strong>{% trans 'Total Budget' %}:</strong> {{ job.budget }} ILP ({{ job.amount_per_person }} ? {{ job.max_responses }})</p>
+        <p><strong>{% trans 'Amount Per Person' %}:</strong> {{ job.amount_per_person }} pesos</p>
+        <p><strong>{% trans 'Total Budget' %}:</strong> {{ job.budget }} pesos ({{ job.amount_per_person }} ? {{ job.max_responses }})</p>
         
         <p><strong>{% trans 'Responses Needed' %}:</strong> 
             {{ job.get_accepted_submissions_count }} / {{ job.max_responses }} {% trans 'accepted' %}
@@ -31,7 +31,8 @@
         
         {% if job.has_reference_media %}
             <div class="card" style="margin-top: 1rem;">
-                <h3>{% trans 'Reference Media From Funder' %}</h3>
+            <div>
+                {% include 'components/static_title_with_audio.html' with title_text="Reference Media From Funder" slug="section_reference_media" heading_tag="h3" %}
                 <p class="muted-text">{% trans 'Use these examples to better understand the request.' %}</p>
                 {% if job.reference_audio %}
                     <div style="margin-bottom: 0.75rem;">
@@ -67,7 +68,7 @@
     {% if user.is_authenticated %}
         {% if user == job.funder %}
             <div>
-                <h2>{% trans 'Submissions' %}</h2>
+                {% include 'components/static_title_with_audio.html' with title_text="Submissions" slug="section_submissions" heading_tag="h2" %}
                 {% if job.submissions.all %}
                     <ul>
                         {% for submission in job.submissions.all %}
@@ -75,10 +76,19 @@
                                 <strong>{{ submission.creator.username }}</strong> - 
                                 {{ submission.get_status_display }}
                                 {% if submission.status == 'pending' %}
-                                    <a href="{% url 'jobs:accept_submission' job.pk submission.pk %}" class="btn btn-success">{% trans 'Accept' %}</a>
+                                    <div style="display: inline-flex; align-items: center; gap: 0.5rem;">
+                                        <a href="{% url 'jobs:accept_submission' job.pk submission.pk %}" class="btn btn-success">{% trans 'Accept' %}</a>
+                                        {% audio_player_static_ui "button_accept" "label" %}
+                                    </div>
                                 {% endif %}
                                 {% if submission.note %}
                                     <p>{{ submission.note }}</p>
+                                {% endif %}
+                                {% if submission.text_content %}
+                                    <div style="margin-top:0.5rem;">
+                                        <p><strong>{% trans 'Text Content' %}:</strong></p>
+                                        <div style="background-color: #f5f5f5; padding: 1rem; border-radius: 0.5rem; white-space: pre-wrap;">{{ submission.text_content }}</div>
+                                    </div>
                                 {% endif %}
                             </li>
                         {% endfor %}
@@ -87,6 +97,34 @@
                     <p>{% trans 'No submissions yet.' %}</p>
                 {% endif %}
             </div>
+            
+            {% if can_complete_contract %}
+                <div class="card" style="margin-top: 1.5rem; background-color: #f0fdf4; border: 2px solid #10b981;">
+                    {% include 'components/static_title_with_audio.html' with title_text="Complete Contract" slug="section_complete_contract" heading_tag="h2" %}
+                    <p>{% trans 'All accepted submissions have been marked as complete by workers. You can now complete the contract to release payments.' %}</p>
+                    <form method="post" action="{% url 'jobs:complete_contract' job.pk %}">
+                        {% csrf_token %}
+                        <div style="display: flex; align-items: center; gap: 0.5rem;">
+                            <button type="submit" class="btn btn-success">{% trans 'Complete Contract' %}</button>
+                            {% audio_player_static_ui "button_complete_contract" "label" %}
+                        </div>
+                    </form>
+                    <p class="text-muted" style="margin-top: 0.5rem; font-size: 0.875rem;">
+                        {% trans 'Note: Payment release functionality is coming soon.' %}
+                    </p>
+                </div>
+            {% elif job.contract_completed and job.status != 'complete' %}
+                <div class="card" style="margin-top: 1.5rem; background-color: #eff6ff; border: 2px solid #3b82f6;">
+                    <p>{% trans 'Contract has been completed. You can now mark the job as complete.' %}</p>
+                    <form method="post" action="{% url 'jobs:mark_job_completed' job.pk %}">
+                        {% csrf_token %}
+                        <div style="display: flex; align-items: center; gap: 0.5rem;">
+                            <button type="submit" class="btn btn-primary">{% trans 'Mark job completed' %}</button>
+                            {% audio_player_static_ui "button_mark_job_completed" "label" %}
+                        </div>
+                    </form>
+                </div>
+            {% endif %}
         {% else %}
             {% if job.status == 'submitting' %}
                 {% if job.has_reached_max_responses %}
@@ -95,15 +133,21 @@
                     </div>
                 {% elif user_submissions %}
                     <div class="card bg-info">
-                        <p>{% trans 'You have already submitted work for this job. You can only submit once per job.' %}</p>
+                        <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+                            <p style="margin: 0;">{% trans 'You have already submitted work for this job. You can only submit once per job.' %}</p>
+                            {% audio_player_static_ui "message_already_submitted" "label" %}
+                        </div>
                     </div>
                 {% else %}
                     <div class="card bg-success" style="margin-top: 1.5rem; padding: 1.5rem; text-align: center;">
-                        <h2 style="margin-top: 0;">{% trans 'Ready to Submit Work?' %}</h2>
+                        {% include 'components/static_title_with_audio.html' with title_text="Ready to Submit Work?" slug="section_ready_to_submit" heading_tag="h2" %}
                         <p style="margin-bottom: 1rem;">{% trans 'This job is accepting submissions. Click below to submit your work.' %}</p>
-                        <a href="{% url 'jobs:submit' job.pk %}" class="btn btn-primary" style="font-size: 1.25rem; padding: 0.75rem 2rem;">
-                            {% trans 'Submit Work for This Job' %}
-                        </a>
+                        <div style="display: flex; align-items: center; gap: 0.5rem; justify-content: center;">
+                            <a href="{% url 'jobs:submit' job.pk %}" class="btn btn-primary" style="font-size: 1.25rem; padding: 0.75rem 2rem;">
+                                {% trans 'Submit Work for This Job' %}
+                            </a>
+                            {% audio_player_static_ui "button_submit_work_for_job" "label" %}
+                        </div>
                     </div>
                 {% endif %}
             {% elif job.status == 'draft' or job.status == 'recruiting' or job.status == 'selecting' %}
@@ -117,9 +161,12 @@
                             }
                         </style>
                         <p style="margin-bottom: 1rem;">{% trans 'Submit your profile to apply for this job. The job owner will review applications and select workers.' %}</p>
-                        <a href="{% url 'jobs:apply_to_job' job.pk %}" class="btn btn-primary" style="font-size: 1.25rem; padding: 0.75rem 2rem;">
-                            {% trans 'Apply to This Job' %}
-                        </a>
+                        <div style="display: flex; align-items: center; gap: 0.5rem; justify-content: center;">
+                            <a href="{% url 'jobs:apply_to_job' job.pk %}" class="btn btn-primary" style="font-size: 1.25rem; padding: 0.75rem 2rem;">
+                                {% trans 'Apply to This Job' %}
+                            </a>
+                            {% audio_player_static_ui "button_apply_to_job" "label" %}
+                        </div>
                     </div>
                 {% endif %}
             {% elif job.status == 'reviewing' %}

@@ -51,6 +51,17 @@ class ProfileForm(forms.ModelForm):
         help_text=_('List languages you can work in (comma-separated)')
     )
     
+    pretty_name = forms.CharField(
+        label=_('Pretty Name'),
+        required=False,
+        max_length=255,
+        widget=forms.TextInput(attrs={
+            'class': 'form-control',
+            'placeholder': _('Display name shown on the site (e.g., Financiador, Creador)')
+        }),
+        help_text=_('Display name shown on the site frontend. Leave empty to use username.')
+    )
+    
     role = forms.ChoiceField(
         label=_('Role'),
         choices=User.ROLE_CHOICES,
@@ -101,7 +112,7 @@ class ProfileForm(forms.ModelForm):
     
     class Meta:
         model = User
-        fields = ['email', 'wallet_endpoint', 'preferred_language', 'native_languages', 'role', 
+        fields = ['email', 'wallet_endpoint', 'preferred_language', 'native_languages', 'pretty_name', 'role', 
                   'profile_note', 'profile_audio', 'profile_video', 'profile_image']
     
     def clean_email(self):

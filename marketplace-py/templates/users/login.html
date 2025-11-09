@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-{% load i18n %}
+{% load i18n audio_tags %}
 
 {% block title %}{% trans 'Login' %} - {{ block.super }}{% endblock %}
 
@@ -11,16 +11,19 @@
         {% csrf_token %}
         
         <div class="form-group">
-            <label for="username">{% trans 'Username' %}</label>
+            {% include 'components/form_label_with_audio.html' with label_text="Username" slug="form_username" field_id="username" %}
             <input type="text" id="username" name="username" required aria-required="true" autofocus>
         </div>
         
         <div class="form-group">
-            <label for="password">{% trans 'Password' %}</label>
+            {% include 'components/form_label_with_audio.html' with label_text="Password" slug="form_password" field_id="password" %}
             <input type="password" id="password" name="password" required aria-required="true">
         </div>
         
-        <button type="submit" class="btn btn-primary">{% trans 'Login' %}</button>
+        <div style="display: flex; align-items: center; gap: 0.5rem;">
+            <button type="submit" class="btn btn-primary">{% trans 'Login' %}</button>
+            {% audio_player_static_ui "button_login" "label" %}
+        </div>
         <p>
             {% trans 'Don\'t have an account?' %}<br>
             <a href="{% url 'users:register_creator' %}">{% trans 'Register as Job Creator' %}</a> | 
