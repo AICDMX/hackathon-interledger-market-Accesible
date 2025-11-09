@@ -1,5 +1,4 @@
 from decimal import Decimal
-import os
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
@@ -11,12 +10,10 @@ from django.views.decorators.http import require_POST
 from django.utils import timezone
 from datetime import timedelta
 from django.core.files.base import ContentFile
-from django.conf import settings
 from audio.forms import AudioContributionForm
 from .forms import JobApplicationForm
 from .models import Job, JobSubmission, JobApplication
 from .audio_support import AUDIO_SUPPORT_OPPORTUNITIES, get_audio_support_opportunity
-from .payments_utils import create_incoming_payment, start_quote
 
 
 COMMUNITY_FUND_AMOUNT = 10
@@ -229,31 +226,6 @@ def job_detail(request, pk):
         'all_accepted_complete': all_accepted_complete,
     }
     return render(request, 'jobs/job_detail.html', context)
-
-
-@login_required
-def approve_quote(request, pk: int):
-    """Kick off the Open Payments quote flow and redirect to wallet."""
-    job = get_object_or_404(Job, pk=pk, funder=request.user)
-    if not request.user.wallet_endpoint:
-        messages.error(request, _('Please add your wallet address in your profile first.'))
-        return redirect('jobs:detail', pk=job.pk)
-
-    # MVP: pay the full budget
-    amount = job.budget
-    # MVP: use a single configured seller id
-    seller_id = getattr(settings, 'PAYMENTS_SELLER_ID', os.environ.get('PAYMENTS_SELLER_ID', 'seller-mvr5656'))
-
-    result = start_quote(
-        offer_id=job.pk,
-        seller_id=seller_id,
-        buyer_wallet_address_url=request.user.wallet_endpoint,
-        amount=str(amount),
-    )
-    if result.get('success'):
-        return redirect(result['redirect_url'])
-    messages.error(request, _('Could not start payment: {error}').format(error=result.get('error', 'Unknown error')))
-    return redirect('jobs:detail', pk=job.pk)
 
 
 @login_required
@@ -1096,7 +1068,7 @@ def submit_job(request, pk):
         # If preview, redirect to preview page
         if is_preview:
             return redirect('jobs:preview_submission', pk=job.pk)
-        
+
         return redirect('jobs:detail', pk=job.pk)
     
     # Check if user has a draft submission to pre-populate the form
@@ -1113,20 +1085,20 @@ def submit_job(request, pk):
 def preview_submission(request, pk):
     """Preview a draft submission for a job."""
     job = get_object_or_404(Job, pk=pk)
-    
+
     # Check if user was selected as an applicant
     user_application = job.applications.filter(applicant=request.user, status='selected').first()
     if not user_application:
         messages.error(request, _('You must be approved as an applicant before you can preview submissions for this job.'))
         return redirect('jobs:detail', pk=job.pk)
-    
+
     # Get the user's draft submission
     draft_submission = job.submissions.filter(creator=request.user, is_draft=True).first()
-    
+
     if not draft_submission:
         messages.warning(request, _('No draft submission found. Please create a draft first.'))
         return redirect('jobs:submit', pk=job.pk)
-    
+
     context = {
         'job': job,
         'submission': draft_submission,
@@ -1193,15 +1165,15 @@ def decline_submission(request, job_pk, submission_pk):
     """Decline/reject a submission for a job."""
     job = get_object_or_404(Job, pk=job_pk, funder=request.user)
     submission = get_object_or_404(JobSubmission, pk=submission_pk, job=job)
-    
+
     if submission.status == 'rejected':
         messages.warning(request, _('This submission is already declined.'))
         return redirect('jobs:detail', pk=job.pk)
-    
+
     # Decline this submission
     submission.status = 'rejected'
     submission.save()
-    
+
     messages.success(request, _('Submission declined.'))
     return redirect('jobs:detail', pk=job.pk)
 

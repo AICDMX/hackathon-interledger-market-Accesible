@@ -12,7 +12,6 @@ urlpatterns = [
     path('<int:pk>/edit/', views.edit_job, name='edit'),
     path('<int:pk>/duplicate/', views.duplicate_job, name='duplicate'),
     path('<int:pk>/', views.job_detail, name='detail'),
-    path('<int:pk>/approve-quote/', views.approve_quote, name='approve_quote'),
     path('<int:pk>/submit/', views.submit_job, name='submit'),
     path('<int:pk>/preview-submission/', views.preview_submission, name='preview_submission'),
     path('my-jobs/', views.my_jobs, name='my_jobs'),
