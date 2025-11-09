@@ -2,7 +2,10 @@
 Template tags for audio functionality.
 """
 from django import template
+from django.conf import settings
 from django.contrib.contenttypes.models import ContentType
+from django.contrib.staticfiles.storage import staticfiles_storage
+from django.templatetags.static import static
 from audio.mixins import get_audio_for_content
 
 register = template.Library()
@@ -23,7 +26,11 @@ def audio_player(context, content_object, target_field, language_code=None):
         language_code: Optional language code (defaults to current language)
     """
     if language_code is None:
-        language_code = context.get('LANGUAGE_CODE', 'en')
+        preferred_audio = context.get('preferred_audio_language')
+        if preferred_audio:
+            language_code = preferred_audio
+        else:
+            language_code = context.get('LANGUAGE_CODE', settings.LANGUAGE_CODE)
     
     audio_snippet = get_audio_for_content(content_object, target_field, language_code)
     
@@ -34,7 +41,6 @@ def audio_player(context, content_object, target_field, language_code=None):
     fallback_path = getattr(settings, 'AUDIO_FALLBACK_FILE', 'audio/fallback.mp3')
     request = context.get('request')
     if request:
-        from django.contrib.staticfiles.storage import staticfiles_storage
         fallback_audio_url = request.build_absolute_uri(staticfiles_storage.url(fallback_path))
     else:
         fallback_audio_url = static(fallback_path)

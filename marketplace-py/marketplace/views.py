@@ -16,7 +16,13 @@ def set_language_custom(request):
         language = request.POST.get('language')
         next_url = request.POST.get('next', '/')
 
-        if language and language in dict(settings.LANGUAGES):
+        languages = dict(settings.LANGUAGES)
+        if language and language in languages:
+            preferred_audio_language = language
+            supported_ui = set(getattr(settings, 'SUPPORTED_UI_LANGUAGES', (settings.LANGUAGE_CODE,)))
+            fallback_language = getattr(settings, 'FALLBACK_TEXT_LANGUAGE', settings.LANGUAGE_CODE)
+            text_language = preferred_audio_language if preferred_audio_language in supported_ui else fallback_language
+
             # Parse next_url into components
             parsed = urlparse(next_url)
             path = parsed.path or '/'
@@ -37,10 +43,10 @@ def set_language_custom(request):
                 path_without_lang = '/' + path_without_lang
 
             # Default language shouldn't keep a prefix
-            if language == settings.LANGUAGE_CODE:
+            if text_language == settings.LANGUAGE_CODE:
                 final_path = path_without_lang
             else:
-                final_path = f'/{language}{path_without_lang}'
+                final_path = f'/{text_language}{path_without_lang}'
 
             final_url = urlunparse((
                 parsed.scheme,
@@ -51,11 +57,21 @@ def set_language_custom(request):
                 parsed.fragment,
             ))
 
-            translation.activate(language)
+            translation.activate(text_language)
             response = redirect(final_url or '/')
             response.set_cookie(
                 settings.LANGUAGE_COOKIE_NAME,
-                language,
+                text_language,
+                max_age=settings.LANGUAGE_COOKIE_AGE,
+                path=settings.LANGUAGE_COOKIE_PATH,
+                domain=settings.LANGUAGE_COOKIE_DOMAIN,
+                secure=settings.LANGUAGE_COOKIE_SECURE,
+                httponly=settings.LANGUAGE_COOKIE_HTTPONLY,
+                samesite=settings.LANGUAGE_COOKIE_SAMESITE,
+            )
+            response.set_cookie(
+                settings.PREFERRED_AUDIO_LANGUAGE_COOKIE_NAME,
+                preferred_audio_language,
                 max_age=settings.LANGUAGE_COOKIE_AGE,
                 path=settings.LANGUAGE_COOKIE_PATH,
                 domain=settings.LANGUAGE_COOKIE_DOMAIN,

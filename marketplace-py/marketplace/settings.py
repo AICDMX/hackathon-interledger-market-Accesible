@@ -71,6 +71,7 @@ TEMPLATES = [
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
                 'django.template.context_processors.i18n',  # For language switching
+                'marketplace.context_processors.language_preferences',
             ],
         },
     },
@@ -129,6 +130,11 @@ LANGUAGES = [
     ('maz', 'Mazahua'),
     ('que', 'Quechua'),
 ]
+
+# UI language rules
+SUPPORTED_UI_LANGUAGES = ('en', 'es')
+FALLBACK_TEXT_LANGUAGE = 'es'
+PREFERRED_AUDIO_LANGUAGE_COOKIE_NAME = 'preferred_audio_language'
 
 LOCALE_PATHS = [
     BASE_DIR / 'locale',

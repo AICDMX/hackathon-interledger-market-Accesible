@@ -192,7 +192,7 @@
                       data-audio-target="label"
                       data-content-type="dashboard"
                       data-object-id="job_post"
-                      data-language="{{ LANGUAGE_CODE }}"
+                      data-language="{{ preferred_audio_language|default:LANGUAGE_CODE }}"
                       data-support-url="{{ audio_target.support_url }}"
                       data-support-message="{{ audio_target.description_es }}"
                       data-support-needs-funding="{{ audio_target.needs_funding|yesno:'true,false' }}"
@@ -211,7 +211,7 @@
                       data-audio-target="label"
                       data-content-type="dashboard"
                       data-object-id="my_products"
-                      data-language="{{ LANGUAGE_CODE }}"
+                      data-language="{{ preferred_audio_language|default:LANGUAGE_CODE }}"
                       data-support-url="{{ audio_target.support_url }}"
                       data-support-message="{{ audio_target.description_es }}"
                       data-support-needs-funding="{{ audio_target.needs_funding|yesno:'true,false' }}"
@@ -230,7 +230,7 @@
                       data-audio-target="label"
                       data-content-type="dashboard"
                       data-object-id="my_money"
-                      data-language="{{ LANGUAGE_CODE }}"
+                      data-language="{{ preferred_audio_language|default:LANGUAGE_CODE }}"
                       data-support-url="{{ audio_target.support_url }}"
                       data-support-message="{{ audio_target.description_es }}"
                       data-support-needs-funding="{{ audio_target.needs_funding|yesno:'true,false' }}"
@@ -249,7 +249,7 @@
                       data-audio-target="label"
                       data-content-type="dashboard"
                       data-object-id="pending_jobs"
-                      data-language="{{ LANGUAGE_CODE }}"
+                      data-language="{{ preferred_audio_language|default:LANGUAGE_CODE }}"
                       data-support-url="{{ audio_target.support_url }}"
                       data-support-message="{{ audio_target.description_es }}"
                       data-support-needs-funding="{{ audio_target.needs_funding|yesno:'true,false' }}"
@@ -268,7 +268,7 @@
                       data-audio-target="label"
                       data-content-type="dashboard"
                       data-object-id="page_1"
-                      data-language="{{ LANGUAGE_CODE }}"
+                      data-language="{{ preferred_audio_language|default:LANGUAGE_CODE }}"
                       data-support-url="{{ audio_target.support_url }}"
                       data-support-message="{{ audio_target.description_es }}"
                       data-support-needs-funding="{{ audio_target.needs_funding|yesno:'true,false' }}"
@@ -287,7 +287,7 @@
                       data-audio-target="label"
                       data-content-type="dashboard"
                       data-object-id="page_2"
-                      data-language="{{ LANGUAGE_CODE }}"
+                      data-language="{{ preferred_audio_language|default:LANGUAGE_CODE }}"
                       data-support-url="{{ audio_target.support_url }}"
                       data-support-message="{{ audio_target.description_es }}"
                       data-support-needs-funding="{{ audio_target.needs_funding|yesno:'true,false' }}"
@@ -413,7 +413,7 @@ document.addEventListener('DOMContentLoaded', function() {
     document.querySelectorAll('.dashboard-audio-wrapper').forEach(function(wrapper) {
         const objectIdStr = wrapper.dataset.objectId;
         const targetField = wrapper.dataset.audioTarget;
-        const languageCode = wrapper.dataset.language || '{{ LANGUAGE_CODE }}';
+        const languageCode = wrapper.dataset.language || '{{ preferred_audio_language|default:LANGUAGE_CODE }}';
         
         // Create audio player button
         const audioBtn = document.createElement('button');

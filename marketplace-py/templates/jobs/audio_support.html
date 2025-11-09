@@ -1,7 +1,11 @@
 {% extends 'base.html' %}
-{% load i18n %}
+{% load i18n static %}
 
 {% block title %}{{ opportunity.title }} - {{ block.super }}{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'audio/audio-contribution.css' %}">
+{% endblock %}
 
 {% block content %}
 <section class="card" style="margin-bottom: 1.5rem;">
@@ -35,33 +39,49 @@
 
 <section class="card" id="upload-audio">
     <h2 style="margin-bottom: 0.5rem;">{% trans 'Subir audio comunitario' %}</h2>
-    <p>{% trans 'Graba un mensaje corto (menos de 30 segundos) explicando el botón y súbelo aquí. Aceptamos MP3, WAV o cualquier audio estándar.' %}</p>
+    <p>{% trans 'Graba un mensaje corto (menos de 30 segundos) explicando el botón y súbelo aquí. Puedes grabar directamente desde tu navegador o subir un archivo de audio.' %}</p>
 
-    <form method="post" enctype="multipart/form-data">
-        {% csrf_token %}
-        <input type="hidden" name="action" value="upload_audio">
-        <div class="form-group">
-            <label for="{{ contribution_form.language_code.id_for_label }}">{{ contribution_form.language_code.label }}</label>
-            {{ contribution_form.language_code }}
-            {% if contribution_form.language_code.errors %}
-                <div class="form-error">{{ contribution_form.language_code.errors }}</div>
-            {% endif %}
-        </div>
-        <div class="form-group">
-            <label for="{{ contribution_form.file.id_for_label }}">{{ contribution_form.file.label }}</label>
-            {{ contribution_form.file }}
-            {% if contribution_form.file.errors %}
-                <div class="form-error">{{ contribution_form.file.errors }}</div>
-            {% endif %}
-        </div>
-        <div class="form-group">
-            <label for="{{ contribution_form.notes.id_for_label }}">{{ contribution_form.notes.label }}</label>
-            {{ contribution_form.notes }}
-            {% if contribution_form.notes.errors %}
-                <div class="form-error">{{ contribution_form.notes.errors }}</div>
-            {% endif %}
-        </div>
-        <button type="submit" class="btn btn-primary">{% trans 'Enviar audio' %}</button>
-    </form>
+    <div id="audio-contribution-form" 
+         data-audio-contribution
+         data-target-slug="{{ opportunity.slug }}"
+         data-language-code="{{ opportunity.language_code }}"
+         data-upload-url="{% url 'audio:upload_contribution' %}"
+         data-max-duration="30000"
+         data-compression-bitrate="192000">
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="upload_audio">
+            <div class="form-group">
+                <label for="{{ contribution_form.language_code.id_for_label }}">{{ contribution_form.language_code.label }}</label>
+                {{ contribution_form.language_code }}
+                {% if contribution_form.language_code.errors %}
+                    <div class="form-error">{{ contribution_form.language_code.errors }}</div>
+                {% endif %}
+            </div>
+            <div class="form-group">
+                <label for="{{ contribution_form.file.id_for_label }}">{{ contribution_form.file.label }}</label>
+                <p class="muted-text" style="font-size: 0.875rem; margin-top: 0.25rem;">
+                    {% trans 'O graba directamente usando los controles de arriba' %}
+                </p>
+                {{ contribution_form.file }}
+                {% if contribution_form.file.errors %}
+                    <div class="form-error">{{ contribution_form.file.errors }}</div>
+                {% endif %}
+            </div>
+            <div class="form-group">
+                <label for="{{ contribution_form.notes.id_for_label }}">{{ contribution_form.notes.label }}</label>
+                {{ contribution_form.notes }}
+                {% if contribution_form.notes.errors %}
+                    <div class="form-error">{{ contribution_form.notes.errors }}</div>
+                {% endif %}
+            </div>
+            <button type="submit" class="btn btn-primary">{% trans 'Enviar audio' %}</button>
+        </form>
+    </div>
 </section>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'audio/audio-recorder.js' %}"></script>
+<script src="{% static 'audio/audio-contribution-ui.js' %}"></script>
 {% endblock %}

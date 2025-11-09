@@ -2,14 +2,17 @@
 REST API views for audio app.
 """
 from rest_framework import viewsets, status
-from rest_framework.decorators import action
+from rest_framework.decorators import action, api_view, permission_classes
 from rest_framework.response import Response
-from rest_framework.permissions import IsAuthenticatedOrReadOnly, IsAuthenticated
+from rest_framework.permissions import IsAuthenticatedOrReadOnly, IsAuthenticated, AllowAny
 from django.contrib.contenttypes.models import ContentType
 from django.shortcuts import get_object_or_404
-from django.http import FileResponse, Http404
+from django.http import FileResponse, Http404, JsonResponse
 from django.conf import settings
-from .models import AudioSnippet, AudioRequest
+from django.views.decorators.csrf import csrf_exempt
+from django.utils.decorators import method_decorator
+from django.views.decorators.http import require_http_methods
+from .models import AudioSnippet, AudioRequest, AudioContribution
 from .serializers import AudioSnippetSerializer, AudioRequestSerializer, AudioSnippetCreateSerializer
 from .mixins import get_audio_for_content
 
@@ -216,3 +219,84 @@ class AudioRequestViewSet(viewsets.ModelViewSet):
         
         serializer = self.get_serializer(audio_request)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+
+@api_view(['POST'])
+@permission_classes([AllowAny])  # Allow anonymous contributions
+def upload_audio_contribution(request):
+    """
+    Upload audio contribution (supports both file upload and browser recording).
+    Handles background uploads with keepalive support.
+    Note: CSRF protection is handled by Django middleware for form submissions,
+    but API calls from JavaScript may need CSRF token in headers.
+    """
+    if request.method != 'POST':
+        return Response(
+            {'error': 'Method not allowed'},
+            status=status.HTTP_405_METHOD_NOT_ALLOWED
+        )
+
+    # Get form data (supports both multipart/form-data and application/json)
+    audio_file = request.FILES.get('file')
+    language_code = request.POST.get('language_code', '') or request.data.get('language_code', '')
+    notes = request.POST.get('notes', '') or request.data.get('notes', '')
+    target_slug = request.POST.get('target_slug', '') or request.data.get('target_slug', '')
+    
+    # Validate required fields
+    if not audio_file:
+        return Response(
+            {'error': 'No audio file provided'},
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    
+    if not language_code:
+        return Response(
+            {'error': 'Language code is required'},
+            status=status.HTTP_400_BAD_REQUEST
+        )
+
+    # Validate file type
+    allowed_types = ['audio/webm', 'audio/ogg', 'audio/mp4', 'audio/wav', 'audio/mpeg', 'audio/mp3']
+    if audio_file.content_type not in allowed_types:
+        # Check file extension as fallback
+        file_ext = audio_file.name.split('.')[-1].lower()
+        if file_ext not in ['webm', 'ogg', 'mp4', 'wav', 'mp3', 'mpeg']:
+            return Response(
+                {'error': f'Invalid file type. Allowed: {", ".join(allowed_types)}'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+    # Validate file size (max 10MB)
+    max_size = 10 * 1024 * 1024  # 10MB
+    if audio_file.size > max_size:
+        return Response(
+            {'error': f'File too large. Maximum size: {max_size / (1024 * 1024)}MB'},
+            status=status.HTTP_400_BAD_REQUEST
+        )
+
+    try:
+        # Create audio contribution
+        contribution = AudioContribution.objects.create(
+            file=audio_file,
+            language_code=language_code,
+            notes=notes,
+            target_slug=target_slug,
+            target_label=target_slug.replace('_', ' ').title(),  # Generate label from slug
+            contributed_by=request.user if request.user.is_authenticated else None,
+            status='pending'
+        )
+
+        return Response(
+            {
+                'success': True,
+                'message': 'Audio contribution uploaded successfully',
+                'contribution_id': contribution.id,
+                'status': contribution.status
+            },
+            status=status.HTTP_201_CREATED
+        )
+    except Exception as e:
+        return Response(
+            {'error': f'Error uploading audio: {str(e)}'},
+            status=status.HTTP_500_INTERNAL_SERVER_ERROR
+        )
