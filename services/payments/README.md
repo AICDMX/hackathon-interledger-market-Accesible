@@ -143,22 +143,59 @@ Response:
 
 ## Test with curl
 
-1) Add seller:
+The `scripts/` directory contains curl-based scripts for testing each endpoint:
+
+### List all sellers
 ```bash
-bash scripts/01_add_seller.sh
+bash scripts/00_list_sellers.sh
 ```
 
-2) Start quote:
+### Add a seller
 ```bash
-bash scripts/02_start_quote.sh
+bash scripts/01_add_seller.sh <sellerId> <walletAddressUrl> <keyId> <privateKeyPath>
 ```
+
+Example:
+```bash
+bash scripts/01_add_seller.sh \
+  seller-mvr5656 \
+  https://ilp.interledger-test.dev/mvr5656 \
+  fe775339-6ebc-4eb8-a4b4-0811acba3b62 \
+  private.key
+```
+
+### Start a quote
+```bash
+bash scripts/02_start_quote.sh <offerId> <sellerId> <buyerWalletAddressUrl> <amount>
+```
+
+Example:
+```bash
+bash scripts/02_start_quote.sh \
+  offer-123 \
+  seller-mvr5656 \
+  https://ilp.interledger-test.dev/buyer \
+  100
+```
+
 Follow the printed `redirectUrl` in a browser to authenticate.
 
-3) Finish payment:
-In real flow, the wallet calls `/payments/finish`. For local testing (without a wallet), you can simulate by hitting:
+### Finish payment
+In real flow, the wallet calls `/payments/finish`. For local testing (without a wallet), you can simulate:
 ```bash
-# NOTE: This won’t actually continue the grant without a real wallet’s interact_ref/hash.
-curl -sS "http://localhost:4001/payments/finish?pendingId=REPLACE&interact_ref=TEST&hash=TEST" | jq
+bash scripts/03_finish_payment.sh <pendingId> <interact_ref> <hash>
+```
+
+Example:
+```bash
+# NOTE: This won't actually continue the grant without a real wallet's interact_ref/hash.
+bash scripts/03_finish_payment.sh 01HZZ... TEST TEST
+```
+
+### Full workflow example
+To see the complete flow with documentation:
+```bash
+bash scripts/full_workflow_example.sh
 ```
 
 ## Notes and TODOs
