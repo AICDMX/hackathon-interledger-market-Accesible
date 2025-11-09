@@ -1,8 +1,5 @@
 version: '3.8'
 
-# Note: wallet-nodejs is excluded from this docker-compose configuration
-# and will not be started when running docker-compose up
-
 services:
   web:
     build:
@@ -39,4 +36,17 @@ services:
     # For development with hot reload, uncomment below and adjust command:
     # volumes:
     #   - ./services/payments:/app
+    # command: npm run dev
+
+  wallet:
+    build: ./wallet-nodejs
+    container_name: wallet-nodejs
+    ports:
+      - "3001:3001"
+    environment:
+      - NODE_ENV=production
+      - PORT=3001
+    # For development with hot reload, uncomment below:
+    # volumes:
+    #   - ./wallet-nodejs:/app
     # command: npm run dev
