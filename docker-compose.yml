@@ -30,8 +30,13 @@ services:
       - "4001:3000"
     volumes:
       - ./services/payments/data:/app/dist/data
+      - ./services/payments/src/privates:/app/src/privates:ro
     environment:
       - PORT=3000
+      - SELLER_ID=seller-mvr5656
+      - SELLER_WALLET_ADDRESS_URL=https://ilp.interledger-test.dev/mvr5656
+      - SELLER_KEY_ID=3f722728-a2c1-44d3-add9-ad4ac3ce11b1
+      - SELLER_PRIVATE_KEY_PATH=/app/src/privates/mvr5656.key
     # For development with hot reload, uncomment below and adjust command:
     # volumes:
     #   - ./services/payments:/app

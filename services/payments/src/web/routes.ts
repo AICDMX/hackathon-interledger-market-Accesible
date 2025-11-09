@@ -7,7 +7,8 @@ import {
   getPaymentStatus,
   createIncomingPayment,
   listPendingPayments,
-  getOfferPayments
+  getOfferPayments,
+  getWalletProfile
 } from './routes_handlers';
 
 const router = express.Router();
@@ -27,6 +28,7 @@ router.get('/offers/:offerId/payments', getOfferPayments);
 
 // Django integration endpoints
 router.post('/api/payments/incoming', createIncomingPayment);
+router.post('/api/wallet/profile', getWalletProfile);
 
 export default router;
 

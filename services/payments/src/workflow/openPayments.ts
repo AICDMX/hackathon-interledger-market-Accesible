@@ -96,14 +96,20 @@ export async function requestInteractiveOutgoingGrant(client: any, authServer: s
       finish: { method: 'redirect', uri: args.finish.uri, nonce: args.finish.nonce }
     }
   });
-  if (!grant?.interact?.redirect || !grant?.interact?.finish || !grant?.cont?.access_token?.value || !grant?.cont?.uri) {
+  
+  // Debug: log the grant structure
+  console.log('[requestInteractiveOutgoingGrant] grant response:', JSON.stringify(grant, null, 2));
+  
+  // Check for required fields (note: field is 'continue', not 'cont')
+  if (!grant?.interact?.redirect || !grant?.interact?.finish || !grant?.continue?.access_token?.value || !grant?.continue?.uri) {
+    console.error('[requestInteractiveOutgoingGrant] missing fields. Grant:', grant);
     throw new Error('interactive grant response missing fields');
   }
   return {
     redirect: grant.interact.redirect as string,
     finishId: grant.interact.finish as string,
-    continueAccessToken: grant.cont.access_token.value as string,
-    continueUri: grant.cont.uri as string
+    continueAccessToken: grant.continue.access_token.value as string,
+    continueUri: grant.continue.uri as string
   };
 }
 

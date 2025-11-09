@@ -37,11 +37,14 @@ export async function startQuoteFlow(args: {
 
   // 1) Seller: grant + incoming payment
   const inToken = await requestIncomingPaymentGrant(client, sellerWallet.authServer);
+  // Convert amount to smallest unit based on asset scale (e.g., 100.00 EUR with scale 2 = 10000 cents)
+  const amountInSmallestUnit = (parseFloat(args.amount) * Math.pow(10, sellerWallet.assetScale)).toString();
   const incoming = await createIncomingPayment(client, sellerWallet.resourceServer, inToken, {
     walletAddress: sellerWallet.id,
-    value: args.amount,
+    value: amountInSmallestUnit,
     assetCode: sellerWallet.assetCode,
-    assetScale: sellerWallet.assetScale
+    assetScale: sellerWallet.assetScale,
+    description: `Payment for job ${args.offerId}`
   });
 
   // 2) Buyer: grant + quote
@@ -85,7 +88,16 @@ export async function startQuoteFlow(args: {
     status: 'pending'
   });
 
-  return { pendingId, redirectUrl: interactive.redirect };
+  return { 
+    success: true,
+    pendingId, 
+    redirectUrl: interactive.redirect,
+    paymentUrl: interactive.redirect, // Same as redirect for compatibility
+    incomingPaymentId: incoming.id,
+    quoteId: quote.id,
+    amount: args.amount,
+    assetCode: sellerWallet.assetCode
+  };
 }
 
 export async function completePayment(args: {
@@ -159,10 +171,13 @@ export async function createIncomingPaymentForJob(args: {
   // Request incoming payment grant
   const inToken = await requestIncomingPaymentGrant(client, sellerWallet.authServer);
   
+  // Convert amount to smallest unit based on asset scale
+  const amountInSmallestUnit = (parseFloat(args.amount) * Math.pow(10, sellerWallet.assetScale)).toString();
+  
   // Create incoming payment
   const incoming = await createIncomingPayment(client, sellerWallet.resourceServer, inToken, {
     walletAddress: sellerWallet.id,
-    value: args.amount,
+    value: amountInSmallestUnit,
     assetCode: sellerWallet.assetCode,
     assetScale: sellerWallet.assetScale,
     description: args.description

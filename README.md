@@ -41,7 +41,7 @@ docker compose logs -f web
 The stack exposes:
 
 - Django marketplace: http://localhost:8000 (serves UI + API, runs migrations & collectstatic on boot)
-- Payments microservice: http://localhost:4001 (Express API that mediates wallet grants/incoming payments)
+- Payments microservice: http://localhost:4001 (Express API that validates wallets and mediates payment grants)
 
 ## Service Details
 
@@ -51,8 +51,13 @@ The stack exposes:
 
 - **Node payments microservice (`services/payments`)**  
   - Wraps the `@interledger/open-payments` SDK inside an Express server.  
-  - Configure Rafiki/Open Payments credentials via environment variables (see forthcoming `.env.example`).  
-  - `npm run dev` for local TS development, `npm run build && npm start` for production, or rely on the Dockerfile baked into `docker-compose.yml`.
+  - **Validates wallet profiles** via `/api/wallet/profile` before initiating payments.
+  - Manages three test wallet profiles:
+    - `mvr5656` (Platform/Issuer) - Authenticates API calls
+    - `edutest` (Funder/Sender) - Pays for jobs
+    - `bobtest5656` (Creator/Receiver) - Receives payments
+  - Private keys stored in `src/privates/` (mounted as Docker volume).
+  - See `services/payments/README.md` for full API documentation.
 
 - **Wallet CLI helper (`wallet-nodejs`)**  
   - Standalone script (`node index.js`) that requests grants and creates incoming payments against a configured wallet address.  

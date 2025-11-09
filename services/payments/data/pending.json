@@ -1,0 +1,22 @@
+{
+  "pendings": [
+    {
+      "id": "01K9M66P3W97SZ1GWBG7ZW2NJB",
+      "offerId": "25",
+      "sellerId": "seller-mvr5656",
+      "buyerWalletAddressUrl": "https://ilp.interledger-test.dev/edutest",
+      "incomingPaymentId": "https://ilp.interledger-test.dev/f537937b-7016-481b-b655-9f0d1014822c/incoming-payments/35946b57-ae7c-49b4-adb5-cc0ed2a3e42e",
+      "quoteId": "https://ilp.interledger-test.dev/f537937b-7016-481b-b655-9f0d1014822c/quotes/e4d1588d-e5b5-46ea-9991-1c05d97285e5",
+      "interactRedirect": "https://auth.interledger-test.dev/interact/4fd0bb45-6349-4e5f-9f72-7a1bdb5b7919/13C23107E8C7B0C9?clientName=mvr5656&clientUri=https%3A%2F%2Filp.interledger-test.dev%2Fmvr5656",
+      "finishId": "13C23107E8C7B0C9",
+      "continueAccessToken": "5418E82E91176BBD0B5C",
+      "continueUri": "https://auth.interledger-test.dev/continue/283ddec8-4615-4863-b4a7-a22183cdcab0",
+      "buyer": {
+        "id": "https://ilp.interledger-test.dev/edutest",
+        "authServer": "https://auth.interledger-test.dev/f537937b-7016-481b-b655-9f0d1014822c",
+        "resourceServer": "https://ilp.interledger-test.dev/f537937b-7016-481b-b655-9f0d1014822c"
+      },
+      "status": "pending"
+    }
+  ]
+}

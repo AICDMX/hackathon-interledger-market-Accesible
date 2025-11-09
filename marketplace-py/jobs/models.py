@@ -119,6 +119,14 @@ class Job(models.Model):
         help_text=_('Interledger payment ID for contract/escrow')
     )
     
+    payment_url = models.URLField(
+        max_length=500,
+        blank=True,
+        null=True,
+        verbose_name=_('Payment URL'),
+        help_text=_('Interledger payment redirect URL for buyer to complete payment')
+    )
+    
     contract_completed = models.BooleanField(
         default=False,
         verbose_name=_('Contract Completed'),

@@ -1,5 +1,6 @@
 from decimal import Decimal
 import os
+import logging
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
@@ -16,9 +17,10 @@ from audio.forms import AudioContributionForm
 from .forms import JobApplicationForm
 from .models import Job, JobSubmission, JobApplication
 from .audio_support import AUDIO_SUPPORT_OPPORTUNITIES, get_audio_support_opportunity
-from .payments_utils import create_incoming_payment, start_quote
+from .payments_utils import create_incoming_payment, start_quote, get_wallet_profile
 
 
+logger = logging.getLogger(__name__)
 COMMUNITY_FUND_AMOUNT = 10
 
 
@@ -235,9 +237,21 @@ def job_detail(request, pk):
 def approve_quote(request, pk: int):
     """Kick off the Open Payments quote flow and redirect to wallet."""
     job = get_object_or_404(Job, pk=pk, funder=request.user)
+    
+    # Check if wallet endpoint is configured
     if not request.user.wallet_endpoint:
         messages.error(request, _('Please add your wallet address in your profile first.'))
         return redirect('jobs:detail', pk=job.pk)
+    
+    # Fetch and validate wallet profile via payments service
+    wallet_result = get_wallet_profile(request.user.wallet_endpoint)
+    if not wallet_result.get('success'):
+        error_msg = wallet_result.get('error', 'Invalid wallet address')
+        messages.error(request, _('Could not validate wallet address: {error}').format(error=error_msg))
+        return redirect('jobs:detail', pk=job.pk)
+    
+    wallet_profile = wallet_result.get('wallet')
+    logger.info(f"Validated wallet profile for {request.user.username}: {wallet_profile.get('id')}")
 
     # MVP: pay the full budget
     amount = job.budget
@@ -251,7 +265,21 @@ def approve_quote(request, pk: int):
         amount=str(amount),
     )
     if result.get('success'):
-        return redirect(result['redirect_url'])
+        # Save payment details to job
+        payment_url = result.get('payment_url', result.get('redirect_url'))
+        pending_id = result.get('pending_id')
+        
+        job.payment_url = payment_url
+        if pending_id:
+            job.payment_id = pending_id
+        job.save(update_fields=['payment_url', 'payment_id'])
+        
+        logger.info(f"Payment initiated for job {job.pk}. Payment URL: {payment_url}")
+        messages.success(request, _('Payment link generated successfully. Redirecting to payment...'))
+        
+        # Redirect to payment URL
+        return redirect(payment_url)
+    
     messages.error(request, _('Could not start payment: {error}').format(error=result.get('error', 'Unknown error')))
     return redirect('jobs:detail', pk=job.pk)
 

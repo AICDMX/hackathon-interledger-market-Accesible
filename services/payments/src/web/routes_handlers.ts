@@ -35,7 +35,17 @@ export async function startQuote(req: Request, res: Response) {
       buyerWalletAddressUrl,
       amount: String(amount)
     });
-    return res.status(200).json(result);
+    // Return enhanced response with all payment details
+    return res.status(200).json({
+      success: result.success || true,
+      redirectUrl: result.redirectUrl,
+      paymentUrl: result.paymentUrl || result.redirectUrl,
+      pendingId: result.pendingId,
+      incomingPaymentId: result.incomingPaymentId,
+      quoteId: result.quoteId,
+      amount: result.amount,
+      assetCode: result.assetCode
+    });
   } catch (err: any) {
     // eslint-disable-next-line no-console
     console.error('[startQuote] error', err);
@@ -133,6 +143,37 @@ export const createIncomingPayment = asyncHandler(async (req: Request, res: Resp
     paymentId: result.incomingPaymentId,
     payment_id: result.incomingPaymentId, // Alternative key for compatibility
     data: result
+  });
+});
+
+export const getWalletProfile = asyncHandler(async (req: Request, res: Response) => {
+  const { walletAddressUrl } = req.body;
+  
+  if (!walletAddressUrl) {
+    throw new ApiError('Required field: walletAddressUrl', 400);
+  }
+  
+  // Import the getWalletDoc function
+  const { getWalletDoc, buildSellerClient } = await import('../workflow/openPayments');
+  
+  // Get the first seller to use as authentication context
+  const sellers = await sellersRepo.list();
+  if (sellers.length === 0) {
+    throw new ApiError('No seller configured', 500);
+  }
+  
+  const seller = sellers[0];
+  const client = await buildSellerClient({
+    walletAddressUrl: seller.walletAddressUrl,
+    keyId: seller.keyId,
+    privateKeyPath: seller.privateKeyPath
+  });
+  
+  const walletDoc = await getWalletDoc(client, walletAddressUrl);
+  
+  return res.json({
+    success: true,
+    wallet: walletDoc
   });
 });
 

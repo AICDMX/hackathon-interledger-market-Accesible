@@ -7,22 +7,43 @@ Reference: Hop Sauna OpenPaymentsProcessor https://codeberg.org/whythawk/hop-sau
 ## What this service does
 
 - Stores sellers (merchant accounts) with their Open Payments credentials (wallet address URL, keyId, private key path).
+- **Validates wallet profiles** via Open Payments API before initiating payments.
 - Starts a buyer quote flow:
   - Create seller incoming payment (escrow-like)
   - Create buyer quote (receiver = seller incoming payment)
   - Request interactive outgoing-payment grant (redirect browser to wallet)
 - Completes payment when the wallet redirects to `/payments/finish`.
 
-No Django changes required. Django should call the `start` endpoint and then redirect the user to the wallet. After completion, Django can poll or listen for a webhook (webhook not implemented yet).
+Django integration validates wallet addresses via the `/api/wallet/profile` endpoint before starting the quote flow.
+
+## Wallet Profiles Setup
+
+This service uses three Interledger test wallet profiles:
+
+1. **mvr5656 (Emisor/Issuer)** - `https://ilp.interledger-test.dev/mvr5656`
+   - Role: Platform/Seller (authenticates API calls)
+   - Asset: MXN, scale 2
+   - Requires private key stored in `src/privates/AICDMX_private.key`
+
+2. **edutest (Remitente/Sender)** - `https://ilp.interledger-test.dev/edutest`
+   - Role: Funder/Buyer (pays for jobs)
+   - Asset: EUR, scale 2
+   - Assigned to funder users in Django
+
+3. **bobtest5656 (Receptor/Receiver)** - `https://ilp.interledger-test.dev/bobtest5656`
+   - Role: Creator/Worker (receives payment)
+   - Asset: EUR, scale 2
+   - Assigned to creator users in Django
 
 ## Requirements
 
 - Node 18+
 - Install dependencies:
   - `cd services/payments && npm install`
-- Open Payments test wallets for:
-  - Seller(s): merchant accounts you control (store their key material here)
-  - Buyer: the end-user’s wallet address URL (no keys stored here)
+- Private key file for the platform wallet (mvr5656) in `src/privates/AICDMX_private.key`
+- Docker volume mounts configured for:
+  - `./services/payments/data` → `/app/dist/data` (persistent storage)
+  - `./services/payments/src/privates` → `/app/src/privates:ro` (private keys, read-only)
 
 ## Configure environment
 
@@ -87,6 +108,47 @@ npm run build && npm start
 
 ## API
 
+### POST /api/wallet/profile
+
+**Validates a wallet address** by fetching its profile from the Interledger Open Payments API.
+
+This endpoint is called by Django before initiating a payment to ensure the wallet address is valid and reachable.
+
+Body:
+```json
+{
+  "walletAddressUrl": "https://ilp.interledger-test.dev/edutest"
+}
+```
+
+Response (success):
+```json
+{
+  "success": true,
+  "wallet": {
+    "id": "https://ilp.interledger-test.dev/edutest",
+    "assetCode": "EUR",
+    "assetScale": 2,
+    "authServer": "https://auth.interledger-test.dev/...",
+    "resourceServer": "https://ilp.interledger-test.dev/..."
+  }
+}
+```
+
+Response (error):
+```json
+{
+  "error": "Invalid wallet address or unreachable"
+}
+```
+
+**Example:**
+```bash
+curl -X POST http://localhost:4001/api/wallet/profile \
+  -H "Content-Type: application/json" \
+  -d '{"walletAddressUrl": "https://ilp.interledger-test.dev/edutest"}'
+```
+
 ### POST /offers/:offerId/quotes/start
 
 Start buyer flow: create seller incoming payment, buyer quote, and interactive grant redirect.
@@ -129,17 +191,45 @@ Response:
 }
 ```
 
-## Django integration (no code changes)
+## Django Integration
 
-- Offer creation UI stores:
-  - `buyerWalletAddressUrl`
-  - `amount`
-  - candidate `sellerId`s
-- “Approve quote” button:
-  - Django calls `POST /offers/:offerId/quotes/start` with `sellerId`, `buyerWalletAddressUrl`, `amount`
-  - Receive `{ redirectUrl }` and redirect the browser
-- Success page:
-  - After `/payments/finish`, you can poll a status endpoint (add later) or handle a webhook (add later).
+The Django marketplace integrates with this service through the `jobs/payments_utils.py` module.
+
+### Wallet Validation Workflow
+
+1. **User Profile Setup**:
+   - Funders set `wallet_endpoint` to their Interledger wallet URL (e.g., `https://ilp.interledger-test.dev/edutest`)
+   - Creators set `wallet_endpoint` to their wallet URL (e.g., `https://ilp.interledger-test.dev/bobtest5656`)
+
+2. **"Approve Quote & Pay" Flow** (`jobs/views.py::approve_quote`):
+   - ✅ Check if user has `wallet_endpoint` configured
+   - ✅ **Call `POST /api/wallet/profile`** to validate the wallet address
+   - ✅ If validation fails, show error and redirect back
+   - ✅ Call `POST /offers/:offerId/quotes/start` to initiate payment
+   - ✅ Redirect browser to Interledger auth page
+
+3. **Payment Completion**:
+   - After user approves in wallet, Interledger redirects to `/payments/finish`
+   - Service completes the outgoing payment
+   - Django can poll payment status (future: webhook support)
+
+### Django Helper Functions
+
+```python
+# jobs/payments_utils.py
+
+# Validate wallet profile
+get_wallet_profile(wallet_address_url)
+# Returns: {"success": True, "wallet": {...}} or {"success": False, "error": "..."}
+
+# Start payment quote
+start_quote(offer_id, seller_id, buyer_wallet_address_url, amount)
+# Returns: {"success": True, "redirect_url": "..."} or {"success": False, "error": "..."}
+
+# Create incoming payment (escrow)
+create_incoming_payment(amount, description)
+# Returns: {"success": True, "payment_id": "..."} or {"success": False, "error": "..."}
+```
 
 ## Test with curl
 
