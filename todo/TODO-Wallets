@@ -1,2 +1,13 @@
 [] click fund or auto have the wallet code. if click fund will take you to a place to do a transaction for the total amount and should show when funded.
 [] when a job is marked complete we need to take that user part from the funding and send it to their wallet.
+
+just two parts
+[] create contract
+$
+date finished
+n payments
+who
+secret key
+- store the transaction id with the transaction
+[] complete contract
+- retreive store and send the wallet to the party
