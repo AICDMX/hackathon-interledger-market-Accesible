@@ -1,24 +1,27 @@
-FROM node:20-alpine AS base
+FROM node:20-alpine AS build
 WORKDIR /app
 
-# Install production deps
-FROM base AS deps
-COPY package.json ./
-RUN npm install --omit=dev
+# Install all dependencies
+COPY package*.json ./
+RUN npm ci
 
-# Build stage with dev deps
-FROM base AS build
-COPY package.json ./
-RUN npm install
+# Build TypeScript
 COPY tsconfig.json ./
 COPY src ./src
 RUN npm run build
 
-# Runtime image
-FROM base AS runner
+# Production stage
+FROM node:20-alpine AS production
+WORKDIR /app
 ENV NODE_ENV=production
-COPY --from=deps /app/node_modules ./node_modules
+
+# Copy package files and install only production dependencies
+COPY package*.json ./
+RUN npm ci --only=production
+
+# Copy built application
 COPY --from=build /app/dist ./dist
+
 USER node
 ENV PORT=3000
 EXPOSE 3000

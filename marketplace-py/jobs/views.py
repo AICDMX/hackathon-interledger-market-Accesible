@@ -11,6 +11,7 @@ from django.views.decorators.http import require_POST
 from django.utils import timezone
 from datetime import timedelta
 from django.core.files.base import ContentFile
+from django.conf import settings
 from audio.forms import AudioContributionForm
 from .forms import JobApplicationForm
 from .models import Job, JobSubmission, JobApplication
@@ -241,7 +242,7 @@ def approve_quote(request, pk: int):
     # MVP: pay the full budget
     amount = job.budget
     # MVP: use a single configured seller id
-    seller_id = os.environ.get('PAYMENTS_SELLER_ID', 'seller-1')
+    seller_id = getattr(settings, 'PAYMENTS_SELLER_ID', os.environ.get('PAYMENTS_SELLER_ID', 'seller-mvr5656'))
 
     result = start_quote(
         offer_id=job.pk,
