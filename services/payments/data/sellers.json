@@ -4,7 +4,7 @@
       "id": "seller-mvr5656",
       "walletAddressUrl": "https://ilp.interledger-test.dev/mvr5656",
       "keyId": "fe775339-6ebc-4eb8-a4b4-0811acba3b62",
-      "privateKeyPath": "/Volumes/CrucialX6/code/website/hackathon-interledger-market-Accesible/services/payments/private.key"
+      "privateKeyPath": "/app/src/privates/AICDMX_private.key"
     }
   ]
 }

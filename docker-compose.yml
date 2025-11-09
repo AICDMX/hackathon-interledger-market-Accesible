@@ -28,6 +28,8 @@ services:
     container_name: payments-service
     ports:
       - "4001:3000"
+    volumes:
+      - ./services/payments/data:/app/dist/data
     environment:
       - PORT=3000
     # For development with hot reload, uncomment below and adjust command:
