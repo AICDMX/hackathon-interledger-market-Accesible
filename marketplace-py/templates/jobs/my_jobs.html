@@ -40,6 +40,10 @@
                 <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
                     <a href="{% url 'jobs:detail' job.pk %}" class="btn btn-primary">{% trans 'View Details' %}</a>
                     {% audio_player_static_ui "button_view_details" "label" %}
+                    {% if job.status == 'draft' %}
+                        <a href="{% url 'jobs:edit' job.pk %}" class="btn btn-primary">{% trans 'Edit' %}</a>
+                        {% audio_player_static_ui "button_edit" "label" %}
+                    {% endif %}
                     <form method="post" action="{% url 'jobs:duplicate' job.pk %}" style="display: inline;">
                         {% csrf_token %}
                         <div style="display: inline-flex; align-items: center; gap: 0.5rem;">

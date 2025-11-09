@@ -1,0 +1,106 @@
+{% extends 'base.html' %}
+{% load i18n static %}
+
+{% block title %}{% trans 'Preview Submission' %} - {{ block.super }}{% endblock %}
+
+{% block content %}
+<div class="card" style="background-color: #fff3cd; border: 2px solid #ffc107; padding: 1rem; margin-bottom: 1rem;">
+    <p style="margin: 0; font-weight: 600;">
+        ?? {% trans 'Preview Mode' %}
+    </p>
+    <p style="margin: 0.5rem 0 0 0;">
+        {% trans 'This is how your submission will appear to the job owner. This is a draft and has not been submitted yet.' %}
+    </p>
+</div>
+
+<div class="title-with-audio" style="display: flex; align-items: center; gap: 0.125rem; flex-wrap: wrap;">
+    <h1 style="margin: 0; display: flex; align-items: center; gap: 0.5rem;">
+        <span>{% trans 'Submission Preview for' %}: {{ job.title }}</span>
+        {% load audio_tags %}
+        {% audio_player job "title" %}
+    </h1>
+</div>
+
+<div class="card">
+    <h2>{% trans 'Job Details' %}</h2>
+    <p><strong>{% trans 'Target Language' %}:</strong> {{ job.target_language }}</p>
+    <p><strong>{% trans 'Budget' %}:</strong> {{ job.budget }} pesos</p>
+    <p><strong>{% trans 'Required Deliverables' %}:</strong> {{ job.get_deliverable_types_display }}</p>
+</div>
+
+<div class="card">
+    <h2>{% trans 'Your Submission' %}</h2>
+    
+    {% if submission.note %}
+        <div style="margin-bottom: 1rem;">
+            <p><strong>{% trans 'Note' %}:</strong></p>
+            <p style="white-space: pre-wrap;">{{ submission.note }}</p>
+        </div>
+    {% endif %}
+    
+    {% if submission.text_content %}
+        <div style="margin-bottom: 1rem;">
+            <p><strong>{% trans 'Text Content' %}:</strong></p>
+            <div style="background-color: #f5f5f5; padding: 1rem; border-radius: 0.5rem; white-space: pre-wrap;">{{ submission.text_content }}</div>
+        </div>
+    {% endif %}
+    
+    {% if submission.text_file %}
+        <div style="margin-bottom: 1rem;">
+            <p><strong>{% trans 'Text File' %}:</strong></p>
+            <div style="display: inline-flex; align-items: center; gap: 0.5rem;">
+                <a href="{{ submission.text_file.url }}" class="btn" target="_blank">{% trans 'View Text File' %}</a>
+                {% audio_player_static_ui "button_view_text_file" "label" %}
+            </div>
+        </div>
+    {% endif %}
+    
+    {% if submission.audio_file %}
+        <div style="margin-bottom: 1rem;">
+            <p><strong>{% trans 'Audio File' %}:</strong></p>
+            <audio controls src="{{ submission.audio_file.url }}" style="width: 100%;">
+                {% trans 'Your browser does not support the audio element.' %}
+            </audio>
+            <div style="margin-top: 0.5rem;">
+                <a href="{{ submission.audio_file.url }}" class="btn" download>{% trans 'Download Audio' %}</a>
+                {% audio_player_static_ui "button_download_audio" "label" %}
+            </div>
+        </div>
+    {% endif %}
+    
+    {% if submission.video_file %}
+        <div style="margin-bottom: 1rem;">
+            <p><strong>{% trans 'Video File' %}:</strong></p>
+            <video controls src="{{ submission.video_file.url }}" style="width: 100%; max-height: 360px;">
+                {% trans 'Your browser does not support the video element.' %}
+            </video>
+            <div style="margin-top: 0.5rem;">
+                <a href="{{ submission.video_file.url }}" class="btn" download>{% trans 'Download Video' %}</a>
+                {% audio_player_static_ui "button_download_video" "label" %}
+            </div>
+        </div>
+    {% endif %}
+    
+    {% if submission.image_file %}
+        <div style="margin-bottom: 1rem;">
+            <p><strong>{% trans 'Image File' %}:</strong></p>
+            <img src="{{ submission.image_file.url }}" alt="{% trans 'Submission image' %}" style="max-width: 100%; border-radius: 0.5rem;">
+            <div style="margin-top: 0.5rem;">
+                <a href="{{ submission.image_file.url }}" class="btn" download>{% trans 'Download Image' %}</a>
+                {% audio_player_static_ui "button_download_image" "label" %}
+            </div>
+        </div>
+    {% endif %}
+    
+    {% if not submission.note and not submission.text_content and not submission.text_file and not submission.audio_file and not submission.video_file and not submission.image_file %}
+        <p class="text-muted">{% trans 'No content submitted yet.' %}</p>
+    {% endif %}
+</div>
+
+<div style="display: flex; align-items: center; gap: 1rem; flex-wrap: wrap; margin-top: 1rem;">
+    <a href="{% url 'jobs:submit' job.pk %}" class="btn btn-primary">{% trans 'Edit Submission' %}</a>
+    {% audio_player_static_ui "button_edit_submission" "label" %}
+    <a href="{% url 'jobs:detail' job.pk %}" class="btn">{% trans 'Back to Job' %}</a>
+    {% audio_player_static_ui "button_back_to_job" "label" %}
+</div>
+{% endblock %}

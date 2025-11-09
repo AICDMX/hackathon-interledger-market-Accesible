@@ -913,7 +913,7 @@ def duplicate_job(request, pk):
     new_job.save()
     
     messages.success(request, _('Job duplicated successfully. You can now edit it.'))
-    return redirect('jobs:detail', pk=new_job.pk)
+    return redirect('jobs:edit', pk=new_job.pk)
 
 
 @login_required
@@ -1059,6 +1059,10 @@ def submit_job(request, pk):
         else:
             messages.success(request, _('Draft saved successfully! You can continue editing and submit it later.'))
         
+        # If preview, redirect to preview page
+        if is_preview:
+            return redirect('jobs:preview_submission', pk=job.pk)
+        
         return redirect('jobs:detail', pk=job.pk)
     
     # Check if user has a draft submission to pre-populate the form
@@ -1069,6 +1073,32 @@ def submit_job(request, pk):
         'draft': draft_submission,
     }
     return render(request, 'jobs/submit_job.html', context)
+
+
+@login_required
+def preview_submission(request, pk):
+    """Preview a draft submission for a job."""
+    job = get_object_or_404(Job, pk=pk)
+    
+    # Check if user was selected as an applicant
+    user_application = job.applications.filter(applicant=request.user, status='selected').first()
+    if not user_application:
+        messages.error(request, _('You must be approved as an applicant before you can preview submissions for this job.'))
+        return redirect('jobs:detail', pk=job.pk)
+    
+    # Get the user's draft submission
+    draft_submission = job.submissions.filter(creator=request.user, is_draft=True).first()
+    
+    if not draft_submission:
+        messages.warning(request, _('No draft submission found. Please create a draft first.'))
+        return redirect('jobs:submit', pk=job.pk)
+    
+    context = {
+        'job': job,
+        'submission': draft_submission,
+        'is_preview': True,
+    }
+    return render(request, 'jobs/preview_submission.html', context)
 
 
 @login_required
@@ -1125,9 +1155,26 @@ def accept_submission(request, job_pk, submission_pk):
 
 
 @login_required
+def decline_submission(request, job_pk, submission_pk):
+    """Decline/reject a submission for a job."""
+    job = get_object_or_404(Job, pk=job_pk, funder=request.user)
+    submission = get_object_or_404(JobSubmission, pk=submission_pk, job=job)
+    
+    if submission.status == 'rejected':
+        messages.warning(request, _('This submission is already declined.'))
+        return redirect('jobs:detail', pk=job.pk)
+    
+    # Decline this submission
+    submission.status = 'rejected'
+    submission.save()
+    
+    messages.success(request, _('Submission declined.'))
+    return redirect('jobs:detail', pk=job.pk)
+
+
+@login_required
 def my_products(request):
     """View user's products/services (placeholder)."""
-    # This is a placeholder for future products functionality
     context = {}
     return render(request, 'jobs/my_products.html', context)
 
@@ -1405,18 +1452,15 @@ def complete_contract(request, pk):
         return redirect('jobs:detail', pk=job.pk)
     
     # Warn if completing contract with fewer accepted submissions than requested
-    accepted_count = accepted_submissions.count()
-    if accepted_count < job.max_responses:
-        messages.warning(request, _('Warning: You are completing the contract with {accepted} accepted submission(s) out of {max} requested. Once the contract is completed, no more submissions will be accepted and you cannot get additional workers later.').format(
-            accepted=accepted_count,
-            max=job.max_responses
-        ))
+    # Note: The warning is shown via JavaScript confirmation popup in the template
+    # No need to show a message here since user already confirmed
     
-    # Mark contract as completed
+    # Mark contract as completed and mark job as complete
     job.contract_completed = True
-    job.save(update_fields=['contract_completed'])
+    job.status = 'complete'
+    job.save(update_fields=['contract_completed', 'status'])
     
-    messages.success(request, _('Contract completed! Payments will be released to workers. (Note: Payment release functionality is coming soon.)'))
+    messages.success(request, _('Contract completed! Job has been marked as complete. Payments will be released to workers. (Note: Payment release functionality is coming soon.)'))
     return redirect('jobs:detail', pk=job.pk)
 
 

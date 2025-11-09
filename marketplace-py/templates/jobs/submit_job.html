@@ -142,6 +142,8 @@
             {% audio_player_static_ui "button_submit" "label" %}
             <button type="submit" name="save_draft" class="btn" style="background-color: #6c757d; color: white;">{% trans 'Save Draft' %}</button>
             {% audio_player_static_ui "button_save_draft" "label" %}
+            <button type="submit" name="preview" class="btn" style="background-color: #17a2b8; color: white;" id="preview-btn">{% trans 'Preview' %}</button>
+            {% audio_player_static_ui "button_preview" "label" %}
             <a href="{% url 'jobs:detail' job.pk %}" class="btn">{% trans 'Cancel' %}</a>
             {% audio_player_static_ui "button_cancel" "label" %}
         </div>
@@ -152,4 +154,44 @@
 {% block extra_js %}
 <script src="{% static 'audio/audio-recorder.js' %}"></script>
 <script src="{% static 'jobs/job-submission-audio.js' %}"></script>
+<script>
+    // Handle preview button click - save as draft and open preview in new tab
+    document.getElementById('preview-btn').addEventListener('click', function(e) {
+        e.preventDefault();
+        
+        // Create a form data object
+        const form = document.getElementById('job-submission-form');
+        const formData = new FormData(form);
+        
+        // Add preview flag
+        formData.append('preview', 'preview');
+        
+        // Get preview URL
+        const previewUrl = '{% url "jobs:preview_submission" job.pk %}';
+        
+        // Submit form via fetch to save draft
+        fetch(form.action, {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-CSRFToken': formData.get('csrfmiddlewaretoken')
+            },
+            redirect: 'follow'
+        })
+        .then(response => {
+            if (response.ok || response.redirected) {
+                // Open preview page in new tab after draft is saved
+                window.open(previewUrl, '_blank');
+            } else {
+                // If there was an error, let the form submit normally to show error messages
+                form.submit();
+            }
+        })
+        .catch(error => {
+            console.error('Error saving draft for preview:', error);
+            // On error, let the form submit normally to show error messages
+            form.submit();
+        });
+    });
+</script>
 {% endblock %}

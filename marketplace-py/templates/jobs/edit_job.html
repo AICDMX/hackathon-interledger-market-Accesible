@@ -161,7 +161,7 @@
         
         <div class="form-group">
             {% include 'components/form_label_with_audio.html' with label_text="Recruit Deadline (Days)" slug="form_recruit_deadline_days" field_id="recruit_deadline_days" required=True %}
-            <input type="number" id="recruit_deadline_days" name="recruit_deadline_days" min="1" value="{{ recruit_deadline_days|default:job.recruit_deadline_days }}" required aria-required="true">
+            <input type="number" id="recruit_deadline_days" name="recruit_deadline_days" min="1" value="{{ recruit_deadline_days|default:7 }}" required aria-required="true">
             <small class="form-text text-muted">{% trans 'Number of days from now when recruiting will automatically end and move to selection phase' %}</small>
         </div>
         
@@ -179,7 +179,7 @@
         
         <div class="form-group">
             <label for="expired_date_days">{% trans 'Expired Date (Days)' %} *</label>
-            <input type="number" id="expired_date_days" name="expired_date_days" min="1" value="{{ expired_date_days|default:job.expired_date_days }}" required aria-required="true">
+            <input type="number" id="expired_date_days" name="expired_date_days" min="1" value="{{ expired_date_days|default:14 }}" required aria-required="true">
             <small class="form-text text-muted">{% trans 'Number of days from now when the job will expire if no applications (in recruiting) or no submissions (in submitting) are received. Wallet contracts expire 7 days after this date.' %}</small>
         </div>
         
