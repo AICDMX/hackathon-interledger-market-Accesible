@@ -6,12 +6,12 @@ services:
     container_name: hackathon-interledger-market
     ports:
       - "8000:8000"
-    volumes:
-      # Mount source code for development (optional - remove for production)
-      # Note: This also persists db.sqlite3, media, and staticfiles
-      - ./marketplace-py:/app
-      # Exclude .venv to avoid conflicts with container's virtual environment
-      - /app/.venv
+#    volumes:
+#      # Mount source code for development (optional - remove for production)
+#      # Note: This also persists db.sqlite3, media, and staticfiles
+#      - ./marketplace-py:/app
+#      # Exclude .venv to avoid conflicts with container's virtual environment
+#      - /app/.venv
     environment:
       - DJANGO_SETTINGS_MODULE=marketplace.settings
       - PYTHONUNBUFFERED=1
@@ -23,28 +23,3 @@ services:
         uv run python manage.py load_default_jobs &&
         uv run python manage.py runserver 0.0.0.0:8000
       "
-  payments:
-    build: ./services/payments
-    container_name: payments-service
-    ports:
-      - "4001:3000"
-    environment:
-      - PORT=3000
-    # For development with hot reload, uncomment below and adjust command:
-    # volumes:
-    #   - ./services/payments:/app
-    #   - /app/node_modules
-    # command: npm run dev
-
-  wallet:
-    build: ./wallet-nodejs
-    container_name: wallet-nodejs
-    ports:
-      - "3001:3001"
-    environment:
-      - NODE_ENV=production
-      - PORT=3001
-    # For development with hot reload, uncomment below:
-    # volumes:
-    #   - ./wallet-nodejs:/app
-    # command: npm run dev

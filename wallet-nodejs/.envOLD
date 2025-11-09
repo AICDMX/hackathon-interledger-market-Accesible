@@ -1,8 +1,0 @@
-PORT=3001
-WALLET_ADDRESS=https://ilp.interledger-test.dev/aicdmx
-KEY_ID=0227b90b-ee4d-4184-b8a9-6befcc9fa812
-PRIVATE_KEY_PATH=./private.key
-AUTH_SERVER=https://auth.interledger-test.dev/f537937b-7016-481b-b655-9f0d1014822c
-RESOURCE_SERVER=https://ilp.interledger-test.dev/f537937b-7016-481b-b655-9f0d1014822c
-ASSET_CODE=MXN
-ASSET_SCALE=2

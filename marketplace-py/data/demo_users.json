@@ -6,9 +6,12 @@
     "last_name": "Santos",
     "pretty_name": "Mar?a Santos",
     "role": "creator",
-    "preferred_language": "es",
+    "preferred_language": "otomi",
     "native_languages": "nahuatl,es",
-    "password": "demo123"
+    "password": "demo123",
+    "seller_key_id": "d7c6fdbe-c9f0-41b0-b86f-8d79877759aa",
+    "seller_private_key": "-----BEGIN PRIVATE KEY-----\nMC4CAQAwBQYDK2VwBCIEIPGTviT7rj1sYw/Y5LML3ymeZnF1wpv2ku+wEq7jTzPk\n-----END PRIVATE KEY-----",
+    "seller_wallet_address": "ilp.interledger-test.dev/get-money"
   },
   {
     "username": "carlos_otomi",
@@ -17,9 +20,12 @@
     "last_name": "Hern?ndez",
     "pretty_name": "Carlos Hern?ndez",
     "role": "creator",
-    "preferred_language": "es",
+    "preferred_language": "otomi",
     "native_languages": "otomi,es",
-    "password": "demo123"
+    "password": "demo123",
+    "seller_key_id": "d7c6fdbe-c9f0-41b0-b86f-8d79877759aa",
+    "seller_private_key": "-----BEGIN PRIVATE KEY-----\nMC4CAQAwBQYDK2VwBCIEIPGTviT7rj1sYw/Y5LML3ymeZnF1wpv2ku+wEq7jTzPk\n-----END PRIVATE KEY-----",
+    "seller_wallet_address": "ilp.interledger-test.dev/get-money"
   },
   {
     "username": "ana_quechua",
@@ -28,9 +34,12 @@
     "last_name": "Quispe",
     "pretty_name": "Ana Quispe",
     "role": "creator",
-    "preferred_language": "es",
+    "preferred_language": "otomi",
     "native_languages": "quechua,es",
-    "password": "demo123"
+    "password": "demo123",
+    "seller_key_id": "d7c6fdbe-c9f0-41b0-b86f-8d79877759aa",
+    "seller_private_key": "-----BEGIN PRIVATE KEY-----\nMC4CAQAwBQYDK2VwBCIEIPGTviT7rj1sYw/Y5LML3ymeZnF1wpv2ku+wEq7jTzPk\n-----END PRIVATE KEY-----",
+    "seller_wallet_address": "ilp.interledger-test.dev/get-money"
   },
   {
     "username": "luis_tsotsil",
@@ -39,9 +48,12 @@
     "last_name": "G?mez",
     "pretty_name": "Luis G?mez",
     "role": "creator",
-    "preferred_language": "es",
+    "preferred_language": "otomi",
     "native_languages": "tsotsil,es",
-    "password": "demo123"
+    "password": "demo123",
+    "seller_key_id": "d7c6fdbe-c9f0-41b0-b86f-8d79877759aa",
+    "seller_private_key": "-----BEGIN PRIVATE KEY-----\nMC4CAQAwBQYDK2VwBCIEIPGTviT7rj1sYw/Y5LML3ymeZnF1wpv2ku+wEq7jTzPk\n-----END PRIVATE KEY-----",
+    "seller_wallet_address": "ilp.interledger-test.dev/get-money"
   },
   {
     "username": "rosa_maya",
@@ -50,9 +62,12 @@
     "last_name": "Chan",
     "pretty_name": "Rosa Chan",
     "role": "creator",
-    "preferred_language": "es",
+    "preferred_language": "otomi",
     "native_languages": "maya,es",
-    "password": "demo123"
+    "password": "demo123",
+    "seller_key_id": "d7c6fdbe-c9f0-41b0-b86f-8d79877759aa",
+    "seller_private_key": "-----BEGIN PRIVATE KEY-----\nMC4CAQAwBQYDK2VwBCIEIPGTviT7rj1sYw/Y5LML3ymeZnF1wpv2ku+wEq7jTzPk\n-----END PRIVATE KEY-----",
+    "seller_wallet_address": "ilp.interledger-test.dev/get-money"
   },
   {
     "username": "juan_mixteco",
@@ -61,30 +76,23 @@
     "last_name": "L?pez",
     "pretty_name": "Juan L?pez",
     "role": "creator",
-    "preferred_language": "es",
+    "preferred_language": "otomi",
     "native_languages": "mixteco,es",
-    "password": "demo123"
+    "password": "demo123",
+    "seller_key_id": "d7c6fdbe-c9f0-41b0-b86f-8d79877759aa",
+    "seller_private_key": "-----BEGIN PRIVATE KEY-----\nMC4CAQAwBQYDK2VwBCIEIPGTviT7rj1sYw/Y5LML3ymeZnF1wpv2ku+wEq7jTzPk\n-----END PRIVATE KEY-----",
+    "seller_wallet_address": "ilp.interledger-test.dev/get-money"
   },
   {
-    "username": "demo_funder_1",
-    "email": "funder1@demo.local",
+    "username": "demo_funder",
+    "email": "funder@demo.local",
     "first_name": "Roberto",
     "last_name": "Mart?nez",
     "pretty_name": "Financiador Roberto",
     "role": "funder",
     "preferred_language": "es",
     "native_languages": "es",
-    "password": "demo123"
-  },
-  {
-    "username": "demo_funder_2",
-    "email": "funder2@demo.local",
-    "first_name": "Patricia",
-    "last_name": "Ram?rez",
-    "pretty_name": "Funder Patricia",
-    "role": "funder",
-    "preferred_language": "en",
-    "native_languages": "en,es",
+    "wallet_address": "ilp.interledger-test.dev/send-money",
     "password": "demo123"
   },
   {

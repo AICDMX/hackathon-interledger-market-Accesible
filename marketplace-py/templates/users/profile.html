@@ -157,6 +157,115 @@
             {% endif %}
         </div>
         
+        <!-- Creator Profile Defaults Section -->
+        <div style="margin-top: 2rem; padding-top: 1.5rem; border-top: 2px solid #e5e7eb;">
+            {% include 'components/static_title_with_audio.html' with title_text="Creator Profile Defaults" slug="section_creator_profile_defaults" heading_tag="h3" %}
+            <p class="text-muted" style="margin-bottom: 1rem;">{% trans 'These fields will be automatically filled when you apply to jobs. They are saved from your job submissions if you don\'t have them set yet.' %}</p>
+            
+            <div class="form-group">
+                {% include 'components/form_label_with_audio.html' with label_text=profile_form.profile_note.label slug="form_profile_note" field_id=profile_form.profile_note.id_for_label %}
+                {{ profile_form.profile_note }}
+                {% if profile_form.profile_note.errors %}
+                    <ul class="errorlist">
+                        {% for error in profile_form.profile_note.errors %}
+                            <li>{{ error }}</li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+                {% if profile_form.profile_note.help_text %}
+                    <small class="text-muted">{{ profile_form.profile_note.help_text }}</small>
+                {% endif %}
+            </div>
+            
+            <div class="form-group">
+                {% include 'components/form_label_with_audio.html' with label_text=profile_form.profile_audio.label slug="form_profile_audio" field_id=profile_form.profile_audio.id_for_label %}
+                <div class="audio-recording-section" data-audio-recording data-file-input-id="{{ profile_form.profile_audio.id_for_label }}">
+                    <div class="recording-controls">
+                        <button type="button" class="btn-record" id="btn-start-recording-profile-audio" aria-label="{% trans 'Start recording' %}">
+                            <span class="record-icon" aria-hidden="true">??</span>
+                            <span class="record-label">{% trans 'Record Audio' %}</span>
+                        </button>
+                        <button type="button" class="btn-retry" id="btn-retry-recording-profile-audio" style="display: none;" aria-label="{% trans 'Record again' %}">
+                            <span class="retry-icon" aria-hidden="true">??</span>
+                            <span class="retry-label">{% trans 'Record Again' %}</span>
+                        </button>
+                        <button type="button" class="btn-stop" id="btn-stop-recording-profile-audio" style="display: none;" aria-label="{% trans 'Stop recording' %}">
+                            <span class="stop-icon" aria-hidden="true">?</span>
+                            <span class="stop-label">{% trans 'Stop' %}</span>
+                        </button>
+                        <button type="button" class="btn-cancel" id="btn-cancel-recording-profile-audio" style="display: none;" aria-label="{% trans 'Cancel recording' %}">
+                            <span class="cancel-icon" aria-hidden="true">?</span>
+                            <span class="cancel-label">{% trans 'Cancel' %}</span>
+                        </button>
+                    </div>
+                    <div class="recording-status" id="recording-status-profile-audio" style="display: none;" role="status" aria-live="polite">
+                        <span class="recording-indicator" aria-hidden="true">??</span>
+                        <span class="recording-time" id="recording-time-profile-audio">0:00</span>
+                    </div>
+                    <div class="recording-preview" id="recording-preview-profile-audio" style="display: none;">
+                        <audio controls id="recording-audio-preview-profile-audio"></audio>
+                    </div>
+                </div>
+                <p class="muted-text" style="font-size: 0.875rem; margin-top: 0.5rem;">
+                    {% trans 'Or upload an audio file:' %}
+                    {% if user.profile_audio %}
+                        <br><small>{% trans 'Current profile audio:' %} <a href="{{ user.profile_audio.url }}" target="_blank">{% trans 'Listen' %}</a></small>
+                    {% endif %}
+                </p>
+                {{ profile_form.profile_audio }}
+                {% if profile_form.profile_audio.errors %}
+                    <ul class="errorlist">
+                        {% for error in profile_form.profile_audio.errors %}
+                            <li>{{ error }}</li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+                {% if profile_form.profile_audio.help_text %}
+                    <small class="text-muted">{{ profile_form.profile_audio.help_text }}</small>
+                {% endif %}
+            </div>
+            
+            <div class="form-group">
+                {% include 'components/form_label_with_audio.html' with label_text=profile_form.profile_video.label slug="form_profile_video" field_id=profile_form.profile_video.id_for_label %}
+                {{ profile_form.profile_video }}
+                {% if user.profile_video %}
+                    <p class="muted-text" style="font-size: 0.875rem; margin-top: 0.5rem;">
+                        <small>{% trans 'Current profile video:' %} <a href="{{ user.profile_video.url }}" target="_blank">{% trans 'View' %}</a></small>
+                    </p>
+                {% endif %}
+                {% if profile_form.profile_video.errors %}
+                    <ul class="errorlist">
+                        {% for error in profile_form.profile_video.errors %}
+                            <li>{{ error }}</li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+                {% if profile_form.profile_video.help_text %}
+                    <small class="text-muted">{{ profile_form.profile_video.help_text }}</small>
+                {% endif %}
+            </div>
+            
+            <div class="form-group">
+                {% include 'components/form_label_with_audio.html' with label_text=profile_form.profile_image.label slug="form_profile_image" field_id=profile_form.profile_image.id_for_label %}
+                {{ profile_form.profile_image }}
+                {% if user.profile_image %}
+                    <p class="muted-text" style="font-size: 0.875rem; margin-top: 0.5rem;">
+                        <small>{% trans 'Current profile image:' %} <a href="{{ user.profile_image.url }}" target="_blank">{% trans 'View' %}</a></small>
+                    </p>
+                {% endif %}
+                {% if profile_form.profile_image.errors %}
+                    <ul class="errorlist">
+                        {% for error in profile_form.profile_image.errors %}
+                            <li>{{ error }}</li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+                {% if profile_form.profile_image.help_text %}
+                    <small class="text-muted">{{ profile_form.profile_image.help_text }}</small>
+                {% endif %}
+            </div>
+        </div>
+        
         {% if profile_form.non_field_errors %}
             <ul class="errorlist">
                 {% for error in profile_form.non_field_errors %}

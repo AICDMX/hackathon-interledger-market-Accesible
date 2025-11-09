@@ -151,3 +151,19 @@ django.template.exceptions.TemplateSyntaxError: Invalid block tag on line 58: 'e
 [x] i see images that still have blank space instead of - can we get that fixed?
 [x] i cant see the the menu when i click on the hamburger in middl nerrow size
 [x] when i got this error it cleared all the feilds. maybe we save it first? or somehow not clear all my work, Please select at least one deliverable type.
+[x] make it so there is only one funder in demo users. add that funder to all the default jobs.
+wallet address sshould be "ilp.interledger-test.dev/send-money"
+[x] add these to all of the seller creator demo users
+seller key id 
+d7c6fdbe-c9f0-41b0-b86f-8d79877759aa
+seller private key
+-----BEGIN PRIVATE KEY-----
+MC4CAQAwBQYDK2VwBCIEIPGTviT7rj1sYw/Y5LML3ymeZnF1wpv2ku+wEq7jTzPk
+-----END PRIVATE KEY-----
+wallet address
+ilp.interledger-test.dev/get-money
+and the default language should be otomi
+[x] update the readme
+[x] create a makefile
+[x] add to profile the profile defualts that are found when doing a job for creators. we are already storeing those defaults we should make them accessable.
+[x] update the readme to include the makefile usage info.

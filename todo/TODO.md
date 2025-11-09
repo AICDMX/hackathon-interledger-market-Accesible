@@ -10,3 +10,4 @@ if wallet work is needed make sure to add it todo-wallet.md cause the wallet par
 you can break things up into more tasks in this file. but only do one task at a time. so first mark it p for in progress then create a new job with [] but dont do it. just stop at the part your doing and leave that for later. 
 
 ## jobs
+[P] we should match as many sounds as possible with the front end buttons 
