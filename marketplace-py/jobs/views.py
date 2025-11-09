@@ -3,7 +3,28 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.utils.translation import gettext_lazy as _
 from django.db.models import Q
+from django.urls import reverse
+from django.http import Http404
+from audio.forms import AudioContributionForm
 from .models import Job, JobSubmission
+from .audio_support import AUDIO_SUPPORT_OPPORTUNITIES, get_audio_support_opportunity
+
+
+COMMUNITY_FUND_AMOUNT = 10
+
+
+def _build_audio_targets():
+    targets = {}
+    for slug, opportunity in AUDIO_SUPPORT_OPPORTUNITIES.items():
+        targets[slug] = {
+            'slug': slug,
+            'title': opportunity.title,
+            'description_es': opportunity.description_es,
+            'language_code': opportunity.language_code,
+            'needs_funding': opportunity.needs_funding,
+            'support_url': reverse('jobs:audio_support', args=[slug]),
+        }
+    return targets
 
 
 def job_list(request):
@@ -237,5 +258,49 @@ def filler_page_2(request):
 @login_required
 def dashboard(request):
     """Dashboard with main navigation icons - mobile first design."""
-    context = {}
+    context = {
+        'audio_targets': _build_audio_targets(),
+        'community_fund_amount': COMMUNITY_FUND_AMOUNT,
+    }
     return render(request, 'jobs/dashboard.html', context)
+
+
+def audio_support(request, slug):
+    """Public page where the community can fund or upload missing audio."""
+    opportunity = get_audio_support_opportunity(slug)
+    if not opportunity:
+        raise Http404
+
+    contribution_form = AudioContributionForm(
+        initial={'language_code': opportunity.language_code}
+    )
+
+    if request.method == 'POST':
+        action = request.POST.get('action')
+        if action == 'upload_audio':
+            contribution_form = AudioContributionForm(request.POST, request.FILES)
+            if contribution_form.is_valid():
+                contribution = contribution_form.save(commit=False)
+                contribution.target_slug = opportunity.slug
+                contribution.target_label = opportunity.title
+                if request.user.is_authenticated:
+                    contribution.contributed_by = request.user
+                contribution.save()
+                messages.success(
+                    request,
+                    _('¡Gracias! Tu audio se subió correctamente. El equipo lo revisará antes de publicarlo.')
+                )
+                return redirect('jobs:audio_support', slug=slug)
+        elif action == 'pledge_funds':
+            messages.info(
+                request,
+                _('Gracias por tu interés en fondear este audio. Conectaremos los pagos de 10 pesos muy pronto.')
+            )
+            return redirect('jobs:audio_support', slug=slug)
+
+    context = {
+        'opportunity': opportunity,
+        'contribution_form': contribution_form,
+        'community_fund_amount': COMMUNITY_FUND_AMOUNT,
+    }
+    return render(request, 'jobs/audio_support.html', context)

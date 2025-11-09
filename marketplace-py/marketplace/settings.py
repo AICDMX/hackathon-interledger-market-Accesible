@@ -38,10 +38,12 @@ INSTALLED_APPS = [
     # Third-party apps
     'modeltranslation',
     'rosetta',
+    'rest_framework',
     
     # Local apps
     'users',
     'jobs',
+    'audio',
 ]
 
 MIDDLEWARE = [
@@ -69,6 +71,7 @@ TEMPLATES = [
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
                 'django.template.context_processors.i18n',  # For language switching
+                'marketplace.context_processors.language_preferences',
             ],
         },
     },
@@ -128,6 +131,11 @@ LANGUAGES = [
     ('que', 'Quechua'),
 ]
 
+# UI language rules
+SUPPORTED_UI_LANGUAGES = ('en', 'es')
+FALLBACK_TEXT_LANGUAGE = 'es'
+PREFERRED_AUDIO_LANGUAGE_COOKIE_NAME = 'preferred_audio_language'
+
 LOCALE_PATHS = [
     BASE_DIR / 'locale',
 ]
@@ -166,3 +174,33 @@ LOGOUT_REDIRECT_URL = '/'
 
 # Accessibility: Ensure proper ARIA labels and semantic HTML
 # This will be enforced in templates
+
+# REST Framework configuration
+REST_FRAMEWORK = {
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.IsAuthenticatedOrReadOnly',
+    ],
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+    'PAGE_SIZE': 20,
+    'DEFAULT_RENDERER_CLASSES': [
+        'rest_framework.renderers.JSONRenderer',
+        'rest_framework.renderers.BrowsableAPIRenderer',
+    ],
+}
+
+# Caching configuration (using in-memory cache for development)
+# In production, use Redis: CACHES = {'default': {'BACKEND': 'django.core.cache.backends.redis.RedisCache', 'LOCATION': 'redis://127.0.0.1:6379/1'}}
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+        'LOCATION': 'audio-cache',
+    }
+}
+
+# Audio cache timeout (in seconds)
+AUDIO_CACHE_TIMEOUT = 300  # 5 minutes
+
+# Fallback audio file path (relative to STATIC_URL)
+# This file will be used when audio snippets are not available
+# Format: MP3 is recommended for widest browser support
+AUDIO_FALLBACK_FILE = 'audio/fallback.mp3'  # Path relative to static files

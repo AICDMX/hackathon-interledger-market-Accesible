@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-{% load i18n %}
+{% load i18n static %}
 
 {% block title %}{% trans 'Dashboard' %}{% endblock %}
 
@@ -54,12 +54,23 @@
         line-height: 1;
     }
 
-    .dashboard-label {
-        font-size: 1rem;
-        font-weight: 600;
-        color: #2c3e50;
-        margin: 0;
-    }
+        .dashboard-label {
+            font-size: 1rem;
+            font-weight: 600;
+            color: #2c3e50;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        .dashboard-audio-wrapper {
+            display: inline-flex;
+            align-items: center;
+            margin-left: 0.25rem;
+        }
 
     /* Tablet and up: 3 columns */
     @media (min-width: 600px) {
@@ -119,6 +130,51 @@
             font-size: 3.5rem;
         }
     }
+
+    .audio-info-banner {
+        position: fixed;
+        bottom: 1.5rem;
+        left: 50%;
+        transform: translate(-50%, 20px);
+        background: rgba(44, 62, 80, 0.95);
+        color: #fff;
+        padding: 0.5rem 1.25rem;
+        border-radius: 999px;
+        font-size: 0.9rem;
+        box-shadow: 0 4px 14px rgba(0, 0, 0, 0.2);
+        opacity: 0;
+        pointer-events: auto;
+        transition: opacity 0.25s ease, transform 0.25s ease;
+        z-index: 1000;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+
+    .audio-info-banner.show {
+        opacity: 1;
+        transform: translate(-50%, 0);
+    }
+
+    .audio-info-action {
+        background: #f1c40f;
+        color: #2c3e50;
+        border: none;
+        border-radius: 20px;
+        padding: 0.3rem 0.9rem;
+        font-size: 0.85rem;
+        font-weight: 600;
+        text-decoration: none;
+        cursor: pointer;
+        transition: background 0.2s ease;
+        white-space: nowrap;
+    }
+
+    .audio-info-action:hover,
+    .audio-info-action:focus {
+        background: #f39c12;
+        color: #fff;
+    }
 </style>
 {% endblock %}
 
@@ -128,36 +184,326 @@
     
     <div class="dashboard-grid" role="grid" aria-label="{% trans 'Main navigation' %}">
         <a href="{% url 'jobs:create' %}" class="dashboard-icon-card" role="gridcell" aria-label="{% trans 'Post Job' %}">
-            <div class="dashboard-icon" aria-hidden="true">??</div>
-            <p class="dashboard-label">{% trans 'Job Post' %}</p>
+            <div class="dashboard-icon" aria-hidden="true">
+                <img src="/media/available%20jobs.png" alt="{% trans 'Job Post' %}" style="width: 5rem; height: 5rem; object-fit: contain;" loading="lazy" />
+            </div>
+            <p class="dashboard-label">
+                {% trans 'Job Post' %}
+                {% with audio_target=audio_targets.job_post %}
+                <span class="dashboard-audio-wrapper" 
+                      data-audio-target="label"
+                      data-content-type="dashboard"
+                      data-object-id="job_post"
+                      data-language="{{ preferred_audio_language|default:LANGUAGE_CODE }}"
+                      data-support-url="{{ audio_target.support_url }}"
+                      data-support-message="{{ audio_target.description_es }}"
+                      data-support-needs-funding="{{ audio_target.needs_funding|yesno:'true,false' }}"
+                      data-support-language="{{ audio_target.language_code }}">
+                </span>
+                {% endwith %}
+            </p>
         </a>
 
         <a href="{% url 'jobs:my_products' %}" class="dashboard-icon-card" role="gridcell" aria-label="{% trans 'My Products' %}">
             <div class="dashboard-icon" aria-hidden="true">
-                <img src="/media/my%20products.png" alt="{% trans 'My Products' %}" style="max-width: 80%; height: auto; display: block; margin: 0 auto;">
+                <img src="/media/my%20products.png" alt="{% trans 'My Products' %}" style="width: 5rem; height: 5rem; object-fit: contain;" loading="lazy" />
             </div>
-            <p class="dashboard-label">{% trans 'My Products' %}</p>
+            <p class="dashboard-label">
+                {% trans 'My Products' %}
+                {% with audio_target=audio_targets.my_products %}
+                <span class="dashboard-audio-wrapper" 
+                      data-audio-target="label"
+                      data-content-type="dashboard"
+                      data-object-id="my_products"
+                      data-language="{{ preferred_audio_language|default:LANGUAGE_CODE }}"
+                      data-support-url="{{ audio_target.support_url }}"
+                      data-support-message="{{ audio_target.description_es }}"
+                      data-support-needs-funding="{{ audio_target.needs_funding|yesno:'true,false' }}"
+                      data-support-language="{{ audio_target.language_code }}">
+                </span>
+                {% endwith %}
+            </p>
         </a>
 
         <a href="{% url 'jobs:my_money' %}" class="dashboard-icon-card" role="gridcell" aria-label="{% trans 'My Money' %}">
-            <div class="dashboard-icon" aria-hidden="true">??</div>
-            <p class="dashboard-label">{% trans 'My Money' %}</p>
+            <div class="dashboard-icon" aria-hidden="true">
+                <img src="/media/my%20money.png" alt="{% trans 'My Money' %}" style="width: 5rem; height: 5rem; object-fit: contain;" loading="lazy" />
+            </div>
+            <p class="dashboard-label">
+                {% trans 'My Money' %}
+                {% with audio_target=audio_targets.my_money %}
+                <span class="dashboard-audio-wrapper" 
+                      data-audio-target="label"
+                      data-content-type="dashboard"
+                      data-object-id="my_money"
+                      data-language="{{ preferred_audio_language|default:LANGUAGE_CODE }}"
+                      data-support-url="{{ audio_target.support_url }}"
+                      data-support-message="{{ audio_target.description_es }}"
+                      data-support-needs-funding="{{ audio_target.needs_funding|yesno:'true,false' }}"
+                      data-support-language="{{ audio_target.language_code }}">
+                </span>
+                {% endwith %}
+            </p>
         </a>
 
         <a href="{% url 'jobs:pending_jobs' %}" class="dashboard-icon-card" role="gridcell" aria-label="{% trans 'Pending Jobs' %}">
-            <div class="dashboard-icon" aria-hidden="true">?</div>
-            <p class="dashboard-label">{% trans 'My Pending to Finish Jobs' %}</p>
+            <div class="dashboard-icon" aria-hidden="true">
+                <img src="/media/my%20pending%20to%20do%20.png" alt="{% trans 'My Pending to Finish Jobs' %}" style="width: 5rem; height: 5rem; object-fit: contain;" loading="lazy" />
+            </div>
+            <p class="dashboard-label">
+                {% trans 'My Pending to Finish Jobs' %}
+                {% with audio_target=audio_targets.pending_jobs %}
+                <span class="dashboard-audio-wrapper" 
+                      data-audio-target="label"
+                      data-content-type="dashboard"
+                      data-object-id="pending_jobs"
+                      data-language="{{ preferred_audio_language|default:LANGUAGE_CODE }}"
+                      data-support-url="{{ audio_target.support_url }}"
+                      data-support-message="{{ audio_target.description_es }}"
+                      data-support-needs-funding="{{ audio_target.needs_funding|yesno:'true,false' }}"
+                      data-support-language="{{ audio_target.language_code }}">
+                </span>
+                {% endwith %}
+            </p>
         </a>
 
         <a href="{% url 'jobs:filler_1' %}" class="dashboard-icon-card" role="gridcell" aria-label="{% trans 'Page 1' %}">
-            <div class="dashboard-icon" aria-hidden="true">??</div>
-            <p class="dashboard-label">{% trans 'Page 1' %}</p>
+            <div class="dashboard-icon" aria-hidden="true">
+                <img src="/media/watch%20video.png" alt="{% trans 'Page 1' %}" style="width: 5rem; height: 5rem; object-fit: contain;" loading="lazy" />
+            </div>
+            <p class="dashboard-label">
+                {% trans 'Page 1' %}
+                {% with audio_target=audio_targets.page_1 %}
+                <span class="dashboard-audio-wrapper" 
+                      data-audio-target="label"
+                      data-content-type="dashboard"
+                      data-object-id="page_1"
+                      data-language="{{ preferred_audio_language|default:LANGUAGE_CODE }}"
+                      data-support-url="{{ audio_target.support_url }}"
+                      data-support-message="{{ audio_target.description_es }}"
+                      data-support-needs-funding="{{ audio_target.needs_funding|yesno:'true,false' }}"
+                      data-support-language="{{ audio_target.language_code }}">
+                </span>
+                {% endwith %}
+            </p>
         </a>
 
         <a href="{% url 'jobs:filler_2' %}" class="dashboard-icon-card" role="gridcell" aria-label="{% trans 'Page 2' %}">
-            <div class="dashboard-icon" aria-hidden="true">??</div>
-            <p class="dashboard-label">{% trans 'Page 2' %}</p>
+            <div class="dashboard-icon" aria-hidden="true">
+                <img src="/media/listen.png" alt="{% trans 'Page 2' %}" style="width: 5rem; height: 5rem; object-fit: contain;" loading="lazy" />
+            </div>
+            <p class="dashboard-label">
+                {% trans 'Page 2' %}
+                {% with audio_target=audio_targets.page_2 %}
+                <span class="dashboard-audio-wrapper" 
+                      data-audio-target="label"
+                      data-content-type="dashboard"
+                      data-object-id="page_2"
+                      data-language="{{ preferred_audio_language|default:LANGUAGE_CODE }}"
+                      data-support-url="{{ audio_target.support_url }}"
+                      data-support-message="{{ audio_target.description_es }}"
+                      data-support-needs-funding="{{ audio_target.needs_funding|yesno:'true,false' }}"
+                      data-support-language="{{ audio_target.language_code }}">
+                </span>
+                {% endwith %}
+            </p>
         </a>
     </div>
 </div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'audio/audio-player.js' %}"></script>
+<script>
+// Initialize audio players for dashboard items
+// Note: To use audio for dashboard items, create AudioSnippet entries in Django admin
+// You'll need a ContentType for dashboard items (or use an existing model)
+document.addEventListener('DOMContentLoaded', function() {
+    const audioMessages = {
+        error: 'No pudimos reproducir el audio. Inténtalo de nuevo o sube uno nuevo.',
+        notAvailable: 'Aún no tenemos audio para este botón.',
+        moduleMissing: 'El reproductor todavía no está listo en este dispositivo.',
+        notConfigured: 'Conecta este botón con un contenido para habilitar el audio.'
+    };
+    const fallbackAudioUrl = '{% static "audio/fallback.mp3" %}';
+    const defaultFundAmount = {{ community_fund_amount|default:10 }};
+
+    const audioInfoBanner = document.createElement('div');
+    audioInfoBanner.className = 'audio-info-banner';
+    audioInfoBanner.setAttribute('role', 'status');
+    audioInfoBanner.setAttribute('aria-live', 'polite');
+    audioInfoBanner.setAttribute('aria-atomic', 'true');
+    document.body.appendChild(audioInfoBanner);
+
+    let audioInfoTimeoutId = null;
+    let fallbackAudioInstance = null;
+    function showAudioMessage(message, options = {}) {
+        const { actions = [], playFallback } = options;
+        audioInfoBanner.innerHTML = '';
+        const textSpan = document.createElement('span');
+        textSpan.textContent = message;
+        audioInfoBanner.appendChild(textSpan);
+
+        actions.forEach(action => {
+            if (!action.url) {
+                return;
+            }
+            const actionLink = document.createElement('a');
+            actionLink.className = 'audio-info-action';
+            actionLink.href = action.url;
+            actionLink.textContent = action.label || 'Ver';
+            actionLink.setAttribute('role', 'button');
+            if (action.target) {
+                actionLink.target = action.target;
+                if (action.target === '_blank') {
+                    actionLink.rel = 'noopener noreferrer';
+                }
+            }
+            audioInfoBanner.appendChild(actionLink);
+        });
+
+        audioInfoBanner.classList.add('show');
+        if (audioInfoTimeoutId) {
+            clearTimeout(audioInfoTimeoutId);
+        }
+        audioInfoTimeoutId = setTimeout(function() {
+            audioInfoBanner.classList.remove('show');
+        }, 3500);
+
+        if (playFallback) {
+            playFallbackAudio();
+        }
+    }
+
+    function playFallbackAudio() {
+        if (!fallbackAudioUrl) {
+            return;
+        }
+        if (!fallbackAudioInstance) {
+            fallbackAudioInstance = new Audio(fallbackAudioUrl);
+        }
+        fallbackAudioInstance.currentTime = 0;
+        fallbackAudioInstance.play().catch(() => {});
+    }
+
+    function buildSupportActions(wrapper) {
+        if (!wrapper) {
+            return [];
+        }
+        const supportUrl = wrapper.dataset.supportUrl;
+        if (!supportUrl) {
+            return [];
+        }
+        const needsFunding = wrapper.dataset.supportNeedsFunding === 'true';
+        const actions = [{
+            label: 'Subir audio',
+            url: `${supportUrl}#upload-audio`,
+        }];
+        if (needsFunding) {
+            actions.unshift({
+                label: `Fondear (${defaultFundAmount} pesos)`,
+                url: `${supportUrl}#funding`,
+            });
+        }
+        return actions;
+    }
+
+    function showSupportBanner(wrapper, options = {}) {
+        const { message, playFallback = true } = options;
+        const finalMessage = message || (wrapper && wrapper.dataset.supportMessage) || audioMessages.notAvailable;
+        const actions = buildSupportActions(wrapper);
+        showAudioMessage(finalMessage, {
+            actions,
+            playFallback,
+        });
+    }
+
+    // These will be populated once you set up ContentType IDs
+    // You can find ContentType IDs in Django admin under Content Types
+    // For now, we'll create buttons that will work once audio is set up
+    
+    document.querySelectorAll('.dashboard-audio-wrapper').forEach(function(wrapper) {
+        const objectIdStr = wrapper.dataset.objectId;
+        const targetField = wrapper.dataset.audioTarget;
+        const languageCode = wrapper.dataset.language || '{{ preferred_audio_language|default:LANGUAGE_CODE }}';
+        
+        // Create audio player button
+        const audioBtn = document.createElement('button');
+        audioBtn.className = 'audio-play-btn';
+        audioBtn.style.cssText = 'display: inline-flex; align-items: center; gap: 0.25rem; padding: 0.25rem 0.5rem; background-color: #3498db; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 0.875rem; transition: background-color 0.2s;';
+        audioBtn.innerHTML = '<span aria-hidden="true">🔊</span><span class="audio-label">{% trans "Listen" %}</span>';
+        audioBtn.setAttribute('aria-label', '{% trans "Play audio" %}');
+        
+        // Store data attributes for API calls
+        wrapper.dataset.contentTypeId = ''; // Will be set when ContentType is created
+        wrapper.dataset.objectIdNum = objectIdStr;
+        
+        audioBtn.onclick = function(e) {
+            e.stopPropagation(); // Prevent link navigation
+            e.preventDefault();
+            
+            // Try to use the audio player module if available
+            if (window.audioPlayerModule) {
+                // The audio player module will handle loading audio via API
+                // For now, show that audio can be added via admin
+                const contentTypeId = wrapper.dataset.contentTypeId;
+                if (contentTypeId) {
+                    // Try to load audio via API
+                    const apiUrl = `/api/audio/snippets/get/${contentTypeId}/${objectIdStr}/${targetField}/${languageCode}/`;
+                    fetch(apiUrl)
+                        .then(response => {
+                            if (response.ok) {
+                                return response.json();
+                            }
+                            return null;
+                        })
+                        .then(data => {
+                            if (data && data.audio_url) {
+                                // Audio exists - play it
+                                const audio = new Audio(data.audio_url);
+                                audio.play().catch(() => {
+                                    // If main audio fails, try fallback
+                                    if (data.fallback_audio_url) {
+                                        const fallbackAudio = new Audio(data.fallback_audio_url);
+                                        fallbackAudio.play().catch(() => {
+                                            showSupportBanner(wrapper);
+                                        });
+                                    } else {
+                                        showSupportBanner(wrapper);
+                                    }
+                                });
+                            } else if (data && data.fallback_audio_url) {
+                                // Use fallback audio
+                                const fallbackAudio = new Audio(data.fallback_audio_url);
+                                fallbackAudio.play().catch(() => {
+                                    showSupportBanner(wrapper);
+                                });
+                            } else {
+                                // No audio - show request option
+                                showSupportBanner(wrapper);
+                            }
+                        })
+                        .catch(() => {
+                            // Try fallback on network error
+                            if (fallbackAudioUrl) {
+                                const fallbackAudio = new Audio(fallbackAudioUrl);
+                                fallbackAudio.play().catch(() => {
+                                    showSupportBanner(wrapper);
+                                });
+                            } else {
+                                showSupportBanner(wrapper);
+                            }
+                        });
+                } else {
+                    showSupportBanner(wrapper);
+                }
+            } else {
+                showSupportBanner(wrapper, { message: audioMessages.moduleMissing });
+            }
+        };
+        
+        wrapper.appendChild(audioBtn);
+    });
+});
+</script>
 {% endblock %}

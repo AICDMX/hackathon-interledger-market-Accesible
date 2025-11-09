@@ -15,7 +15,7 @@ ENV PATH="/app/.venv/bin:$PATH"
 COPY pyproject.toml uv.lock ./
 
 # Install dependencies (checkpoint 2: expensive step, cached unless pyproject.toml/uv.lock change)
-RUN uv sync --frozen
+RUN uv sync --frozen --no-install-project
 
 # Create directories for media and static files (checkpoint 3: static directories)
 RUN mkdir -p /app/media /app/staticfiles /app/locale
@@ -27,5 +27,5 @@ COPY . ./
 # Expose port
 EXPOSE 8000
 
-# Run migrations and start server
-CMD ["sh", "-c", "uv run python manage.py migrate --noinput && uv run python manage.py collectstatic --noinput && uv run python manage.py runserver 0.0.0.0:8000"]
+# Run migrations/collectstatic, then launch production-ready gunicorn
+CMD ["sh", "-c", "python manage.py migrate --noinput && python manage.py collectstatic --noinput && gunicorn marketplace.wsgi:application --bind 0.0.0.0:8000"]
