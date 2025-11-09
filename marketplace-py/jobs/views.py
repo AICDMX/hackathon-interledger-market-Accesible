@@ -155,16 +155,54 @@ def job_detail(request, pk):
     
     # Add helper data for contract completion if user is job owner
     can_complete_contract = False
+    applications = None
+    selected_count = 0
+    can_start_contract = False
+    show_start_contract_button = False
+    show_complete_contract_button = False
+    show_cancel_contract_button = False
+    accepted_submissions_count = 0
+    all_accepted_complete = False
+    
     if request.user.is_authenticated and request.user == job.funder:
         accepted_submissions = job.submissions.filter(status='accepted')
-        all_accepted_complete = accepted_submissions.exists() and all(
-            sub.is_complete for sub in accepted_submissions
-        )
+        accepted_submissions_count = accepted_submissions.count()
+        # All accepted submissions are automatically marked as complete when accepted
+        # So if there are accepted submissions, they're all complete
+        all_accepted_complete = accepted_submissions_count > 0
         can_complete_contract = (
             job.status == 'reviewing' and
             accepted_submissions.exists() and
             all_accepted_complete and
             not job.contract_completed
+        )
+        
+        # Show complete contract button if job is in reviewing state and has accepted submissions
+        show_complete_contract_button = (
+            job.status == 'reviewing' and
+            accepted_submissions.exists() and
+            not job.contract_completed
+        )
+        
+        # Show cancel contract button if job is in an active state (not completed or canceled)
+        show_cancel_contract_button = (
+            job.status not in ['complete', 'canceled', 'expired']
+        )
+        
+        # Get applications for job owner
+        applications = job.applications.select_related('applicant').order_by('-created_at')
+        selected_count = applications.filter(status='selected').count()
+        
+        # Can start contract if job is in selecting or recruiting state and at least one application is selected
+        can_start_contract = (
+            (job.status == 'selecting' or job.status == 'recruiting') and
+            selected_count > 0
+        )
+        
+        # Show start contract button if job is in selecting state, or in recruiting state with approved applications
+        show_start_contract_button = (
+            job.status == 'selecting' or 
+            (job.status == 'recruiting' and selected_count > 0)
         )
     
     context = {
@@ -172,6 +210,14 @@ def job_detail(request, pk):
         'user_submissions': user_submissions,
         'user_application': user_application,
         'can_complete_contract': can_complete_contract,
+        'applications': applications,
+        'selected_count': selected_count,
+        'can_start_contract': can_start_contract,
+        'show_start_contract_button': show_start_contract_button,
+        'show_complete_contract_button': show_complete_contract_button,
+        'show_cancel_contract_button': show_cancel_contract_button,
+        'accepted_submissions_count': accepted_submissions_count,
+        'all_accepted_complete': all_accepted_complete,
     }
     return render(request, 'jobs/job_detail.html', context)
 
@@ -235,13 +281,20 @@ def job_owner_dashboard(request):
 
 @login_required
 def accepted_jobs(request):
-    """View jobs where user's submissions were accepted."""
+    """View all user's job activity: applications and accepted submissions."""
+    # Get user's applications (pending, selected, rejected)
+    applications = JobApplication.objects.filter(
+        applicant=request.user
+    ).select_related('job').order_by('-created_at')
+    
+    # Get user's accepted submissions
     accepted_submissions = JobSubmission.objects.filter(
         creator=request.user,
         status='accepted'
     ).select_related('job').order_by('-created_at')
     
     context = {
+        'applications': applications,
         'accepted_submissions': accepted_submissions,
     }
     return render(request, 'jobs/accepted_jobs.html', context)
@@ -268,6 +321,7 @@ def create_job(request):
         submit_limit = request.POST.get('submit_limit', '10')
         submit_deadline_days = request.POST.get('submit_deadline_days', '7')
         expired_date_days = request.POST.get('expired_date_days', '14')
+        title_audio = request.FILES.get('title_audio')
         reference_audio = request.FILES.get('reference_audio')
         reference_video = request.FILES.get('reference_video')
         reference_image = request.FILES.get('reference_image')
@@ -785,6 +839,84 @@ def edit_job(request, pk):
 
 
 @login_required
+@require_POST
+def duplicate_job(request, pk):
+    """Duplicate an existing job."""
+    original_job = get_object_or_404(Job, pk=pk, funder=request.user)
+    
+    # Create a copy of the job
+    # Get all field values from the original job
+    new_job = Job(
+        title=f"{original_job.title} (Copy)",
+        description=original_job.description,
+        target_language=original_job.target_language,
+        target_dialect=original_job.target_dialect,
+        deliverable_types=original_job.deliverable_types,
+        amount_per_person=original_job.amount_per_person,
+        budget=original_job.budget,
+        funder=request.user,
+        status='draft',  # Always start as draft
+        max_responses=original_job.max_responses,
+        recruit_limit=original_job.recruit_limit,
+        submit_limit=original_job.submit_limit,
+        submit_deadline_days=original_job.submit_deadline_days,
+        # Reset these fields
+        payment_id='',
+        contract_completed=False,
+        recruit_deadline=None,  # Will be set on save
+        submit_deadline=None,
+        expired_date=None,  # Will be set on save
+    )
+    
+    # Save the new job first (this will set default deadlines)
+    new_job.save()
+    
+    # Copy file fields if they exist (must be done after save)
+    # Use Django's File wrapper to properly copy file content
+    from django.core.files import File
+    import os
+    
+    if original_job.title_audio:
+        original_job.title_audio.open('rb')
+        new_job.title_audio.save(
+            os.path.basename(original_job.title_audio.name),
+            File(original_job.title_audio),
+            save=False
+        )
+        original_job.title_audio.close()
+    if original_job.reference_audio:
+        original_job.reference_audio.open('rb')
+        new_job.reference_audio.save(
+            os.path.basename(original_job.reference_audio.name),
+            File(original_job.reference_audio),
+            save=False
+        )
+        original_job.reference_audio.close()
+    if original_job.reference_video:
+        original_job.reference_video.open('rb')
+        new_job.reference_video.save(
+            os.path.basename(original_job.reference_video.name),
+            File(original_job.reference_video),
+            save=False
+        )
+        original_job.reference_video.close()
+    if original_job.reference_image:
+        original_job.reference_image.open('rb')
+        new_job.reference_image.save(
+            os.path.basename(original_job.reference_image.name),
+            File(original_job.reference_image),
+            save=False
+        )
+        original_job.reference_image.close()
+    
+    # Save again to persist file fields
+    new_job.save()
+    
+    messages.success(request, _('Job duplicated successfully. You can now edit it.'))
+    return redirect('jobs:detail', pk=new_job.pk)
+
+
+@login_required
 def submit_job(request, pk):
     """Submit work for a job."""
     job = get_object_or_404(Job, pk=pk)
@@ -802,7 +934,7 @@ def submit_job(request, pk):
     # Check if user was selected as an applicant
     user_application = job.applications.filter(applicant=request.user, status='selected').first()
     if not user_application:
-        messages.error(request, _('You must be selected as an applicant before you can submit work for this job.'))
+        messages.error(request, _('You must be approved as an applicant before you can submit work for this job.'))
         return redirect('jobs:detail', pk=job.pk)
     
     # Check if submit limit or deadline has been reached
@@ -810,13 +942,16 @@ def submit_job(request, pk):
         messages.error(request, _('This job has reached its submission limit or deadline. Submissions are no longer being accepted.'))
         return redirect('jobs:detail', pk=job.pk)
     
-    # Check if user has already submitted to this job
-    existing_submission = job.submissions.filter(creator=request.user).first()
+    # Check if user has already submitted to this job (non-draft submissions)
+    existing_submission = job.submissions.filter(creator=request.user, is_draft=False).first()
     if existing_submission:
         messages.error(request, _('You have already submitted work for this job. You can only submit once per job.'))
         return redirect('jobs:detail', pk=job.pk)
     
-    # Check if job has reached max responses
+    # Check if user has a draft submission
+    draft_submission = job.submissions.filter(creator=request.user, is_draft=True).first()
+    
+    # Check if job has reached max responses (only count non-draft submissions)
     if job.has_reached_max_responses():
         messages.error(request, _('This job has reached its maximum number of responses ({max}). No more submissions are being accepted.').format(max=job.max_responses))
         return redirect('jobs:detail', pk=job.pk)
@@ -824,11 +959,20 @@ def submit_job(request, pk):
     if request.method == 'POST':
         note = request.POST.get('note', '')
         
-        submission = JobSubmission.objects.create(
-            job=job,
-            creator=request.user,
-            note=note
-        )
+        # Check if this is a draft save or final submit
+        is_draft = 'save_draft' in request.POST
+        
+        # Use existing draft if available, otherwise create new submission
+        if draft_submission:
+            submission = draft_submission
+            submission.note = note
+        else:
+            submission = JobSubmission.objects.create(
+                job=job,
+                creator=request.user,
+                note=note,
+                is_draft=is_draft
+            )
         
         # Handle file uploads
         deliverable_types = job.get_deliverable_types_list()
@@ -846,69 +990,85 @@ def submit_job(request, pk):
         if 'image' in deliverable_types and 'image_file' in request.FILES:
             submission.image_file = request.FILES['image_file']
         
+        # Set is_draft flag
+        submission.is_draft = is_draft
+        
         submission.save()
         
         # Refresh submission to ensure files are saved
         submission.refresh_from_db()
         
-        # If user doesn't have profile defaults set, save submission values as defaults
-        user = request.user
-        profile_updated = False
-        
-        # Save note as profile_note if profile_note is empty
-        if note and not user.profile_note:
-            user.profile_note = note
-            profile_updated = True
-        
-        # Save files as profile defaults if they're empty
-        # Copy files explicitly to ensure they're saved to profile upload paths
-        # Use request.FILES directly for better efficiency and reliability
-        try:
-            if 'audio' in deliverable_types and 'audio_file' in request.FILES and not user.profile_audio:
-                audio_file = request.FILES['audio_file']
-                user.profile_audio.save(
-                    audio_file.name,
-                    ContentFile(audio_file.read()),
-                    save=False
-                )
+        # Only save profile defaults and trigger status transitions for final submissions (not drafts)
+        if not is_draft:
+            # If user doesn't have profile defaults set, save submission values as defaults
+            user = request.user
+            profile_updated = False
+            
+            # Save note as profile_note if profile_note is empty
+            if note and not user.profile_note:
+                user.profile_note = note
                 profile_updated = True
             
-            if 'video' in deliverable_types and 'video_file' in request.FILES and not user.profile_video:
-                video_file = request.FILES['video_file']
-                user.profile_video.save(
-                    video_file.name,
-                    ContentFile(video_file.read()),
-                    save=False
-                )
-                profile_updated = True
+            # Save files as profile defaults if they're empty
+            # Copy files explicitly to ensure they're saved to profile upload paths
+            # Use request.FILES directly for better efficiency and reliability
+            try:
+                if 'audio' in deliverable_types and 'audio_file' in request.FILES and not user.profile_audio:
+                    audio_file = request.FILES['audio_file']
+                    user.profile_audio.save(
+                        audio_file.name,
+                        ContentFile(audio_file.read()),
+                        save=False
+                    )
+                    profile_updated = True
+                
+                if 'video' in deliverable_types and 'video_file' in request.FILES and not user.profile_video:
+                    video_file = request.FILES['video_file']
+                    user.profile_video.save(
+                        video_file.name,
+                        ContentFile(video_file.read()),
+                        save=False
+                    )
+                    profile_updated = True
+                
+                if 'image' in deliverable_types and 'image_file' in request.FILES and not user.profile_image:
+                    image_file = request.FILES['image_file']
+                    user.profile_image.save(
+                        image_file.name,
+                        ContentFile(image_file.read()),
+                        save=False
+                    )
+                    profile_updated = True
+            except Exception as e:
+                # Log error but don't fail the submission
+                logger = logging.getLogger(__name__)
+                logger.warning(f"Error saving profile defaults: {e}")
             
-            if 'image' in deliverable_types and 'image_file' in request.FILES and not user.profile_image:
-                image_file = request.FILES['image_file']
-                user.profile_image.save(
-                    image_file.name,
-                    ContentFile(image_file.read()),
-                    save=False
-                )
-                profile_updated = True
-        except Exception as e:
-            # Log error but don't fail the submission
-            logger = logging.getLogger(__name__)
-            logger.warning(f"Error saving profile defaults: {e}")
+            if profile_updated:
+                user.save()
+            
+            # Refresh job to check if it should transition to reviewing
+            # Need to refresh to get updated submission count
+            # Note: should_transition_to_reviewing only counts non-draft submissions
+            job.refresh_from_db()
+            if job.should_transition_to_reviewing():
+                job.status = 'reviewing'
+                job.save(update_fields=['status'])
+            
+            messages.success(request, _('Submission created successfully!'))
+        else:
+            messages.success(request, _('Draft saved successfully! You can continue editing and submit it later.'))
         
-        if profile_updated:
-            user.save()
-        
-        # Refresh job to check if it should transition to reviewing
-        # Need to refresh to get updated submission count
-        job.refresh_from_db()
-        if job.should_transition_to_reviewing():
-            job.status = 'reviewing'
-            job.save(update_fields=['status'])
-        
-        messages.success(request, _('Submission created successfully!'))
         return redirect('jobs:detail', pk=job.pk)
     
-    return render(request, 'jobs/submit_job.html', {'job': job})
+    # Check if user has a draft submission to pre-populate the form
+    draft_submission = job.submissions.filter(creator=request.user, is_draft=True).first()
+    
+    context = {
+        'job': job,
+        'draft': draft_submission,
+    }
+    return render(request, 'jobs/submit_job.html', context)
 
 
 @login_required
@@ -933,6 +1093,10 @@ def accept_submission(request, job_pk, submission_pk):
     
     # Accept this submission
     submission.status = 'accepted'
+    # Auto-mark as complete when accepted - submitting work IS completing the work
+    from django.utils import timezone
+    submission.is_complete = True
+    submission.completed_at = timezone.now()
     submission.save()
     
     # Update job status based on progress
@@ -943,8 +1107,8 @@ def accept_submission(request, job_pk, submission_pk):
     if job.status == 'submitting':
         # First submission received, move to reviewing
         new_status = 'reviewing'
-    elif job.status != 'reviewing' and job.submissions.filter(status='pending').exists():
-        # If we have pending submissions and job is not already reviewing, move to reviewing
+    elif job.status != 'reviewing' and job.submissions.filter(status='pending', is_draft=False).exists():
+        # If we have pending submissions (non-draft) and job is not already reviewing, move to reviewing
         new_status = 'reviewing'
     # Note: We intentionally do NOT transition to 'complete' here, even if max_responses is reached.
     # The job stays in 'reviewing' until workers mark their work complete and job owner confirms.
@@ -1068,12 +1232,8 @@ def mark_job_completed(request, pk):
         messages.warning(request, _('You must complete the contract before marking the job as complete.'))
         return redirect('jobs:owner_dashboard')
     
-    # Check that all accepted submissions have been marked as complete by workers
-    incomplete_submissions = accepted_submissions.filter(is_complete=False)
-    if incomplete_submissions.exists():
-        incomplete_count = incomplete_submissions.count()
-        messages.warning(request, _('Cannot complete job: {count} accepted submission(s) have not been marked as complete by the workers yet.').format(count=incomplete_count))
-        return redirect('jobs:owner_dashboard')
+    # All accepted submissions are automatically marked as complete when accepted
+    # No need to check for incomplete submissions
     
     job.status = 'complete'
     job.save(update_fields=['status'])
@@ -1162,10 +1322,10 @@ def select_application(request, job_pk, application_pk):
     application = get_object_or_404(JobApplication, pk=application_pk, job=job)
     
     action = request.POST.get('action')
-    if action == 'select':
+    if action == 'select' or action == 'approve':
         application.status = 'selected'
         application.save()
-        messages.success(request, _('Application selected.'))
+        messages.success(request, _('Application approved.'))
     elif action == 'reject':
         application.status = 'rejected'
         application.save()
@@ -1175,34 +1335,37 @@ def select_application(request, job_pk, application_pk):
         application.save()
         messages.success(request, _('Application status reset to pending.'))
     
-    return redirect('jobs:view_applications', pk=job.pk)
+    # Redirect to job detail page (where applications are now shown)
+    return redirect('jobs:detail', pk=job.pk)
 
 
 @login_required
 @require_POST
 def pre_approve_payments(request, pk):
     """Stub for pre-approved payments - button that doesn't work yet.
-    When called, transitions job from selecting to submitting state."""
+    When called, transitions job from selecting to submitting state.
+    After this, no more applications will be accepted."""
     job = get_object_or_404(Job, pk=pk, funder=request.user)
     
     selected_applications = job.applications.filter(status='selected')
     
     if not selected_applications.exists():
-        messages.warning(request, _('You need to select at least one applicant before creating pre-approved payments.'))
-        return redirect('jobs:view_applications', pk=job.pk)
+        messages.warning(request, _('You need to approve at least one applicant before starting the contract.'))
+        return redirect('jobs:detail', pk=job.pk)
     
-    # Transition job from selecting to submitting state
-    if job.status == 'selecting':
+    # Transition job from selecting or recruiting to submitting state
+    if job.status == 'selecting' or job.status == 'recruiting':
         job.status = 'submitting'
         job.save(update_fields=['status'])
-        messages.success(request, _('Job moved to submitting phase. Selected workers can now submit their work.'))
+        selected_count = selected_applications.count()
+        messages.success(request, _('Contract started! The job is now in submitting phase. {count} approved worker(s) can now submit their work. No more applications will be accepted.').format(count=selected_count))
     elif job.status != 'submitting':
-        messages.warning(request, _('Job must be in selecting state to create pre-approved payments.'))
-        return redirect('jobs:view_applications', pk=job.pk)
+        messages.warning(request, _('Job must be in selecting or recruiting state to start the contract.'))
+        return redirect('jobs:detail', pk=job.pk)
     
     # TODO: Implement actual pre-approved payment logic
-    messages.info(request, _('Pre-approved payment functionality is coming soon. This will allow you to create payment authorizations for selected workers.'))
-    return redirect('jobs:view_applications', pk=job.pk)
+    messages.info(request, _('Pre-approved payment functionality is coming soon. This will allow you to create payment authorizations for approved workers.'))
+    return redirect('jobs:detail', pk=job.pk)
 
 
 @login_required
@@ -1234,33 +1397,50 @@ def complete_contract(request, pk):
     
     if job.contract_completed:
         messages.info(request, _('Contract has already been completed.'))
-        return redirect('jobs:owner_dashboard')
+        return redirect('jobs:detail', pk=job.pk)
     
     accepted_submissions = job.submissions.filter(status='accepted')
     if accepted_submissions.count() == 0:
         messages.warning(request, _('You need at least one accepted submission before completing the contract.'))
-        return redirect('jobs:owner_dashboard')
+        return redirect('jobs:detail', pk=job.pk)
     
-    # Check that all accepted submissions have been marked as complete by workers
-    incomplete_submissions = accepted_submissions.filter(is_complete=False)
-    if incomplete_submissions.exists():
-        incomplete_count = incomplete_submissions.count()
-        messages.warning(request, _('Cannot complete contract: {count} accepted submission(s) have not been marked as complete by the workers yet.').format(count=incomplete_count))
-        return redirect('jobs:owner_dashboard')
+    # Warn if completing contract with fewer accepted submissions than requested
+    accepted_count = accepted_submissions.count()
+    if accepted_count < job.max_responses:
+        messages.warning(request, _('Warning: You are completing the contract with {accepted} accepted submission(s) out of {max} requested. Once the contract is completed, no more submissions will be accepted and you cannot get additional workers later.').format(
+            accepted=accepted_count,
+            max=job.max_responses
+        ))
     
-    # Check that job is in reviewing state
-    if job.status != 'reviewing':
-        messages.warning(request, _('Contract can only be completed when job is in reviewing state.'))
-        return redirect('jobs:owner_dashboard')
-    
-    # TODO: Implement actual contract completion/payment release logic
-    # This should release the pre-approved payments/assets to the selected workers
-    # See todo/todo-later.md for details on implementing payment release
+    # Mark contract as completed
     job.contract_completed = True
     job.save(update_fields=['contract_completed'])
     
     messages.success(request, _('Contract completed! Payments will be released to workers. (Note: Payment release functionality is coming soon.)'))
-    return redirect('jobs:owner_dashboard')
+    return redirect('jobs:detail', pk=job.pk)
+
+
+@login_required
+@require_POST
+def cancel_contract(request, pk):
+    """Cancel the contract/job. Can be done from any active state."""
+    job = get_object_or_404(Job, pk=pk, funder=request.user)
+    
+    # Don't allow canceling if already completed or canceled
+    if job.status == 'complete':
+        messages.warning(request, _('Cannot cancel a completed job.'))
+        return redirect('jobs:detail', pk=job.pk)
+    
+    if job.status == 'canceled':
+        messages.info(request, _('This job has already been canceled.'))
+        return redirect('jobs:detail', pk=job.pk)
+    
+    # Cancel the job
+    job.status = 'canceled'
+    job.save(update_fields=['status'])
+    
+    messages.success(request, _('Contract has been canceled. No further actions can be taken on this job.'))
+    return redirect('jobs:detail', pk=job.pk)
 
 
 def audio_support(request, slug):

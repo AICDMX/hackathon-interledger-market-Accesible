@@ -19,6 +19,7 @@ class Job(models.Model):
         ('submitting', _('Submitting')),
         ('reviewing', _('Reviewing')),
         ('expired', _('Expired')),
+        ('canceled', _('Canceled')),
         ('complete', _('Complete')),
     ]
     
@@ -201,12 +202,12 @@ class Job(models.Model):
         return self.submissions.filter(status='accepted').first()
     
     def get_accepted_submissions_count(self):
-        """Get count of accepted submissions."""
-        return self.submissions.filter(status='accepted').count()
+        """Get count of accepted submissions (excluding drafts)."""
+        return self.submissions.filter(status='accepted', is_draft=False).count()
     
     def get_pending_submissions_count(self):
-        """Get count of pending submissions."""
-        return self.submissions.filter(status='pending').count()
+        """Get count of pending submissions (excluding drafts)."""
+        return self.submissions.filter(status='pending', is_draft=False).count()
     
     def has_reached_max_responses(self):
         """Check if the job has reached its maximum number of accepted responses."""
@@ -247,8 +248,8 @@ class Job(models.Model):
         return self.has_reached_recruit_limit() or self.has_passed_recruit_deadline()
     
     def get_submissions_count(self):
-        """Get count of all submissions for this job."""
-        return self.submissions.count()
+        """Get count of all submissions for this job (excluding drafts)."""
+        return self.submissions.filter(is_draft=False).count()
     
     def has_reached_submit_limit(self):
         """Check if the job has reached its submit limit."""
@@ -399,6 +400,12 @@ class JobSubmission(models.Model):
         verbose_name=_('Status')
     )
     
+    is_draft = models.BooleanField(
+        default=False,
+        verbose_name=_('Is Draft'),
+        help_text=_('Whether this submission is a draft (not yet submitted)')
+    )
+    
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     
@@ -429,7 +436,7 @@ class JobApplication(models.Model):
     
     STATUS_CHOICES = [
         ('pending', _('Pending')),
-        ('selected', _('Selected')),
+        ('selected', _('Approved')),
         ('rejected', _('Rejected')),
     ]
     

@@ -46,10 +46,10 @@
                         {% if application.status == 'pending' %}
                             <form method="post" action="{% url 'jobs:select_application' job.pk application.pk %}" style="display: inline;">
                                 {% csrf_token %}
-                                <input type="hidden" name="action" value="select">
+                                <input type="hidden" name="action" value="approve">
                                 <div style="display: inline-flex; align-items: center; gap: 0.5rem;">
-                                    <button type="submit" class="btn btn-success">{% trans 'Select' %}</button>
-                                    {% audio_player_static_ui "button_select" "label" %}
+                                    <button type="submit" class="btn btn-success">{% trans 'Approve' %}</button>
+                                    {% audio_player_static_ui "button_approve" "label" %}
                                 </div>
                             </form>
                             <form method="post" action="{% url 'jobs:select_application' job.pk application.pk %}" style="display: inline;">
@@ -126,7 +126,7 @@
         <div class="card" style="margin-top: 1.5rem; background-color: #f0fdf4; border: 2px solid #10b981;">
             {% load audio_tags %}
             {% include 'components/static_title_with_audio.html' with title_text="Pre-approve Payments" slug="section_pre_approve_payments" heading_tag="h2" %}
-            <p>{% trans 'You have selected' %} {{ selected_count }} {% trans 'applicant(s). Click below to create pre-approved payments for them.' %}</p>
+            <p>{% trans 'You have approved' %} {{ selected_count }} {% trans 'applicant(s). Click below to create pre-approved payments for them.' %}</p>
             <form method="post" action="{% url 'jobs:pre_approve_payments' job.pk %}">
                 {% csrf_token %}
                 <div style="display: flex; align-items: center; gap: 0.5rem;">

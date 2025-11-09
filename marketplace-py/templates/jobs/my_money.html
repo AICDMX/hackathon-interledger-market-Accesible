@@ -42,7 +42,13 @@
     </div>
     
     {% if accepted_submissions %}
-    {% include 'components/static_title_with_audio.html' with title_text="Accepted Jobs" slug="section_accepted_jobs_money" heading_tag="h3" %}
+    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.5rem;">
+        {% include 'components/static_title_with_audio.html' with title_text="Accepted Jobs" slug="section_accepted_jobs_money" heading_tag="h3" %}
+        <div style="display: flex; align-items: center; gap: 0.5rem;">
+            <a href="{% url 'jobs:accepted' %}" class="btn btn-secondary" style="font-size: 0.9rem;">{% trans 'View Details' %}</a>
+            {% audio_player_static_ui "button_view_details" "label" %}
+        </div>
+    </div>
     <ul>
         {% for submission in accepted_submissions %}
         <li>

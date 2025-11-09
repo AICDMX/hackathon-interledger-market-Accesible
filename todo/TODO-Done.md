@@ -48,3 +48,5 @@
 [x] copy Perd?n-esto-a?n-no-se-ha-traducido.mp3 to be the defualt for fallback-oto.mp3 instead
 [x] users should have a pretty name and that should be used on the site front end like in dashboards and job pages. like Financiador. in data dir update the default users to have a pretty name that goes with the username. uploaders should have names as well.
 [x] if i submit a job. if i dont have profile defualts already set. then make those my profile defualts
+[x] title audio is not requried but we still get this error if we dont have it Error creating job: name 'title_audio' is not defined
+[x] to user profile add wallet address

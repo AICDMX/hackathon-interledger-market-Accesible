@@ -40,3 +40,37 @@ django.template.exceptions.TemplateSyntaxError: Invalid block tag on line 58: 'e
     5. Added "Complete Contract" button that appears after accepting work when all accepted submissions are marked complete by workers. This button releases payments (stub - functionality coming soon). After contract is completed, job owner can then mark job as complete.
     6. Added contract_completed field to Job model to track contract completion status.
     7. Updated workflow: selecting → pre-approve payments → submitting → reviewing → complete contract → mark job completed
+[C] i am working through the work flow. but when i have a user apply to a job. there is nothing on the job side from the guy who added the job to accept them to the job. and when 1 or more accepted the button to start contract should be there. it should be there before any accepted. but inactive unusable untill atleast 1 has accepted. if they ask for more then one job doer and the number of accepted is lower then that number then it should do a pop up warning that you can only start the contract once. and it will start with only those accepted now and wont allow more to apply
+  - Fixed:
+    1. Added applications section to job_detail.html for job owners when job is in 'recruiting' or 'selecting' state, showing all applications with ability to select/reject/reset them directly from the job detail page.
+    2. Added "Start Contract" button that appears when job is in 'selecting' state. Button is visible but disabled until at least one application is selected.
+    3. Added JavaScript popup warning when starting contract with fewer selected applicants than max_responses, warning that contract can only start once and will start with only currently selected workers.
+    4. Updated pre_approve_payments view to redirect to job detail page and show message that no more applications will be accepted after contract starts.
+    5. Updated select_application view to redirect back to job detail page after selecting/rejecting applications.
+    6. Once contract is started (job transitions to 'submitting' state), no more applications can be accepted (already enforced by apply_to_job view checking job.status == 'recruiting').
+[x] to user profile add wallet address
+  - Added wallet_address field to User model as TextField (multi-line text box)
+  - Added wallet_address to ProfileForm with Textarea widget (3 rows)
+  - Added wallet_address field to profile template with audio button support
+  - Created migration 0005_user_wallet_address.py
+[C] is there still a point to the page work accepted? seems like it shows at the top of the main dashboard view?
+  - Analysis: The `accepted_jobs` page shows detailed information (submission notes, text content, accepted date, funder) that is NOT shown in `my_money` page (which only shows title + budget in a simple list). However, there is some redundancy:
+    - `accepted_jobs`: All accepted jobs with full details
+    - `my_money`: All accepted jobs in simple list format (part of financial summary)
+    - `pending_jobs`: Only incomplete accepted jobs (for work management)
+  - Action taken: 
+    1. Added a "View Details" link from `my_money` page to the `accepted_jobs` page
+    2. **MAJOR IMPROVEMENT**: Enhanced `accepted_jobs` page to show critical status information that was missing:
+       - Job Status (submitting/reviewing/complete) with color-coded badges
+       - Work Completion Status (completed/not submitted/in progress)
+       - Payment Status (contract completed/payment released/waiting for contract completion/payment pending)
+       - Action Required alerts (when work needs to be submitted, when waiting for payment)
+       - "Submit Work" button when work needs to be submitted
+    3. **RENAMED & EXPANDED**: Renamed page from "Accepted Jobs" to "My Jobs" and now shows:
+       - **My Applications** section: Shows all jobs user applied to (pending/selected/rejected) with application status, job status, and action alerts
+       - **Accepted Jobs** section: Shows accepted submissions with full status details (work completion, payment status, etc.)
+    Now users can see ALL their job activity in one place: applications they submitted (and their status), jobs they were accepted for, payment status, and what actions they need to take next. Much more useful!
+[C] we should have a duplicat job button. it should be in my jobs page as well on all stages of the jobs page. 
+[X] Note: Some accepted submissions have not been marked as complete by workers yet. You can still complete the contract. is showing on the jobs page even when its not true
+  - Fixed: Simplified workflow - when a job owner accepts a submission, it's automatically marked as complete. Removed the redundant "Mark as Complete" step since submitting work IS completing the work. The warning message no longer appears because all accepted submissions are automatically complete.
+[P] add save draft to job submission. so they can save it for later

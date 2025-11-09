@@ -112,7 +112,7 @@ class ProfileForm(forms.ModelForm):
     
     class Meta:
         model = User
-        fields = ['email', 'wallet_endpoint', 'preferred_language', 'native_languages', 'pretty_name', 'role', 
+        fields = ['email', 'wallet_endpoint', 'wallet_address', 'preferred_language', 'native_languages', 'pretty_name', 'role', 
                   'profile_note', 'profile_audio', 'profile_video', 'profile_image']
     
     def clean_email(self):

@@ -52,13 +52,20 @@
     </div>
 {% endif %}
 
+{% if draft %}
+    <div class="card" style="background-color: #fff3cd; border: 1px solid #ffc107; padding: 1rem; margin-bottom: 1rem;">
+        <p style="margin: 0;"><strong>{% trans 'You have a saved draft' %}</strong></p>
+        <p style="margin: 0.5rem 0 0 0;">{% trans 'Your previous draft has been loaded. You can continue editing and save it again, or submit it when ready.' %}</p>
+    </div>
+{% endif %}
+
 <div class="card">
     <form method="post" enctype="multipart/form-data" id="job-submission-form">
         {% csrf_token %}
         
         <div class="form-group">
             {% include 'components/form_label_with_audio.html' with label_text="Note" slug="form_note" field_id="note" %}
-            <textarea id="note" name="note" rows="4" placeholder="{% trans 'Additional information about your submission...' %}"></textarea>
+            <textarea id="note" name="note" rows="4" placeholder="{% trans 'Additional information about your submission...' %}">{% if draft %}{{ draft.note }}{% endif %}</textarea>
         </div>
         
         {% for deliverable_type in job.get_deliverable_types_list %}
@@ -66,11 +73,16 @@
                 {% if deliverable_type == 'text' %}
                     {% include 'components/form_label_with_audio.html' with label_text="Text File" slug="form_text_file" field_id="text_file" %}
                     <input type="file" id="text_file" name="text_file" accept=".txt,.doc,.docx,.pdf">
+                    {% if draft and draft.text_file %}
+                        <p class="muted-text" style="font-size: 0.875rem; margin-top: 0.5rem;">
+                            {% trans 'Current file:' %} <a href="{{ draft.text_file.url }}" target="_blank">{{ draft.text_file.name }}</a>
+                        </p>
+                    {% endif %}
                     <p class="muted-text" style="font-size: 0.875rem; margin-top: 0.5rem; margin-bottom: 0.5rem;">
                         {% trans 'Or enter text directly:' %}
                     </p>
                     {% include 'components/form_label_with_audio.html' with label_text="Text Content" slug="form_text_content" field_id="text_content" %}
-                    <textarea id="text_content" name="text_content" rows="6" placeholder="{% trans 'Enter your text content here...' %}"></textarea>
+                    <textarea id="text_content" name="text_content" rows="6" placeholder="{% trans 'Enter your text content here...' %}">{% if draft %}{{ draft.text_content }}{% endif %}</textarea>
                 {% elif deliverable_type == 'video' %}
                     {% include 'components/form_label_with_audio.html' with label_text="Video File" slug="form_video_file" field_id="video_file" %}
                     <input type="file" id="video_file" name="video_file" accept="video/*" capture="environment">
@@ -110,6 +122,11 @@
                         {% trans 'Or upload an audio file:' %}
                     </p>
                     <input type="file" id="audio_file" name="audio_file" accept="audio/*">
+                    {% if draft and draft.audio_file %}
+                        <p class="muted-text" style="font-size: 0.875rem; margin-top: 0.5rem;">
+                            {% trans 'Current file:' %} <a href="{{ draft.audio_file.url }}" target="_blank">{{ draft.audio_file.name }}</a>
+                        </p>
+                    {% endif %}
                 {% elif deliverable_type == 'image' %}
                     {% include 'components/form_label_with_audio.html' with label_text="Image File" slug="form_image_file" field_id="image_file" %}
                     <input type="file" id="image_file" name="image_file" accept="image/*" capture="environment">
@@ -121,8 +138,10 @@
         {% endfor %}
         
         <div style="display: flex; align-items: center; gap: 1rem; flex-wrap: wrap;">
-            <button type="submit" class="btn btn-primary">{% trans 'Submit' %}</button>
+            <button type="submit" name="submit" class="btn btn-primary">{% trans 'Submit' %}</button>
             {% audio_player_static_ui "button_submit" "label" %}
+            <button type="submit" name="save_draft" class="btn" style="background-color: #6c757d; color: white;">{% trans 'Save Draft' %}</button>
+            {% audio_player_static_ui "button_save_draft" "label" %}
             <a href="{% url 'jobs:detail' job.pk %}" class="btn">{% trans 'Cancel' %}</a>
             {% audio_player_static_ui "button_cancel" "label" %}
         </div>

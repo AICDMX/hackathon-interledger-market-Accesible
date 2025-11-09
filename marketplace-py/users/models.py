@@ -25,6 +25,12 @@ class User(AbstractUser):
         help_text=_('Interledger wallet endpoint')
     )
     
+    wallet_address = models.TextField(
+        blank=True,
+        verbose_name=_('Wallet Address'),
+        help_text=_('Your wallet address')
+    )
+    
     preferred_language = models.CharField(
         max_length=10,
         default='en',
