@@ -3,11 +3,11 @@ Open Payments API Client Module
 """
 
 import logging
-from app.open_payments_sdk import configuration
-from app.open_payments_sdk.api.auth import AccessTokens, Grants
-from app.open_payments_sdk.api.resource import IncomingPayments, OutgoingPayments, Quotes
-from app.open_payments_sdk.api.wallet import Wallet
-from app.open_payments_sdk.http import HttpClient
+from .. import configuration
+from ..api.auth import AccessTokens, Grants
+from ..api.resource import IncomingPayments, OutgoingPayments, Quotes
+from ..api.wallet import Wallet
+from ..http import HttpClient
 
 
 class OpenPaymentsClient:

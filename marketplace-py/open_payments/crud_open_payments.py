@@ -20,10 +20,11 @@ along with this program.  If not, see <http:#www.gnu.org/licenses/>.
 
 from ulid import ULID
 from pydantic import AnyUrl
-from app.open_payments_sdk.http import HttpClient
-from app.open_payments_sdk.client.client import OpenPaymentsClient
-from app.open_payments_sdk.api.auth import GrantRequest, Grant, InteractRef
-from app.open_payments_sdk.models.resource import (
+from django.conf import settings
+from open_payments_sdk.http import HttpClient
+from open_payments_sdk.client.client import OpenPaymentsClient
+from open_payments_sdk.api.auth import GrantRequest, Grant, InteractRef
+from open_payments_sdk.models.resource import (
     IncomingPaymentRequest,
     OutgoingPaymentRequest,
     OutgoingPayment,
@@ -31,9 +32,8 @@ from app.open_payments_sdk.models.resource import (
     QuoteRequest,
 )
 
-from app.core.config import settings
-from app.utilities.openpayments import paymentsparser
-from app.schemas.openpayments.open_payments import SellerOpenPaymentAccount, PendingIncomingPaymentTransaction
+from utilities.openpayments import paymentsparser
+from schemas.openpayments.open_payments import SellerOpenPaymentAccount, PendingIncomingPaymentTransaction
 
 
 class OpenPaymentsProcessor:
@@ -62,7 +62,7 @@ class OpenPaymentsProcessor:
         seller: SellerOpenPaymentAccount,
         buyer: str,
         http_client: HttpClient = None,
-        redirect_uri: str = settings.DEFAULT_REDIRECT_AFTER_AUTH,
+        redirect_uri: str = None,
     ) -> None:
         if not http_client:
             http_client = HttpClient(http_timeout=10.0)
@@ -80,6 +80,9 @@ class OpenPaymentsProcessor:
         self.pending_payment = PendingIncomingPaymentTransaction(
             **{"id": ULID(), "seller": self.seller_wallet, "buyer": self.buyer_wallet}
         )
+        # Use provided redirect_uri or fallback to a default
+        if not redirect_uri:
+            redirect_uri = getattr(settings, 'DEFAULT_REDIRECT_AFTER_AUTH', '/payments/finish/')
         self.redirect_uri = f"{redirect_uri}{self.pending_payment.id}"
 
     ###################################################################################################

@@ -4,11 +4,11 @@ Grants Module
 
 from logging import Logger
 
-from app.open_payments_sdk.gnap_utils.security import SecurityBase
-from app.open_payments_sdk.http import HttpClient
-from app.open_payments_sdk.models.auth import AccessToken, Grant
-from app.open_payments_sdk.models.auth import GrantContinueResponse, GrantRequest, InteractRef
-from app.open_payments_sdk.utils.utils import get_default_covered_components, get_default_headers
+from ..gnap_utils.security import SecurityBase
+from ..http import HttpClient
+from ..models.auth import AccessToken, Grant
+from ..models.auth import GrantContinueResponse, GrantRequest, InteractRef
+from ..utils.utils import get_default_covered_components, get_default_headers
 
 
 class Grants(SecurityBase):

@@ -8,9 +8,9 @@ from typing import Sequence
 from http_message_signatures import HTTPMessageSigner, algorithms
 from http_sf import ser
 from httpx import Request
-from app.open_payments_sdk.gnap_utils.hash import HashManager
-from app.open_payments_sdk.gnap_utils.http_signatures import OPKeyResolver, PatchedHTTPSignatureComponentResolver
-from app.open_payments_sdk.gnap_utils.keys import KeyManager
+from .hash import HashManager
+from .http_signatures import OPKeyResolver, PatchedHTTPSignatureComponentResolver
+from .keys import KeyManager
 
 
 class SecurityBase:

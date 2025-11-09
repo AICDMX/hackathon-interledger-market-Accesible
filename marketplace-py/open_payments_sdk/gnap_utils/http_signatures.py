@@ -6,7 +6,7 @@ from http_message_signatures import HTTPSignatureKeyResolver
 from http_message_signatures.resolvers import HTTPSignatureComponentResolver
 from http_message_signatures.structures import CaseInsensitiveDict
 
-from app.open_payments_sdk.gnap_utils.keys import KeyManager
+from .keys import KeyManager
 
 
 class OPKeyResolver(HTTPSignatureKeyResolver):

@@ -8,7 +8,7 @@ import uuid
 from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PrivateKey
 from cryptography.hazmat.primitives import serialization
 
-from app.open_payments_sdk.models.keys import Key, KeyJwks, KeyPair
+from ..models.keys import Key, KeyJwks, KeyPair
 
 
 class KeyManager:

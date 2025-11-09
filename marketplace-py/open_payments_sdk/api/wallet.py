@@ -1,5 +1,5 @@
-from app.open_payments_sdk.http import HttpClient
-from app.open_payments_sdk.models.wallet import JsonWebKeySet, WalletAddress
+from ..http import HttpClient
+from ..models.wallet import JsonWebKeySet, WalletAddress
 
 
 class Wallet:

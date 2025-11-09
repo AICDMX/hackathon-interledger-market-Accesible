@@ -3,9 +3,9 @@ Resource Server Module
 """
 
 from logging import Logger
-from app.open_payments_sdk.gnap_utils.security import SecurityBase
-from app.open_payments_sdk.http import HttpClient
-from app.open_payments_sdk.models.resource import (
+from ..gnap_utils.security import SecurityBase
+from ..http import HttpClient
+from ..models.resource import (
     IncomingPayment,
     IncomingPaymentRequest,
     IncomingPaymentResponse,
@@ -17,7 +17,7 @@ from app.open_payments_sdk.models.resource import (
     Quote,
     QuoteRequest,
 )
-from app.open_payments_sdk.utils.utils import get_default_covered_components, get_default_headers
+from ..utils.utils import get_default_covered_components, get_default_headers
 
 
 class IncomingPayments(SecurityBase):
