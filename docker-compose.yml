@@ -35,9 +35,10 @@ services:
     environment:
       - PORT=3000
     # For development with hot reload, uncomment below and adjust command:
-    # volumes:
-    #   - ./services/payments:/app
-    # command: npm run dev
+    volumes:
+      - ./services/payments:/app
+      - /app/node_modules
+    command: npm start
 
   wallet:
     build: ./wallet-nodejs

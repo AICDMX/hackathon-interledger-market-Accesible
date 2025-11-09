@@ -14,10 +14,12 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-change-this-in-production'
+# Read from environment in production; falls back to dev default
+SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-change-this-in-production')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+# Toggle via environment variable DEBUG=True/False
+DEBUG = os.environ.get('DEBUG', 'True').lower() in ('1', 'true', 'yes')
 
 # ALLOWED_HOSTS configuration
 # In Docker, set ALLOWED_HOSTS environment variable (e.g., ALLOWED_HOSTS=* or ALLOWED_HOSTS=localhost,127.0.0.1)
