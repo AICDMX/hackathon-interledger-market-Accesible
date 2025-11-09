@@ -69,7 +69,8 @@
         .dashboard-audio-wrapper {
             display: inline-flex;
             align-items: center;
-            margin-left: 0.25rem;
+            margin-left: 0.5rem;
+            vertical-align: middle;
         }
 
     /* Tablet and up: 3 columns */
@@ -337,7 +338,7 @@
 
         <a href="{% url 'jobs:filler_2' %}" class="dashboard-icon-card" role="gridcell" aria-label="{% trans 'Page 2' %}">
             <div class="dashboard-icon" aria-hidden="true">
-                <img src="/media/listen.png" alt="{% trans 'Page 2' %}" style="width: 5rem; height: 5rem; object-fit: contain;" loading="lazy" />
+                <img src="{{ audio_config.icon_active }}" alt="{% trans 'Page 2' %}" style="width: 5rem; height: 5rem; object-fit: contain;" loading="lazy" />
             </div>
             <p class="dashboard-label">
                 {% trans 'Page 2' %}
@@ -372,7 +373,19 @@ document.addEventListener('DOMContentLoaded', function() {
         moduleMissing: 'El reproductor todav?a no est? listo en este dispositivo.',
         notConfigured: 'Conecta este bot?n con un contenido para habilitar el audio.'
     };
-    const fallbackAudioUrl = '{% static "audio/fallback.mp3" %}';
+    // Load audio configuration and core module
+    window.AUDIO_CONFIG = {
+        iconInactive: '{{ audio_config.icon_inactive }}',
+        iconActive: '{{ audio_config.icon_active }}',
+        fallbackAudio: {{ audio_config.fallback_audio|safe }},
+        fallbackFile: '{{ audio_config.fallback_file }}',
+        staticUrl: '{{ audio_config.static_url }}'
+    };
+    // Load the centralized audio player module
+    const script = document.createElement('script');
+    script.src = '{% static "audio/audio-player-core.js" %}';
+    document.head.appendChild(script);
+    
     const defaultFundAmount = {{ community_fund_amount|default:10 }};
 
     const audioInfoBanner = document.createElement('div');
@@ -497,7 +510,7 @@ document.addEventListener('DOMContentLoaded', function() {
         audioBtn.className = 'audio-play-btn';
         audioBtn.style.cssText = 'display: inline-flex; align-items: center; justify-content: center; padding: 0.25rem; background-color: transparent; border: none; cursor: pointer; transition: opacity 0.2s;';
         const audioIcon = document.createElement('img');
-        audioIcon.src = '/media/listen.png';
+        audioIcon.src = window.AUDIO_CONFIG.iconInactive || '/media/listen-inactive.png';
         audioIcon.alt = '{% trans "Listen" %}';
         audioIcon.className = 'audio-icon';
         audioIcon.style.cssText = 'width: 32px; height: 32px; object-fit: contain; display: block;';
@@ -531,12 +544,24 @@ document.addEventListener('DOMContentLoaded', function() {
                         .then(data => {
                             if (data && data.audio_url) {
                                 // Audio exists - play it
+                                audioIcon.src = '/media/listen-active.png';
                                 const audio = new Audio(data.audio_url);
-                                audio.play().catch(() => {
+                                audio.addEventListener('ended', function() {
+                                    audioIcon.src = '/media/listen-inactive.png';
+                                }, { once: true });
+                                audio.play().then(() => {
+                                    // Playing successfully
+                                }).catch(() => {
+                                    audioIcon.src = '/media/listen-inactive.png';
                                     // If main audio fails, try fallback
                                     if (data.fallback_audio_url) {
                                         const fallbackAudio = new Audio(data.fallback_audio_url);
+                                        audioIcon.src = '/media/listen-active.png';
+                                        fallbackAudio.addEventListener('ended', function() {
+                                            audioIcon.src = '/media/listen-inactive.png';
+                                        });
                                         fallbackAudio.play().catch(() => {
+                                            audioIcon.src = '/media/listen-inactive.png';
                                             showSupportBanner(wrapper);
                                         });
                                     } else {
@@ -545,25 +570,47 @@ document.addEventListener('DOMContentLoaded', function() {
                                 });
                             } else if (data && data.fallback_audio_url) {
                                 // Use fallback audio
+                                audioIcon.src = '/media/listen-active.png';
                                 const fallbackAudio = new Audio(data.fallback_audio_url);
+                                fallbackAudio.addEventListener('ended', function() {
+                                    audioIcon.src = '/media/listen-inactive.png';
+                                }, { once: true });
                                 fallbackAudio.play().catch(() => {
+                                    audioIcon.src = '/media/listen-inactive.png';
                                     showSupportBanner(wrapper);
                                 });
                             } else {
-                                // No audio - show request option
-                                showSupportBanner(wrapper);
+                                // No audio - use fallback system
+                                audioIcon.src = '/media/listen-active.png';
+                                let fallbackPath = fallbackAudioUrl || '{% static "audio/fallback.mp3" %}';
+                                if (languageCode === 'oto') {
+                                    fallbackPath = '{% static "audio/fallback-oto.mp3" %}';
+                                }
+                                const fallbackAudio = new Audio(fallbackPath);
+                                fallbackAudio.addEventListener('ended', function() {
+                                    audioIcon.src = '/media/listen-inactive.png';
+                                }, { once: true });
+                                fallbackAudio.play().catch(() => {
+                                    audioIcon.src = '/media/listen-inactive.png';
+                                    showSupportBanner(wrapper);
+                                });
                             }
                         })
                         .catch(() => {
                             // Try fallback on network error
-                            if (fallbackAudioUrl) {
-                                const fallbackAudio = new Audio(fallbackAudioUrl);
-                                fallbackAudio.play().catch(() => {
-                                    showSupportBanner(wrapper);
-                                });
-                            } else {
-                                showSupportBanner(wrapper);
+                            audioIcon.src = '/media/listen-active.png';
+                            let fallbackPath = fallbackAudioUrl || '{% static "audio/fallback.mp3" %}';
+                            if (languageCode === 'oto') {
+                                fallbackPath = '{% static "audio/fallback-oto.mp3" %}';
                             }
+                            const fallbackAudio = new Audio(fallbackPath);
+                            fallbackAudio.addEventListener('ended', function() {
+                                audioIcon.src = '/media/listen-inactive.png';
+                            }, { once: true });
+                            fallbackAudio.play().catch(() => {
+                                audioIcon.src = '/media/listen-inactive.png';
+                                showSupportBanner(wrapper);
+                            });
                         });
                 } else {
                     showSupportBanner(wrapper);

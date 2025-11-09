@@ -326,6 +326,45 @@ def create_job(request):
                     reference_image=reference_image
                 )
                 
+                # Save job creation values as profile defaults if not already set
+                user = request.user
+                profile_updated = False
+                
+                if target_language and not user.default_target_language:
+                    user.default_target_language = target_language
+                    profile_updated = True
+                
+                if target_dialect and not user.default_target_dialect:
+                    user.default_target_dialect = target_dialect
+                    profile_updated = True
+                
+                if deliverable_types and not user.default_deliverable_types:
+                    user.default_deliverable_types = deliverable_types
+                    profile_updated = True
+                
+                if recruit_limit_int and not user.default_recruit_limit:
+                    user.default_recruit_limit = recruit_limit_int
+                    profile_updated = True
+                
+                if submit_limit_int and not user.default_submit_limit:
+                    user.default_submit_limit = submit_limit_int
+                    profile_updated = True
+                
+                if recruit_deadline_days_int and not user.default_recruit_deadline_days:
+                    user.default_recruit_deadline_days = recruit_deadline_days_int
+                    profile_updated = True
+                
+                if submit_deadline_days_int and not user.default_submit_deadline_days:
+                    user.default_submit_deadline_days = submit_deadline_days_int
+                    profile_updated = True
+                
+                if expired_date_days_int and not user.default_expired_date_days:
+                    user.default_expired_date_days = expired_date_days_int
+                    profile_updated = True
+                
+                if profile_updated:
+                    user.save()
+                
                 messages.success(request, _('Draft saved successfully! You can edit and publish it later.'))
                 return redirect('jobs:edit', pk=job.pk)
             except ValueError as e:
@@ -408,6 +447,45 @@ def create_job(request):
                         reference_video=reference_video,
                         reference_image=reference_image
                     )
+                    
+                    # Save job creation values as profile defaults if not already set
+                    user = request.user
+                    profile_updated = False
+                    
+                    if target_language and not user.default_target_language:
+                        user.default_target_language = target_language
+                        profile_updated = True
+                    
+                    if target_dialect and not user.default_target_dialect:
+                        user.default_target_dialect = target_dialect
+                        profile_updated = True
+                    
+                    if deliverable_types and not user.default_deliverable_types:
+                        user.default_deliverable_types = deliverable_types
+                        profile_updated = True
+                    
+                    if recruit_limit_int and not user.default_recruit_limit:
+                        user.default_recruit_limit = recruit_limit_int
+                        profile_updated = True
+                    
+                    if submit_limit_int and not user.default_submit_limit:
+                        user.default_submit_limit = submit_limit_int
+                        profile_updated = True
+                    
+                    if recruit_deadline_days_int and not user.default_recruit_deadline_days:
+                        user.default_recruit_deadline_days = recruit_deadline_days_int
+                        profile_updated = True
+                    
+                    if submit_deadline_days_int and not user.default_submit_deadline_days:
+                        user.default_submit_deadline_days = submit_deadline_days_int
+                        profile_updated = True
+                    
+                    if expired_date_days_int and not user.default_expired_date_days:
+                        user.default_expired_date_days = expired_date_days_int
+                        profile_updated = True
+                    
+                    if profile_updated:
+                        user.save()
                     
                     messages.success(request, _('Job created successfully! It will be published for recruiting.'))
                     return redirect('jobs:detail', pk=job.pk)

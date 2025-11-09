@@ -217,6 +217,10 @@ AUDIO_FALLBACK_BY_LANGUAGE = {
     # 'que': 'audio/fallback-que.mp3',
 }
 
+# Audio icon paths (relative to MEDIA_URL)
+AUDIO_ICON_INACTIVE = 'listen-inactive.png'
+AUDIO_ICON_ACTIVE = 'listen-active.png'
+
 # Payments service configuration
 PAYMENTS_SERVICE_URL = os.environ.get('PAYMENTS_SERVICE_URL', 'http://payments:3000')
 # In development, use http://localhost:4001 if running payments service locally

@@ -11,8 +11,10 @@
 {% load audio_tags %}
 <div class="title-with-audio" style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
     {% include 'components/static_title_with_audio.html' with title_text="Apply to Job" slug="page_apply_to_job" heading_tag="h1" %}
-    <div style="display: inline-block; margin-left: 0.5rem;">{{ job.title }}</div>
-    {% audio_player job "title" %}
+    <div style="display: flex; align-items: center; gap: 0.5rem;">
+        <span>{{ job.title }}</span>
+        {% audio_player job "title" %}
+    </div>
 </div>
 
 <div class="card">
@@ -37,7 +39,7 @@
         {% csrf_token %}
         
         <div class="form-group">
-            <label for="{{ form.profile_note.id_for_label }}">{% trans 'Profile Note' %} *</label>
+            {% include 'components/form_label_with_audio.html' with label_text="Profile Note" slug="form_profile_note" field_id=form.profile_note.id_for_label required=True %}
             {{ form.profile_note }}
             {% if form.profile_note.errors %}
                 <div class="error">{{ form.profile_note.errors }}</div>
@@ -86,7 +88,7 @@
         </div>
         
         <div class="form-group">
-            <label for="{{ form.profile_video.id_for_label }}">{% trans 'Profile Video (Optional)' %}</label>
+            {% include 'components/form_label_with_audio.html' with label_text="Profile Video (Optional)" slug="form_profile_video" field_id=form.profile_video.id_for_label %}
             {{ form.profile_video }}
             <p class="muted-text" style="font-size: 0.875rem; margin-top: 0.5rem;">
                 {% trans 'Record with your camera or upload an existing video.' %}
@@ -110,8 +112,12 @@
             {% endif %}
         </div>
         
-        <button type="submit" class="btn btn-primary">{% trans 'Submit Application' %}</button>
-        <a href="{% url 'jobs:detail' job.pk %}" class="btn">{% trans 'Cancel' %}</a>
+        <div style="display: flex; align-items: center; gap: 1rem; flex-wrap: wrap;">
+            <button type="submit" class="btn btn-primary">{% trans 'Submit Application' %}</button>
+            {% audio_player_static_ui "button_submit_application" "label" %}
+            <a href="{% url 'jobs:detail' job.pk %}" class="btn">{% trans 'Cancel' %}</a>
+            {% audio_player_static_ui "button_cancel" "label" %}
+        </div>
     </form>
 </div>
 {% endblock %}

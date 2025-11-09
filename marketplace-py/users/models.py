@@ -68,6 +68,63 @@ class User(AbstractUser):
         help_text=_('Optional profile image')
     )
     
+    # Job creation defaults for funders
+    default_target_language = models.CharField(
+        max_length=10,
+        blank=True,
+        verbose_name=_('Default Target Language'),
+        help_text=_('Default target language for new jobs')
+    )
+    
+    default_target_dialect = models.CharField(
+        max_length=100,
+        blank=True,
+        verbose_name=_('Default Target Dialect'),
+        help_text=_('Default target dialect for new jobs')
+    )
+    
+    default_deliverable_types = models.CharField(
+        max_length=50,
+        blank=True,
+        verbose_name=_('Default Deliverable Types'),
+        help_text=_('Default deliverable types for new jobs (comma-separated)')
+    )
+    
+    default_recruit_limit = models.IntegerField(
+        null=True,
+        blank=True,
+        verbose_name=_('Default Recruit Limit'),
+        help_text=_('Default recruit limit for new jobs')
+    )
+    
+    default_submit_limit = models.IntegerField(
+        null=True,
+        blank=True,
+        verbose_name=_('Default Submit Limit'),
+        help_text=_('Default submit limit for new jobs')
+    )
+    
+    default_recruit_deadline_days = models.IntegerField(
+        null=True,
+        blank=True,
+        verbose_name=_('Default Recruit Deadline (Days)'),
+        help_text=_('Default recruit deadline in days for new jobs')
+    )
+    
+    default_submit_deadline_days = models.IntegerField(
+        null=True,
+        blank=True,
+        verbose_name=_('Default Submit Deadline (Days)'),
+        help_text=_('Default submit deadline in days for new jobs')
+    )
+    
+    default_expired_date_days = models.IntegerField(
+        null=True,
+        blank=True,
+        verbose_name=_('Default Expired Date (Days)'),
+        help_text=_('Default expired date in days for new jobs')
+    )
+    
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     

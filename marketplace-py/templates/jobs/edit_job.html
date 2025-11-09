@@ -194,7 +194,7 @@
         
         <div class="reference-media-grid">
             <div class="form-group">
-                <label for="reference_audio">{% trans 'Audio instructions' %}</label>
+                {% include 'components/form_label_with_audio.html' with label_text="Audio instructions" slug="form_reference_audio" field_id="reference_audio" %}
                 <div class="audio-recording-section" data-audio-recording data-file-input-id="reference_audio" data-max-duration="180000" data-compression-bitrate="192000">
                     <div class="recording-controls">
                         <button type="button" class="btn-record" id="btn-start-recording-audio" aria-label="{% trans 'Start recording' %}">
@@ -229,13 +229,13 @@
             </div>
             
             <div class="form-group">
-                <label for="reference_video">{% trans 'Video reference' %}</label>
+                {% include 'components/form_label_with_audio.html' with label_text="Video reference" slug="form_reference_video" field_id="reference_video" %}
                 <input type="file" id="reference_video" name="reference_video" accept="video/*" capture="environment">
                 <small class="form-text text-muted">{% trans 'Record with your camera or upload an existing clip.' %}</small>
             </div>
             
             <div class="form-group">
-                <label for="reference_image">{% trans 'Image reference' %}</label>
+                {% include 'components/form_label_with_audio.html' with label_text="Image reference" slug="form_reference_image" field_id="reference_image" %}
                 <input type="file" id="reference_image" name="reference_image" accept="image/*" capture="environment">
                 <small class="form-text text-muted">{% trans 'Take a quick photo or upload inspiration images.' %}</small>
             </div>

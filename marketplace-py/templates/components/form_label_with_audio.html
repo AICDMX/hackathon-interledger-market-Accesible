@@ -1,0 +1,21 @@
+{% load i18n audio_tags %}
+{% comment %}
+Reusable component for displaying a form label with an audio speaker button.
+Usage: {% include 'components/form_label_with_audio.html' with label_text="Email" slug="form_email" field_id="id_email" %}
+Or: {% include 'components/form_label_with_audio.html' with label_text=form.email.label slug="form_email" field_id=form.email.id_for_label %}
+
+Parameters:
+- label_text: The text to display as the label (will be translated)
+- slug: The slug identifier for the StaticUIElement (e.g., "form_email", "form_preferred_language")
+- field_id: The ID attribute for the label's 'for' attribute
+- required: Optional boolean to add required indicator
+{% endcomment %}
+
+<div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+    <label for="{{ field_id }}" style="margin: 0; flex: 1;">
+        {% trans label_text %}{% if required %} *{% endif %}
+    </label>
+    {% if slug %}
+        {% audio_player_static_ui slug "label" %}
+    {% endif %}
+</div>

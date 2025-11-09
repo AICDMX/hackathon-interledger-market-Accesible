@@ -1,6 +1,7 @@
 """
 Custom context processors for marketplace project.
 """
+import json
 from django.conf import settings
 
 
@@ -26,4 +27,12 @@ def language_preferences(request):
         'preferred_audio_language': preferred_audio,
         'audio_text_fallback_active': audio_text_fallback_active,
         'fallback_text_language': fallback_language,
+        'audio_config': {
+            'icon_inactive': (settings.MEDIA_URL.rstrip('/') + '/' + getattr(settings, 'AUDIO_ICON_INACTIVE', 'listen-inactive.png')).replace('//', '/'),
+            'icon_active': (settings.MEDIA_URL.rstrip('/') + '/' + getattr(settings, 'AUDIO_ICON_ACTIVE', 'listen-active.png')).replace('//', '/'),
+            'fallback_audio': json.dumps(getattr(settings, 'AUDIO_FALLBACK_BY_LANGUAGE', {})),
+            'fallback_file': getattr(settings, 'AUDIO_FALLBACK_FILE', 'audio/fallback.mp3'),
+            'media_url': settings.MEDIA_URL,
+            'static_url': settings.STATIC_URL,
+        },
     }

@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-{% load i18n static %}
+{% load i18n static audio_tags %}
 
 {% block title %}{% trans 'Profile' %} - {{ block.super }}{% endblock %}
 
@@ -8,7 +8,7 @@
 {% endblock %}
 
 {% block content %}
-<h1>{% trans 'My Profile' %}</h1>
+{% include 'components/static_title_with_audio.html' with title_text="My Profile" slug="page_my_profile" heading_tag="h1" %}
 
 {% if messages %}
 <ul class="messages">
@@ -26,13 +26,13 @@
         <input type="hidden" name="update_profile" value="1">
         
         <div class="form-group">
-            <label for="username">{% trans 'Username' %}</label>
+            {% include 'components/form_label_with_audio.html' with label_text="Username" slug="form_username" field_id="username" %}
             <input type="text" id="username" value="{{ user.username }}" disabled>
             <small class="text-muted">{% trans 'Username cannot be changed' %}</small>
         </div>
         
         <div class="form-group">
-            <label for="{{ profile_form.email.id_for_label }}">{{ profile_form.email.label }}</label>
+            {% include 'components/form_label_with_audio.html' with label_text=profile_form.email.label slug="form_email" field_id=profile_form.email.id_for_label %}
             {{ profile_form.email }}
             {% if profile_form.email.errors %}
                 <ul class="errorlist">
@@ -47,7 +47,7 @@
         </div>
         
         <div class="form-group">
-            <label for="{{ profile_form.role.id_for_label }}">{{ profile_form.role.label }}</label>
+            {% include 'components/form_label_with_audio.html' with label_text=profile_form.role.label slug="form_role" field_id=profile_form.role.id_for_label %}
             {{ profile_form.role }}
             {% if profile_form.role.errors %}
                 <ul class="errorlist">
@@ -92,7 +92,7 @@
         </div>
         
         <div class="form-group">
-            <label for="{{ profile_form.native_languages.id_for_label }}">{{ profile_form.native_languages.label }}</label>
+            {% include 'components/form_label_with_audio.html' with label_text=profile_form.native_languages.label slug="form_native_languages" field_id=profile_form.native_languages.id_for_label %}
             {{ profile_form.native_languages }}
             {% if profile_form.native_languages.errors %}
                 <ul class="errorlist">
@@ -126,7 +126,7 @@
         <input type="hidden" name="change_password" value="1">
         
         <div class="form-group">
-            <label for="{{ password_form.old_password.id_for_label }}">{{ password_form.old_password.label }}</label>
+            {% include 'components/form_label_with_audio.html' with label_text=password_form.old_password.label slug="form_old_password" field_id=password_form.old_password.id_for_label %}
             {{ password_form.old_password }}
             {% if password_form.old_password.errors %}
                 <ul class="errorlist">
@@ -175,7 +175,10 @@
             </ul>
         {% endif %}
         
-        <button type="submit" class="btn btn-primary">{% trans 'Change Password' %}</button>
+        <div style="display: flex; align-items: center; gap: 0.5rem;">
+            <button type="submit" class="btn btn-primary">{% trans 'Change Password' %}</button>
+            {% audio_player_static_ui "button_change_password" "label" %}
+        </div>
     </form>
 </div>
 {% endblock %}

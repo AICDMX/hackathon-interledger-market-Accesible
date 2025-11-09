@@ -42,3 +42,6 @@
 [x] browser jobs dashboard should show how many have been submited of workers or if in works submit stage it should show how many of needed have been submited. it should also have some tags. applied would be good. or about to start when its like 48 hours or less be for deadline
 [x] lots of things missing spanish translation. can we get that added to the forms and such. 
 [x] anyplace we have titles we want to start having the speaker button so we can read out the thing in the native langauge selected
+[x] use the listen.png for all the audio buttons. we dont need the plain text just the icon
+[x] grab the fave icon/tiny logo from the top level media file. and any others from there like logo and add them were expected
+[x] fromat the liten buttons so they are next to the text they belong too.

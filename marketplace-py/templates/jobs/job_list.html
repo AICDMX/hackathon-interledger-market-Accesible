@@ -108,11 +108,11 @@
 <div class="card">
     <form method="get" action="{% url 'jobs:list' %}" role="search">
         <div class="form-group">
-            <label for="search">{% trans 'Search Jobs' %}</label>
+            {% include 'components/form_label_with_audio.html' with label_text="Search Jobs" slug="form_search_jobs" field_id="search" %}
             <input type="text" id="search" name="search" value="{{ search_query }}" placeholder="{% trans 'Search by title or description...' %}">
         </div>
         <div class="form-group">
-            <label for="language">{% trans 'Filter by Language' %}</label>
+            {% include 'components/form_label_with_audio.html' with label_text="Filter by Language" slug="form_filter_language" field_id="language" %}
             <select id="language" name="language">
                 <option value="">{% trans 'All Languages' %}</option>
                 <option value="en" {% if language_filter == 'en' %}selected{% endif %}>English</option>
@@ -126,7 +126,10 @@
         {% if user.is_authenticated %}
         <div class="form-group">
             <fieldset class="filter-options">
-                <legend>{% trans 'Filter Options' %}</legend>
+                <legend style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+                    {% trans 'Filter Options' %}
+                    {% audio_player_static_ui "section_filter_options" "label" %}
+                </legend>
                 <div class="checkbox-group">
                     <label>
                         <input type="checkbox" name="hide_applied" {% if hide_applied %}checked{% endif %}>

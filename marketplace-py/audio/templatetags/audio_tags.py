@@ -1,6 +1,7 @@
 """
 Template tags for audio functionality.
 """
+import json
 from django import template
 from django.conf import settings
 from django.contrib.contenttypes.models import ContentType
@@ -9,6 +10,23 @@ from django.templatetags.static import static
 from audio.mixins import get_audio_for_content, get_audio_with_fallback, get_audio_for_static_ui, get_fallback_audio_url
 
 register = template.Library()
+
+
+def get_audio_config_from_context_or_settings(context):
+    """Get audio_config from context or construct from settings."""
+    audio_config = context.get('audio_config')
+    if audio_config:
+        return audio_config
+    
+    # Fallback: construct from settings if not in context
+    return {
+        'icon_inactive': (settings.MEDIA_URL.rstrip('/') + '/' + getattr(settings, 'AUDIO_ICON_INACTIVE', 'listen-inactive.png')).replace('//', '/'),
+        'icon_active': (settings.MEDIA_URL.rstrip('/') + '/' + getattr(settings, 'AUDIO_ICON_ACTIVE', 'listen-active.png')).replace('//', '/'),
+        'fallback_audio': json.dumps(getattr(settings, 'AUDIO_FALLBACK_BY_LANGUAGE', {})),
+        'fallback_file': getattr(settings, 'AUDIO_FALLBACK_FILE', 'audio/fallback.mp3'),
+        'media_url': settings.MEDIA_URL,
+        'static_url': settings.STATIC_URL,
+    }
 
 
 @register.inclusion_tag('audio/audio_player.html', takes_context=True)
@@ -69,6 +87,7 @@ def audio_player(context, content_object, target_field, language_code=None):
         'request': request,
         'LANGUAGE_CODE': settings.LANGUAGE_CODE,
         'preferred_audio_language': preferred_audio,
+        'audio_config': get_audio_config_from_context_or_settings(context),
     }
 
 
@@ -134,6 +153,7 @@ def audio_player_static_ui(context, slug, target_field='label', language_code=No
             'request': context.get('request'),
             'LANGUAGE_CODE': settings.LANGUAGE_CODE,
             'preferred_audio_language': preferred_audio,
+            'audio_config': get_audio_config_from_context_or_settings(context),
         }
     
     # If language_code is explicitly provided, use it directly
@@ -168,4 +188,5 @@ def audio_player_static_ui(context, slug, target_field='label', language_code=No
         'request': request,
         'LANGUAGE_CODE': settings.LANGUAGE_CODE,
         'preferred_audio_language': preferred_audio,
+        'audio_config': get_audio_config_from_context_or_settings(context),
     }

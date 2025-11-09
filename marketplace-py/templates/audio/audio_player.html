@@ -4,6 +4,18 @@ Audio player template component.
 Usage: {% audio_player content_object "title" "en" %}
 {% endcomment %}
 
+<script>
+// Inject audio configuration from Django
+window.AUDIO_CONFIG = {
+    iconInactive: '{{ audio_config.icon_inactive }}',
+    iconActive: '{{ audio_config.icon_active }}',
+    fallbackAudio: {{ audio_config.fallback_audio|safe }},
+    fallbackFile: '{{ audio_config.fallback_file }}',
+    staticUrl: '{{ audio_config.static_url }}'
+};
+</script>
+<script src="{% static 'audio/audio-player-core.js' %}"></script>
+
 <div class="audio-player-wrapper" 
      data-audio-target="{{ target_field }}"
      data-content-type="{{ content_type_id }}"
@@ -15,7 +27,7 @@ Usage: {% audio_player content_object "title" "en" %}
         <button class="audio-play-btn" 
                 aria-label="{% blocktrans with field=target_field lang=language_code %}Play audio for {{ field }} in {{ lang }}{% endblocktrans %}"
                 onclick="playAudio(this)">
-            <img src="/media/listen.png" alt="{% trans 'Listen' %}" class="audio-icon" aria-hidden="true">
+            <img src="{{ audio_config.icon_inactive }}" alt="{% trans 'Listen' %}" class="audio-icon" aria-hidden="true">
         </button>
         
         <div class="audio-player-container" style="display: none;">
@@ -34,7 +46,7 @@ Usage: {% audio_player content_object "title" "en" %}
             <button class="audio-play-btn audio-fallback-btn" 
                     aria-label="{% blocktrans with field=target_field lang=language_code %}Play fallback audio for {{ field }} in {{ lang }}{% endblocktrans %}"
                     onclick="playAudio(this)">
-                <img src="/media/listen.png" alt="{% trans 'Listen (Fallback)' %}" class="audio-icon" aria-hidden="true">
+                <img src="{{ audio_config.icon_inactive }}" alt="{% trans 'Listen (Fallback)' %}" class="audio-icon" aria-hidden="true">
             </button>
             
             <div class="audio-player-container" style="display: none;">
@@ -53,7 +65,7 @@ Usage: {% audio_player content_object "title" "en" %}
             <button class="audio-request-btn" 
                     aria-label="{% blocktrans with field=target_field lang=language_code %}Request audio for {{ field }} in {{ lang }}{% endblocktrans %}"
                     onclick="requestAudio(this)">
-                <img src="/media/listen.png" alt="{% trans 'Request audio' %}" class="audio-icon" aria-hidden="true">
+                <img src="{{ audio_config.icon_inactive }}" alt="{% trans 'Request audio' %}" class="audio-icon" aria-hidden="true">
             </button>
             
             <div class="audio-request-message" style="display: none;" role="alert"></div>
@@ -62,14 +74,22 @@ Usage: {% audio_player content_object "title" "en" %}
 </div>
 
 <script>
-// Audio player functionality
+// Audio player functionality - uses centralized module
 function playAudio(button) {
     const wrapper = button.closest('.audio-player-wrapper');
     const playerContainer = wrapper.querySelector('.audio-player-container');
-    const audio = playerContainer.querySelector('audio');
+    const audio = playerContainer ? playerContainer.querySelector('audio') : null;
+    const icon = button.querySelector('.audio-icon');
     
-    // Just play the audio directly without showing player controls
-    audio.play().catch(err => {
+    if (!audio) {
+        // No audio element found - use fallback
+        const languageCode = wrapper.dataset.language || '{{ preferred_audio_language|default:LANGUAGE_CODE }}';
+        playFallbackAudio(button, languageCode);
+        return;
+    }
+    
+    // Use centralized module to play with icon management
+    window.AudioPlayerModule.playAudioWithIcon(audio, icon).catch(err => {
         console.error('Error playing audio:', err);
         // If audio fails, try fallback
         const languageCode = wrapper.dataset.language || '{{ preferred_audio_language|default:LANGUAGE_CODE }}';
@@ -82,14 +102,22 @@ function closeAudioPlayer(button) {
     const wrapper = container.closest('.audio-player-wrapper');
     const playBtn = wrapper.querySelector('.audio-play-btn');
     const audio = container.querySelector('audio');
+    const icon = playBtn ? playBtn.querySelector('.audio-icon') : null;
     
     // Stop audio
     audio.pause();
     audio.currentTime = 0;
     
+    // Reset icon to inactive
+    if (icon) {
+        window.AudioPlayerModule.setIconState(icon, 'inactive');
+    }
+    
     // Hide player, show button
     container.style.display = 'none';
-    playBtn.style.display = 'inline-flex';
+    if (playBtn) {
+        playBtn.style.display = 'inline-flex';
+    }
 }
 
 function requestAudio(button) {
@@ -101,42 +129,12 @@ function requestAudio(button) {
 }
 
 function playFallbackAudio(button, languageCode) {
-    // Get fallback audio URL based on language
-    // Language-specific fallbacks: oto -> fallback-oto.mp3, others -> fallback.mp3
-    let fallbackPath = '{% static "audio/fallback.mp3" %}';
-    if (languageCode === 'oto') {
-        fallbackPath = '{% static "audio/fallback-oto.mp3" %}';
-    }
+    const icon = button.querySelector('.audio-icon');
     
-    // Create audio element and play directly (no visible player)
-    const audio = new Audio(fallbackPath);
-    
-    // Play audio
-    audio.play().catch(err => {
+    // Use centralized module
+    window.AudioPlayerModule.playFallbackAudio(languageCode, icon).catch(err => {
         console.error('Error playing fallback audio:', err);
-        // Try generic fallback if language-specific fails
-        if (languageCode === 'oto') {
-            const genericFallback = new Audio('{% static "audio/fallback.mp3" %}');
-            genericFallback.play().catch(() => {
-                console.error('Error playing generic fallback audio');
-            });
-        }
     });
-}
-
-function getCookie(name) {
-    let cookieValue = null;
-    if (document.cookie && document.cookie !== '') {
-        const cookies = document.cookie.split(';');
-        for (let i = 0; i < cookies.length; i++) {
-            const cookie = cookies[i].trim();
-            if (cookie.substring(0, name.length + 1) === (name + '=')) {
-                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                break;
-            }
-        }
-    }
-    return cookieValue;
 }
 </script>
 
@@ -144,8 +142,10 @@ function getCookie(name) {
 .audio-player-wrapper {
     display: inline-flex;
     align-items: center;
-    gap: 0.5rem;
-    margin-left: 0.5rem;
+    vertical-align: middle;
+    gap: 0.25rem;
+    margin-left: 0.25rem;
+    flex-shrink: 0;
 }
 
 .audio-play-btn,
@@ -153,13 +153,15 @@ function getCookie(name) {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    padding: 0.25rem;
+    padding: 0;
     background-color: transparent;
     border: none;
     cursor: pointer;
     transition: opacity 0.2s;
     min-width: 32px;
     min-height: 32px;
+    vertical-align: middle;
+    line-height: 1;
 }
 
 .audio-play-btn *,

@@ -60,7 +60,7 @@
     </div>
     
     <div>
-        <h2>{% trans 'Description' %}</h2>
+        {% include 'components/static_title_with_audio.html' with title_text="Description" slug="section_description" heading_tag="h2" %}
         <p>{{ job.description|linebreaks }}</p>
     </div>
     
@@ -134,7 +134,7 @@
             
             {% if user_submissions %}
                 <div>
-                    <h2>{% trans 'Your Submissions' %}</h2>
+                    {% include 'components/static_title_with_audio.html' with title_text="Your Submissions" slug="section_your_submissions" heading_tag="h2" %}
                     <ul>
                         {% for submission in user_submissions %}
                             <li>

@@ -9,9 +9,11 @@
 
 {% block content %}
 <div class="title-with-audio" style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
-    <h1 style="margin: 0; flex: 1;">{% trans 'Submit Work for' %}: {{ job.title }}</h1>
-    {% load audio_tags %}
-    {% audio_player job "title" %}
+    <h1 style="margin: 0; flex: 1; display: flex; align-items: center; gap: 0.5rem;">
+        <span>{% trans 'Submit Work for' %}: {{ job.title }}</span>
+        {% load audio_tags %}
+        {% audio_player job "title" %}
+    </h1>
 </div>
 
 <div class="card">
@@ -55,23 +57,23 @@
         {% csrf_token %}
         
         <div class="form-group">
-            <label for="note">{% trans 'Note' %}</label>
+            {% include 'components/form_label_with_audio.html' with label_text="Note" slug="form_note" field_id="note" %}
             <textarea id="note" name="note" rows="4" placeholder="{% trans 'Additional information about your submission...' %}"></textarea>
         </div>
         
         {% for deliverable_type in job.get_deliverable_types_list %}
             <div class="form-group">
                 {% if deliverable_type == 'text' %}
-                    <label for="text_file">{% trans 'Text File' %}</label>
+                    {% include 'components/form_label_with_audio.html' with label_text="Text File" slug="form_text_file" field_id="text_file" %}
                     <input type="file" id="text_file" name="text_file" accept=".txt,.doc,.docx,.pdf">
                 {% elif deliverable_type == 'video' %}
-                    <label for="video_file">{% trans 'Video File' %}</label>
+                    {% include 'components/form_label_with_audio.html' with label_text="Video File" slug="form_video_file" field_id="video_file" %}
                     <input type="file" id="video_file" name="video_file" accept="video/*" capture="environment">
                     <p class="muted-text" style="font-size: 0.875rem; margin-top: 0.5rem;">
                         {% trans 'Record with your camera or upload an existing video.' %}
                     </p>
                 {% elif deliverable_type == 'audio' %}
-                    <label for="audio_file">{% trans 'Audio File' %}</label>
+                    {% include 'components/form_label_with_audio.html' with label_text="Audio File" slug="form_audio_file" field_id="audio_file" %}
                     <div class="audio-recording-section" data-audio-recording data-file-input-id="audio_file">
                         <div class="recording-controls">
                             <button type="button" class="btn-record" id="btn-start-recording-audio" aria-label="{% trans 'Start recording' %}">
@@ -104,7 +106,7 @@
                     </p>
                     <input type="file" id="audio_file" name="audio_file" accept="audio/*">
                 {% elif deliverable_type == 'image' %}
-                    <label for="image_file">{% trans 'Image File' %}</label>
+                    {% include 'components/form_label_with_audio.html' with label_text="Image File" slug="form_image_file" field_id="image_file" %}
                     <input type="file" id="image_file" name="image_file" accept="image/*" capture="environment">
                     <p class="muted-text" style="font-size: 0.875rem; margin-top: 0.5rem;">
                         {% trans 'Take a quick photo or upload an existing image.' %}

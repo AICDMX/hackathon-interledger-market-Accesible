@@ -5,9 +5,13 @@
 
 {% block content %}
 {% load audio_tags %}
-{% include 'components/static_title_with_audio.html' with title_text="Applications for" slug="page_view_applications" heading_tag="h1" %}
-<div style="display: inline-block; margin-left: 0.5rem;">{{ job.title }}</div>
-{% audio_player job "title" %}
+<div class="title-with-audio" style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+    {% include 'components/static_title_with_audio.html' with title_text="Applications for" slug="page_view_applications" heading_tag="h1" %}
+    <div style="display: flex; align-items: center; gap: 0.5rem;">
+        <span>{{ job.title }}</span>
+        {% audio_player job "title" %}
+    </div>
+</div>
 
 <div class="card">
     <p><strong>{% trans 'Status' %}:</strong> {{ job.get_status_display }}</p>
