@@ -6,4 +6,5 @@ ok we are going to work on getting some initial pages setup. we are doing mobile
 
 
  conditionla payment from the market wallert 
+ simplifcy the flow in the recievers part of payments 
  
