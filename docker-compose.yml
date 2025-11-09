@@ -6,12 +6,12 @@ services:
     container_name: hackathon-interledger-market
     ports:
       - "8000:8000"
-#    volumes:
-#      # Mount source code for development (optional - remove for production)
-#      # Note: This also persists db.sqlite3, media, and staticfiles
-#      - ./marketplace-py:/app
-#      # Exclude .venv to avoid conflicts with container's virtual environment
-#      - /app/.venv
+    volumes:
+      # Mount source code for development (optional - remove for production)
+      # Note: This also persists db.sqlite3, media, and staticfiles
+      - ./marketplace-py:/app
+      # Exclude .venv to avoid conflicts with container's virtual environment
+      - /app/.venv
     environment:
       - DJANGO_SETTINGS_MODULE=marketplace.settings
       - PYTHONUNBUFFERED=1
