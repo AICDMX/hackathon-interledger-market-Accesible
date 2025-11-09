@@ -3,6 +3,7 @@ import cors from 'cors';
 import helmet from 'helmet';
 import morgan from 'morgan';
 import paymentsRouter from './web/routes';
+import { errorHandler } from './middleware/errorHandler';
 
 const app = express();
 
@@ -16,6 +17,9 @@ app.get('/health', (_req, res) => {
 });
 
 app.use('/', paymentsRouter);
+
+// Error handler must be last
+app.use(errorHandler);
 
 export default app;
 

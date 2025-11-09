@@ -12,6 +12,7 @@ import {
   continueGrant,
   createOutgoingPayment
 } from './openPayments';
+import { notifyDjango } from './webhookNotifier';
 
 export async function startQuoteFlow(args: {
   offerId: string;
@@ -123,7 +124,57 @@ export async function completePayment(args: {
   );
 
   await pendingRepo.update(args.pendingId, { status: 'paid', outgoingPaymentId: op.id });
+  
+  // Notify Django about payment completion
+  await notifyDjango({
+    type: 'payment.completed',
+    pendingId: args.pendingId,
+    offerId: pending.offerId,
+    status: 'paid',
+    outgoingPaymentId: op.id,
+    timestamp: new Date().toISOString()
+  });
+  
   return op;
+}
+
+export async function createIncomingPaymentForJob(args: {
+  amount: string;
+  description: string;
+  sellerId: string;
+}) {
+  const seller = await sellersRepo.get(args.sellerId);
+  if (!seller) throw new Error(`seller ${args.sellerId} not found`);
+
+  // Build client as the seller (merchant)
+  const client = await buildSellerClient({
+    walletAddressUrl: seller.walletAddressUrl,
+    keyId: seller.keyId,
+    privateKeyPath: seller.privateKeyPath
+  });
+
+  // Load seller wallet doc
+  const sellerWallet = await getWalletDoc(client, seller.walletAddressUrl);
+
+  // Request incoming payment grant
+  const inToken = await requestIncomingPaymentGrant(client, sellerWallet.authServer);
+  
+  // Create incoming payment
+  const incoming = await createIncomingPayment(client, sellerWallet.resourceServer, inToken, {
+    walletAddress: sellerWallet.id,
+    value: args.amount,
+    assetCode: sellerWallet.assetCode,
+    assetScale: sellerWallet.assetScale,
+    description: args.description
+  });
+
+  return {
+    incomingPaymentId: incoming.id,
+    walletAddress: sellerWallet.id,
+    amount: args.amount,
+    assetCode: sellerWallet.assetCode,
+    assetScale: sellerWallet.assetScale
+  };
 }
 
 

@@ -83,6 +83,15 @@
                 </form>
             </div>
             
+            <div class="card" style="margin-top: 1rem; background-color: #fff7ed; border: 2px solid #fb923c;">
+                {% include 'components/static_title_with_audio.html' with title_text="Approve Quote & Pay" slug="section_approve_quote" heading_tag="h2" %}
+                <p class="muted-text">{% trans 'Start the payment flow. You will be redirected to your wallet.' %}</p>
+                <div style="display: flex; align-items: center; gap: 0.5rem;">
+                    <a href="{% url 'jobs:approve_quote' job.pk %}" class="btn btn-primary">{% trans 'Approve quote & pay' %}</a>
+                    {% audio_player_static_ui "button_approve_quote" "label" %}
+                </div>
+            </div>
+            
             <div>
                 {% include 'components/static_title_with_audio.html' with title_text="Submissions" slug="section_submissions" heading_tag="h2" %}
                 {% if job.submissions.all %}

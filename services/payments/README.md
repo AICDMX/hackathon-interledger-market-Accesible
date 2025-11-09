@@ -198,10 +198,57 @@ To see the complete flow with documentation:
 bash scripts/full_workflow_example.sh
 ```
 
+## New Features (2025 Update)
+
+### ✅ Payment Status Endpoints
+- `GET /payments/:pendingId/status` - Query individual payment status
+- `GET /payments/pending` - List all payments
+- `GET /offers/:offerId/payments` - Get all payments for a job
+
+### ✅ Django Integration Endpoint
+- `POST /api/payments/incoming` - Create incoming payment for escrow/pre-approved payments
+
+### ✅ Webhook Notifications
+- Automatic Django notifications on payment completion
+- Configurable via `DJANGO_BASE_URL` environment variable
+- Sends events to `/api/webhooks/payments` endpoint
+
+### ✅ Error Handling
+- Comprehensive error middleware
+- Structured error responses
+- Development mode stack traces
+
+### ✅ Documentation
+- Complete API documentation in [API.md](./API.md)
+- Django integration examples
+- Testing guide with curl examples
+
+## Configuration (Updated)
+
+Create a `.env` file based on `.env.example`:
+
+```bash
+cp .env.example .env
+```
+
+Key configuration options:
+```bash
+PORT=3000
+BASE_URL=http://localhost:4001
+DJANGO_BASE_URL=http://web:8000  # For webhook notifications
+
+# Optional: Auto-register default seller on startup
+SELLER_ID=default-seller
+SELLER_WALLET_ADDRESS_URL=https://ilp.interledger-test.dev/mvr5656
+SELLER_KEY_ID=fe775339-6ebc-4eb8-a4b4-0811acba3b62
+SELLER_PRIVATE_KEY_PATH=./privates/mvr5656.key
+```
+
 ## Notes and TODOs
 
 - Hash verification: implement verification of `hash` against `finishId`/wallet per your wallet provider. The Python reference uses a `verify_response_hash` helper.
-- Webhooks/status: add `/offers/:offerId/status` and a webhook to notify Django when payments finalize.
+- ~~Webhooks/status: add `/offers/:offerId/status` and a webhook to notify Django when payments finalize.~~ ✅ **COMPLETED**
 - Key rotation: store `privateKeyPath` securely; consider a secrets manager in production.
+- Consider migrating from file-based storage to database for production use.
 
 

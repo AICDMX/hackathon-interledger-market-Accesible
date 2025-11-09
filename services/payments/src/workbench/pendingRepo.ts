@@ -65,6 +65,16 @@ async function get(id: string): Promise<PendingPaymentRecord | undefined> {
   return db.pendings.find((p) => p.id === id);
 }
 
-export const pendingRepo = { create, update, get };
+async function list(): Promise<PendingPaymentRecord[]> {
+  const db = readDb();
+  return db.pendings;
+}
+
+async function findByOfferId(offerId: string): Promise<PendingPaymentRecord[]> {
+  const db = readDb();
+  return db.pendings.filter((p) => p.offerId === offerId);
+}
+
+export const pendingRepo = { create, update, get, list, findByOfferId };
 
 

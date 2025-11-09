@@ -45,10 +45,12 @@ export async function createIncomingPayment(client: any, resourceServer: string,
   value: string;
   assetCode: string;
   assetScale: number;
+  description?: string;
 }) {
   return client.incomingPayment.create({ url: resourceServer, accessToken }, {
     walletAddress: args.walletAddress,
-    incomingAmount: { value: args.value, assetCode: args.assetCode, assetScale: args.assetScale }
+    incomingAmount: { value: args.value, assetCode: args.assetCode, assetScale: args.assetScale },
+    ...(args.description && { metadata: { description: args.description } })
   });
 }
 

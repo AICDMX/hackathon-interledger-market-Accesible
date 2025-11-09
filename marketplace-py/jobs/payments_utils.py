@@ -6,6 +6,52 @@ from django.conf import settings
 logger = logging.getLogger(__name__)
 
 
+def start_quote(offer_id, seller_id, buyer_wallet_address_url, amount):
+    """
+    Start a buyer quote with the payments service and return the redirect URL.
+
+    Args:
+        offer_id: The offer/job ID used as path parameter on the payments service.
+        seller_id: The configured seller identifier in the payments service.
+        buyer_wallet_address_url: The buyer's wallet address URL.
+        amount: Amount to pay (string or Decimal).
+
+    Returns:
+        dict with 'success' and either 'redirect_url' or 'error'
+    """
+    try:
+        payments_url = f"{settings.PAYMENTS_SERVICE_URL}/offers/{offer_id}/quotes/start"
+        payload = {
+            "sellerId": seller_id,
+            "buyerWalletAddressUrl": buyer_wallet_address_url,
+            "amount": str(amount),
+        }
+        logger.info(f"Starting quote via payments service: {payments_url} payload={payload}")
+        response = requests.post(
+            payments_url,
+            json=payload,
+            timeout=30
+        )
+        if response.status_code == 200:
+            data = response.json()
+            redirect_url = data.get('redirectUrl')
+            if redirect_url:
+                return {"success": True, "redirect_url": redirect_url, "data": data}
+            return {"success": False, "error": "Missing redirectUrl in payments service response"}
+        # Non-200s
+        try:
+            err = response.json().get('error')
+        except Exception:
+            err = response.text
+        return {"success": False, "error": err or f"Payments service error {response.status_code}"}
+    except requests.exceptions.RequestException as e:
+        logger.error(f"Error connecting to payments service: {str(e)}")
+        return {"success": False, "error": f"Could not connect to payments service: {str(e)}"}
+    except Exception as e:
+        logger.error(f"Unexpected error starting quote: {str(e)}")
+        return {"success": False, "error": f"Unexpected error: {str(e)}"}
+
+
 def create_incoming_payment(amount, description):
     """
     Create an incoming payment (escrow) via the payments service.
