@@ -14,7 +14,7 @@ from django.utils.decorators import method_decorator
 from django.views.decorators.http import require_http_methods
 from .models import AudioSnippet, AudioRequest, AudioContribution
 from .serializers import AudioSnippetSerializer, AudioRequestSerializer, AudioSnippetCreateSerializer
-from .mixins import get_audio_for_content
+from .mixins import get_audio_for_content, get_audio_with_fallback
 
 
 class AudioSnippetViewSet(viewsets.ModelViewSet):
@@ -80,7 +80,13 @@ class AudioSnippetViewSet(viewsets.ModelViewSet):
     @action(detail=False, methods=['get'], url_path='get/(?P<content_type_id>[^/.]+)/(?P<object_id>[^/.]+)/(?P<target_field>[^/.]+)/(?P<language_code>[^/.]+)')
     def get_audio(self, request, content_type_id, object_id, target_field, language_code):
         """
-        Get a specific audio snippet.
+        Get a specific audio snippet with language fallback.
+        
+        Uses fallback chain:
+        1. Requested language_code
+        2. Language fallback (FALLBACK_TEXT_LANGUAGE)
+        3. Final fallback (LANGUAGE_CODE)
+        
         URL: /api/audio/snippets/get/<content_type_id>/<object_id>/<target_field>/<language_code>/
         """
         try:
@@ -91,17 +97,52 @@ class AudioSnippetViewSet(viewsets.ModelViewSet):
                 status=status.HTTP_400_BAD_REQUEST
             )
         
-        snippet = AudioSnippet.objects.filter(
-            content_type=content_type,
-            object_id=object_id,
-            target_field=target_field,
-            language_code=language_code,
-            status='ready'
-        ).first()
+        # Get the content object
+        try:
+            model_class = content_type.model_class()
+            if model_class is None:
+                return Response(
+                    {'error': 'Invalid content type'},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+            content_object = model_class.objects.get(pk=object_id)
+        except Exception:
+            return Response(
+                {'error': 'Content object not found'},
+                status=status.HTTP_404_NOT_FOUND
+            )
         
-        if snippet:
-            serializer = self.get_serializer(snippet)
-            return Response(serializer.data)
+        # Get user's preferred language from cookie/context
+        # This is the language the user wants to hear audio in
+        preferred_audio = request.COOKIES.get(
+            getattr(settings, 'PREFERRED_AUDIO_LANGUAGE_COOKIE_NAME', 'preferred_audio_language')
+        )
+        
+        # If no preferred audio language in cookie, try LANGUAGE_COOKIE_NAME
+        if not preferred_audio:
+            preferred_audio = request.COOKIES.get(
+                getattr(settings, 'LANGUAGE_COOKIE_NAME', 'django_language')
+            )
+        
+        # If still no preferred language, use request language
+        if not preferred_audio:
+            preferred_audio = getattr(request, 'LANGUAGE_CODE', None)
+        
+        # Use fallback chain: prioritize user's preferred language
+        # The function will try: preferred -> fallback_text_language -> language_code
+        audio_snippet, actual_language_code = get_audio_with_fallback(
+            content_object,
+            target_field,
+            preferred_language_code=preferred_audio or language_code
+        )
+        
+        if audio_snippet:
+            serializer = self.get_serializer(audio_snippet)
+            data = serializer.data
+            data['actual_language_code'] = actual_language_code
+            if actual_language_code != language_code:
+                data['fallback_used'] = True
+            return Response(data)
         else:
             # Return fallback audio URL when snippet is not available
             from django.templatetags.static import static
@@ -116,7 +157,8 @@ class AudioSnippetViewSet(viewsets.ModelViewSet):
                     'content_type_id': content_type_id,
                     'object_id': object_id,
                     'target_field': target_field,
-                    'language_code': language_code
+                    'requested_language_code': language_code,
+                    'tried_languages': fallback_chain
                 },
                 status=status.HTTP_404_NOT_FOUND
             )

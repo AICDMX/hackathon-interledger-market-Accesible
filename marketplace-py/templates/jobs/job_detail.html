@@ -14,9 +14,86 @@
         {% if job.target_dialect %}
             <p><strong>{% trans 'Dialect' %}:</strong> {{ job.target_dialect }}</p>
         {% endif %}
-        <p><strong>{% trans 'Budget' %}:</strong> {{ job.budget }} ILP</p>
-        <p><strong>{% trans 'Deliverable Types' %}:</strong> {{ job.deliverable_types }}</p>
+        <p><strong>{% trans 'Amount Per Person' %}:</strong> {{ job.amount_per_person }} ILP</p>
+        <p><strong>{% trans 'Total Budget' %}:</strong> {{ job.budget }} ILP ({{ job.amount_per_person }} ? {{ job.max_responses }})</p>
+        
+        <p><strong>{% trans 'Responses Needed' %}:</strong> 
+            {{ job.get_accepted_submissions_count }} / {{ job.max_responses }} {% trans 'accepted' %}
+            {% if not job.has_reached_max_responses %}
+                <span class="text-info">({% trans 'Still accepting submissions' %})</span>
+            {% else %}
+                <span class="text-success">({% trans 'Complete' %})</span>
+            {% endif %}
+        </p>
+        
+        {% if job.is_funded %}
+            <div class="card bg-success">
+                <p><strong>{% trans 'Funding Status' %}:</strong> <span class="text-success">{% trans 'Funded' %}</span></p>
+                <p><strong>{% trans 'Funded Amount' %}:</strong> {{ job.funded_amount }} ILP</p>
+                <p class="text-muted"><small>{% trans 'This job is fully funded and no longer accepts additional funding.' %}</small></p>
+                {% if job.payment_id %}
+                    <p><strong>{% trans 'Payment ID' %}:</strong> <code>{{ job.payment_id }}</code></p>
+                {% endif %}
+            </div>
+        {% elif job.funded_amount > 0 %}
+            <div class="card bg-warning">
+                <p><strong>{% trans 'Funding Status' %}:</strong> <span class="text-warning">{% trans 'Partially Funded' %}</span></p>
+                <p><strong>{% trans 'Funded Amount' %}:</strong> {{ job.funded_amount }} ILP / {{ job.budget }} ILP</p>
+            </div>
+        {% else %}
+            <div class="card bg-info">
+                <p><strong>{% trans 'Funding Status' %}:</strong> <span class="text-muted">{% trans 'Not Funded' %}</span></p>
+                <p><strong>{% trans 'Funded Amount' %}:</strong> {{ job.funded_amount }} ILP / {{ job.budget }} ILP</p>
+            </div>
+        {% endif %}
+        
+        {% if fundings %}
+            <div>
+                <h3>{% trans 'Recent community funders' %}</h3>
+                <ul>
+                    {% for funding in fundings %}
+                        <li>
+                            {{ funding.funder.username }} - {{ funding.amount }} ILP
+                            {% if funding.note %}
+                                <span class="text-muted">({{ funding.note }})</span>
+                            {% endif %}
+                        </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        {% endif %}
+        
+        <p><strong>{% trans 'Deliverable Types' %}:</strong> {{ job.get_deliverable_types_display }}</p>
         <p><strong>{% trans 'Created' %}:</strong> {{ job.created_at|date:"F d, Y" }}</p>
+        
+        {% if job.has_reference_media %}
+            <div class="card" style="margin-top: 1rem;">
+                <h3>{% trans 'Reference Media From Funder' %}</h3>
+                <p class="muted-text">{% trans 'Use these examples to better understand the request.' %}</p>
+                {% if job.reference_audio %}
+                    <div style="margin-bottom: 0.75rem;">
+                        <p style="margin-bottom: 0.25rem;"><strong>{% trans 'Audio instructions' %}</strong></p>
+                        <audio controls src="{{ job.reference_audio.url }}" style="width: 100%;">
+                            {% trans 'Your browser does not support the audio element.' %}
+                        </audio>
+                    </div>
+                {% endif %}
+                {% if job.reference_video %}
+                    <div style="margin-bottom: 0.75rem;">
+                        <p style="margin-bottom: 0.25rem;"><strong>{% trans 'Video reference' %}</strong></p>
+                        <video controls src="{{ job.reference_video.url }}" style="width: 100%; max-height: 360px;">
+                            {% trans 'Your browser does not support the video element.' %}
+                        </video>
+                    </div>
+                {% endif %}
+                {% if job.reference_image %}
+                    <div>
+                        <p style="margin-bottom: 0.25rem;"><strong>{% trans 'Image reference' %}</strong></p>
+                        <img src="{{ job.reference_image.url }}" alt="{% trans 'Reference image for this job' %}" style="max-width: 100%; border-radius: 0.5rem;">
+                    </div>
+                {% endif %}
+            </div>
+        {% endif %}
     </div>
     
     <div>
@@ -26,6 +103,20 @@
     
     {% if user.is_authenticated %}
         {% if user == job.funder %}
+            {% if job.has_remaining_budget %}
+                <div class="card bg-warning">
+                    <h2>{% trans 'Funding Required' %}</h2>
+                    <p>{% trans 'This job needs to be funded before creators can submit work.' %}</p>
+                    <form method="post" action="{% url 'jobs:fund' job.pk %}">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-primary">
+                            {% blocktrans with amount=job.remaining_budget %}
+                                Fund Job ({{ amount }} ILP)
+                            {% endblocktrans %}
+                        </button>
+                    </form>
+                </div>
+            {% endif %}
             <div>
                 <h2>{% trans 'Submissions' %}</h2>
                 {% if job.submissions.all %}
@@ -48,9 +139,48 @@
                 {% endif %}
             </div>
         {% else %}
-            {% if job.status == 'open' %}
-                <div>
-                    <a href="{% url 'jobs:submit' job.pk %}" class="btn btn-primary">{% trans 'Submit Work' %}</a>
+            {% if job.status == 'open' and job.is_funded %}
+                {% if job.has_reached_max_responses %}
+                    <div class="card bg-info">
+                        <p>{% blocktrans with max=job.max_responses %}This job has reached its maximum number of responses ({{ max }}). No more submissions are being accepted.{% endblocktrans %}</p>
+                    </div>
+                {% elif user_submissions %}
+                    <div class="card bg-info">
+                        <p>{% trans 'You have already submitted work for this job. You can only submit once per job.' %}</p>
+                    </div>
+                {% else %}
+                    <div class="card bg-success" style="margin-top: 1.5rem; padding: 1.5rem; text-align: center;">
+                        <h2 style="margin-top: 0;">{% trans 'Ready to Submit Work?' %}</h2>
+                        <p style="margin-bottom: 1rem;">{% trans 'This job is funded and accepting submissions. Click below to submit your work.' %}</p>
+                        <a href="{% url 'jobs:submit' job.pk %}" class="btn btn-primary" style="font-size: 1.25rem; padding: 0.75rem 2rem;">
+                            {% trans 'Submit Work for This Job' %}
+                        </a>
+                    </div>
+                {% endif %}
+            {% elif job.status == 'open' and job.has_remaining_budget %}
+                <div class="card bg-info">
+                    <p>{% trans 'This job is not yet funded. You can help unlock it for creators.' %}</p>
+                    {% if user.is_authenticated %}
+                        <a href="{% url 'jobs:pledge' job.pk %}" class="btn btn-primary">{% trans 'Fund this job' %}</a>
+                    {% else %}
+                        <a href="{% url 'users:login' %}?next={% url 'jobs:pledge' job.pk %}">{% trans 'Login to fund this job.' %}</a>
+                    {% endif %}
+                </div>
+            {% elif job.status == 'open' and not job.is_funded and not user_application %}
+                <div class="card bg-success" style="margin-top: 1.5rem; padding: 1.5rem; text-align: center;">
+                    <h2 style="margin-top: 0;">{% trans 'Interested in This Job?' %}</h2>
+                    <p style="margin-bottom: 1rem;">{% trans 'Submit your profile to apply for this job. The job owner will review applications and select workers.' %}</p>
+                    <a href="{% url 'jobs:apply_to_job' job.pk %}" class="btn btn-primary" style="font-size: 1.25rem; padding: 0.75rem 2rem;">
+                        {% trans 'Apply to This Job' %}
+                    </a>
+                </div>
+            {% elif job.status == 'waiting_completion' %}
+                <div class="card bg-info">
+                    <p>{% trans 'This job is waiting for the funder to finalize payouts. No additional submissions are needed right now.' %}</p>
+                </div>
+            {% elif job.status == 'completed' %}
+                <div class="card bg-info">
+                    <p>{% trans 'This job has been completed and is no longer accepting submissions.' %}</p>
                 </div>
             {% endif %}
             

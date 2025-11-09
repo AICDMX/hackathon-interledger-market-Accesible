@@ -1,0 +1,111 @@
+{% extends 'base.html' %}
+{% load i18n static %}
+
+{% block title %}{% trans 'Apply to Job' %} - {{ block.super }}{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'audio/audio-contribution.css' %}">
+{% endblock %}
+
+{% block content %}
+<h1>{% trans 'Apply to Job' %}: {{ job.title }}</h1>
+
+<div class="card">
+    <p><strong>{% trans 'Target Language' %}:</strong> {{ job.target_language }}</p>
+    <p><strong>{% trans 'Budget' %}:</strong> {{ job.budget }} ILP</p>
+    <p><strong>{% trans 'Amount Per Person' %}:</strong> {{ job.amount_per_person }} ILP</p>
+    <p><strong>{% trans 'Required Deliverables' %}:</strong> {{ job.get_deliverable_types_display }}</p>
+    <p>{{ job.description|linebreaks }}</p>
+</div>
+
+<div class="card">
+    <h2>{% trans 'Submit Your Profile' %}</h2>
+    <p class="muted-text">{% trans 'Tell the job owner about yourself and why you are interested in this job. You can include audio, video, or image files to introduce yourself.' %}</p>
+    
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        
+        <div class="form-group">
+            <label for="{{ form.profile_note.id_for_label }}">{% trans 'Profile Note' %} *</label>
+            {{ form.profile_note }}
+            {% if form.profile_note.errors %}
+                <div class="error">{{ form.profile_note.errors }}</div>
+            {% endif %}
+        </div>
+        
+        <div class="form-group">
+            <label for="{{ form.profile_audio.id_for_label }}">{% trans 'Profile Audio (Optional)' %}</label>
+            <div class="audio-recording-section" data-audio-recording data-file-input-id="{{ form.profile_audio.id_for_label }}">
+                <div class="recording-controls">
+                    <button type="button" class="btn-record" id="btn-start-recording-profile-audio" aria-label="{% trans 'Start recording' %}">
+                        <span class="record-icon" aria-hidden="true">??</span>
+                        <span class="record-label">{% trans 'Record Audio' %}</span>
+                    </button>
+                    <button type="button" class="btn-retry" id="btn-retry-recording-profile-audio" style="display: none;" aria-label="{% trans 'Record again' %}">
+                        <span class="retry-icon" aria-hidden="true">??</span>
+                        <span class="retry-label">{% trans 'Record Again' %}</span>
+                    </button>
+                    <button type="button" class="btn-stop" id="btn-stop-recording-profile-audio" style="display: none;" aria-label="{% trans 'Stop recording' %}">
+                        <span class="stop-icon" aria-hidden="true">?</span>
+                        <span class="stop-label">{% trans 'Stop' %}</span>
+                    </button>
+                    <button type="button" class="btn-cancel" id="btn-cancel-recording-profile-audio" style="display: none;" aria-label="{% trans 'Cancel recording' %}">
+                        <span class="cancel-icon" aria-hidden="true">?</span>
+                        <span class="cancel-label">{% trans 'Cancel' %}</span>
+                    </button>
+                </div>
+                <div class="recording-status" id="recording-status-profile-audio" style="display: none;" role="status" aria-live="polite">
+                    <span class="recording-indicator" aria-hidden="true">??</span>
+                    <span class="recording-time" id="recording-time-profile-audio">0:00</span>
+                </div>
+                <div class="recording-preview" id="recording-preview-profile-audio" style="display: none;">
+                    <audio controls id="recording-audio-preview-profile-audio"></audio>
+                </div>
+            </div>
+            <p class="muted-text" style="font-size: 0.875rem; margin-top: 0.5rem;">
+                {% trans 'Or upload an audio file:' %}
+            </p>
+            {{ form.profile_audio }}
+            {% if form.profile_audio.errors %}
+                <div class="error">{{ form.profile_audio.errors }}</div>
+            {% endif %}
+        </div>
+        
+        <div class="form-group">
+            <label for="{{ form.profile_video.id_for_label }}">{% trans 'Profile Video (Optional)' %}</label>
+            {{ form.profile_video }}
+            <p class="muted-text" style="font-size: 0.875rem; margin-top: 0.5rem;">
+                {% trans 'Record with your camera or upload an existing video.' %}
+            </p>
+            {% if form.profile_video.errors %}
+                <div class="error">{{ form.profile_video.errors }}</div>
+            {% endif %}
+        </div>
+        
+        <div class="form-group">
+            <label for="{{ form.profile_image.id_for_label }}">{% trans 'Profile Image (Optional)' %}</label>
+            {{ form.profile_image }}
+            <p class="muted-text" style="font-size: 0.875rem; margin-top: 0.5rem;">
+                {% trans 'Take a quick photo or upload an existing image.' %}
+            </p>
+            {% if form.profile_image.errors %}
+                <div class="error">{{ form.profile_image.errors }}</div>
+            {% endif %}
+        </div>
+        
+        <button type="submit" class="btn btn-primary">{% trans 'Submit Application' %}</button>
+        <a href="{% url 'jobs:detail' job.pk %}" class="btn">{% trans 'Cancel' %}</a>
+    </form>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'audio/audio-recorder.js' %}"></script>
+<script>
+    // Initialize audio recording for profile audio
+    if (document.querySelector('[data-audio-recording][data-file-input-id="{{ form.profile_audio.id_for_label }}"]')) {
+        const audioSection = document.querySelector('[data-audio-recording][data-file-input-id="{{ form.profile_audio.id_for_label }}"]');
+        // Audio recording will be initialized by audio-recorder.js
+    }
+</script>
+{% endblock %}

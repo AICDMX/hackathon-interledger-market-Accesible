@@ -6,7 +6,7 @@ from django.conf import settings
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.staticfiles.storage import staticfiles_storage
 from django.templatetags.static import static
-from audio.mixins import get_audio_for_content
+from audio.mixins import get_audio_for_content, get_audio_with_fallback
 
 register = template.Library()
 
@@ -16,6 +16,11 @@ def audio_player(context, content_object, target_field, language_code=None):
     """
     Render an audio player for a content object.
     
+    Uses language fallback chain:
+    1. User's preferred language
+    2. Language fallback (FALLBACK_TEXT_LANGUAGE)
+    3. Final fallback (LANGUAGE_CODE)
+    
     Usage:
         {% load audio_tags %}
         {% audio_player job "title" "en" %}
@@ -23,16 +28,24 @@ def audio_player(context, content_object, target_field, language_code=None):
     Args:
         content_object: The model instance
         target_field: Field name (e.g., 'title', 'description')
-        language_code: Optional language code (defaults to current language)
+        language_code: Optional language code (if provided, uses that instead of fallback chain)
     """
-    if language_code is None:
-        preferred_audio = context.get('preferred_audio_language')
-        if preferred_audio:
-            language_code = preferred_audio
-        else:
-            language_code = context.get('LANGUAGE_CODE', settings.LANGUAGE_CODE)
+    # Get user's preferred language from context
+    preferred_audio = context.get('preferred_audio_language')
     
-    audio_snippet = get_audio_for_content(content_object, target_field, language_code)
+    # If language_code is explicitly provided, use it directly
+    # Otherwise, use fallback chain with user's preferred language
+    if language_code is None:
+        # Use fallback chain starting with user's preferred language
+        audio_snippet, actual_language_code = get_audio_with_fallback(
+            content_object, 
+            target_field, 
+            preferred_language_code=preferred_audio
+        )
+        language_code = actual_language_code
+    else:
+        # Use explicitly provided language code
+        audio_snippet = get_audio_for_content(content_object, target_field, language_code)
     
     # Get content type info for API
     content_type = ContentType.objects.get_for_model(content_object.__class__)

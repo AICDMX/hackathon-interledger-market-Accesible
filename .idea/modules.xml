@@ -3,6 +3,7 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/.idea/hackathon-interledger-market-Accesible.iml" filepath="$PROJECT_DIR$/.idea/hackathon-interledger-market-Accesible.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../hop-sauna/.idea/hop-sauna.iml" filepath="$PROJECT_DIR$/../hop-sauna/.idea/hop-sauna.iml" />
     </modules>
   </component>
 </project>

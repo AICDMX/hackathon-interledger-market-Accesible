@@ -208,3 +208,55 @@ def get_audio_for_content(content_object, target_field, language_code, status='r
         if use_cache:
             cache.set(cache_key, None, settings.AUDIO_CACHE_TIMEOUT)
         return None
+
+
+def get_audio_with_fallback(content_object, target_field, preferred_language_code=None, status='ready', use_cache=True):
+    """
+    Get audio snippet with language fallback chain.
+    
+    Tries in order:
+    1. User's preferred language
+    2. Language fallback (FALLBACK_TEXT_LANGUAGE from settings)
+    3. Final fallback (LANGUAGE_CODE from settings)
+    
+    Args:
+        content_object: Any model instance
+        target_field: The field/UI element name
+        preferred_language_code: User's preferred language code (optional)
+        status: Filter by status (default: 'ready')
+        use_cache: Whether to use cache (default: True)
+    
+    Returns:
+        Tuple of (AudioSnippet instance or None, actual_language_code_used)
+    """
+    # Build fallback chain
+    fallback_chain = []
+    
+    # 1. User's preferred language
+    if preferred_language_code:
+        fallback_chain.append(preferred_language_code)
+    
+    # 2. Language fallback from settings
+    fallback_language = getattr(settings, 'FALLBACK_TEXT_LANGUAGE', None)
+    if fallback_language and fallback_language not in fallback_chain:
+        fallback_chain.append(fallback_language)
+    
+    # 3. Final fallback (default language)
+    final_fallback = settings.LANGUAGE_CODE
+    if final_fallback not in fallback_chain:
+        fallback_chain.append(final_fallback)
+    
+    # Try each language in the fallback chain
+    for lang_code in fallback_chain:
+        audio_snippet = get_audio_for_content(
+            content_object, 
+            target_field, 
+            lang_code, 
+            status=status, 
+            use_cache=use_cache
+        )
+        if audio_snippet:
+            return audio_snippet, lang_code
+    
+    # No audio found in any language
+    return None, fallback_chain[0] if fallback_chain else settings.LANGUAGE_CODE

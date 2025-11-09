@@ -1,0 +1,219 @@
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% block title %}{% trans 'Job Owner Dashboard' %} - {{ block.super }}{% endblock %}
+
+{% block extra_css %}
+<style>
+.job-owner-wrapper {
+        display: flex;
+        flex-direction: column;
+        gap: 1.5rem;
+    }
+
+    .job-owner-card {
+        border-left: 4px solid #d1d5db;
+    }
+
+    .job-owner-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        margin-bottom: 0.75rem;
+    }
+
+    .status-pill {
+        padding: 0.25rem 0.75rem;
+        border-radius: 999px;
+        font-size: 0.875rem;
+        font-weight: 600;
+        text-transform: capitalize;
+    }
+
+    .status-open { background-color: #dbeafe; color: #1d4ed8; }
+    .status-in_review { background-color: #fef3c7; color: #b45309; }
+    .status-funded { background-color: #dcfce7; color: #15803d; }
+    .status-rejected { background-color: #fee2e2; color: #b91c1c; }
+    .status-waiting_completion { background-color: #f3e8ff; color: #6d28d9; }
+    .status-completed { background-color: #e0e7ff; color: #4338ca; }
+
+    .submission-list {
+        margin-top: 1rem;
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+    .submission-card {
+        padding: 0.75rem;
+        border: 1px solid #e5e7eb;
+        border-radius: 0.5rem;
+        background-color: #f9fafb;
+    }
+
+    .submission-card.accepted {
+        border-color: #bbf7d0;
+        background-color: #ecfdf5;
+    }
+
+    .submission-card.pending {
+        border-color: #fde68a;
+        background-color: #fffbeb;
+    }
+
+    .submission-card.rejected {
+        border-color: #fecaca;
+        background-color: #fef2f2;
+    }
+
+.submission-files {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        margin-top: 0.5rem;
+    }
+
+    .download-chip {
+        font-size: 0.85rem;
+        border-radius: 999px;
+        border: 1px solid #d1d5db;
+        padding: 0.25rem 0.75rem;
+        background-color: #fff;
+        text-decoration: none;
+        color: #1f2937;
+    }
+
+    .download-chip:hover,
+    .download-chip:focus {
+        border-color: #9ca3af;
+        color: #111827;
+    }
+
+.job-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.75rem;
+        margin-top: 1rem;
+    }
+
+    .job-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 1rem;
+    }
+
+    .status-pending { background-color: #fef3c7; color: #92400e; }
+    .status-accepted { background-color: #dcfce7; color: #166534; }
+    .status-rejected { background-color: #fee2e2; color: #991b1b; }
+</style>
+{% endblock %}
+
+{% block content %}
+<h1>{% trans 'Job Owner Dashboard' %}</h1>
+<p class="text-muted">{% trans 'Review progress, download deliverables, and mark jobs as complete once you are satisfied.' %}</p>
+
+{% if not has_jobs %}
+    <div class="card">
+        <p>{% trans 'You have not created any jobs yet.' %}</p>
+        <a href="{% url 'jobs:create' %}" class="btn btn-primary">{% trans 'Create a Job' %}</a>
+    </div>
+{% else %}
+    <div class="job-owner-wrapper">
+        {% for job in jobs %}
+            <section class="card job-owner-card" aria-labelledby="job-{{ job.pk }}">
+                <div class="job-owner-header">
+                    <div>
+                        <h2 id="job-{{ job.pk }}"><a href="{% url 'jobs:detail' job.pk %}">{{ job.title }}</a></h2>
+                        <p class="text-muted" style="margin: 0;">{% trans 'Created' %}: {{ job.created_at|date:"F d, Y" }}</p>
+                    </div>
+                    <span class="status-pill status-{{ job.status }}">
+                        {{ job.get_status_display }}
+                    </span>
+                </div>
+
+                <div class="job-grid">
+                    <div>
+                        <p><strong>{% trans 'Funding' %}:</strong> {{ job.funded_amount }} / {{ job.budget }} ILP</p>
+                        {% if job.remaining_budget > 0 %}
+                            <p class="text-warning">{% blocktrans with amount=job.remaining_budget %}{{ amount }} ILP still needed{% endblocktrans %}</p>
+                        {% else %}
+                            <p class="text-success">{% trans 'Fully funded' %}</p>
+                        {% endif %}
+                    </div>
+                    <div>
+                        <p><strong>{% trans 'Progress' %}:</strong> {{ job.accepted_submissions }} / {{ job.max_responses }} {% trans 'accepted' %}</p>
+                        <p><strong>{% trans 'Pending reviews' %}:</strong> {{ job.pending_submissions }}</p>
+                        <p><strong>{% trans 'Total submissions' %}:</strong> {{ job.total_submissions }}</p>
+                    </div>
+                </div>
+
+                <div class="job-actions">
+                    <a href="{% url 'jobs:detail' job.pk %}" class="btn btn-primary">{% trans 'View public page' %}</a>
+                    {% if job.status != 'completed' and job.accepted_submissions > 0 %}
+                        <form method="post" action="{% url 'jobs:mark_job_completed' job.pk %}">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-primary">{% trans 'Mark job completed' %}</button>
+                        </form>
+                    {% elif job.status == 'completed' %}
+                        <span class="text-success">{% trans 'Job is completed' %}</span>
+                    {% endif %}
+                </div>
+
+                <div class="submission-list">
+                    <h3>{% trans 'Submissions' %}</h3>
+                    {% if job.submissions.all %}
+                        {% for submission in job.submissions.all %}
+                            <div class="submission-card {{ submission.status }}">
+                                <div style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:0.5rem;">
+                                    <div>
+                                        <strong>{{ submission.creator.username }}</strong>
+                                        <p class="text-muted" style="margin:0;">{{ submission.created_at|date:"F d, Y H:i" }}</p>
+                                    </div>
+                                    <span class="status-pill status-{{ submission.status }}">
+                                        {{ submission.get_status_display }}
+                                    </span>
+                                </div>
+                                {% if submission.note %}
+                                    <p style="margin-top:0.5rem;">{{ submission.note }}</p>
+                                {% endif %}
+                                {% if submission.text_file or submission.audio_file or submission.video_file or submission.image_file %}
+                                    <div class="submission-files">
+                                        {% if submission.text_file %}
+                                            <a href="{{ submission.text_file.url }}" class="download-chip" download>
+                                                {% trans 'Download text' %}
+                                            </a>
+                                        {% endif %}
+                                        {% if submission.audio_file %}
+                                            <a href="{{ submission.audio_file.url }}" class="download-chip" download>
+                                                {% trans 'Download audio' %}
+                                            </a>
+                                        {% endif %}
+                                        {% if submission.video_file %}
+                                            <a href="{{ submission.video_file.url }}" class="download-chip" download>
+                                                {% trans 'Download video' %}
+                                            </a>
+                                        {% endif %}
+                                        {% if submission.image_file %}
+                                            <a href="{{ submission.image_file.url }}" class="download-chip" download>
+                                                {% trans 'Download image' %}
+                                            </a>
+                                        {% endif %}
+                                    </div>
+                                {% else %}
+                                    <p class="text-muted" style="margin-top:0.5rem;">{% trans 'No files attached.' %}</p>
+                                {% endif %}
+                            </div>
+                        {% empty %}
+                            <p class="text-muted">{% trans 'No submissions yet.' %}</p>
+                        {% endfor %}
+                    {% else %}
+                        <p class="text-muted">{% trans 'No submissions yet.' %}</p>
+                    {% endif %}
+                </div>
+            </section>
+        {% endfor %}
+    </div>
+{% endif %}
+{% endblock %}

@@ -16,6 +16,7 @@
                 <option value="in_review" {% if status_filter == 'in_review' %}selected{% endif %}>{% trans 'In Review' %}</option>
                 <option value="funded" {% if status_filter == 'funded' %}selected{% endif %}>{% trans 'Funded' %}</option>
                 <option value="rejected" {% if status_filter == 'rejected' %}selected{% endif %}>{% trans 'Rejected' %}</option>
+                <option value="waiting_completion" {% if status_filter == 'waiting_completion' %}selected{% endif %}>{% trans 'Waiting Completion' %}</option>
                 <option value="completed" {% if status_filter == 'completed' %}selected{% endif %}>{% trans 'Completed' %}</option>
             </select>
         </div>
@@ -30,6 +31,13 @@
                 <h2><a href="{% url 'jobs:detail' job.pk %}">{{ job.title }}</a></h2>
                 <p><strong>{% trans 'Status' %}:</strong> {{ job.get_status_display }}</p>
                 <p><strong>{% trans 'Budget' %}:</strong> {{ job.budget }} ILP</p>
+                {% if job.is_funded %}
+                    <p><strong>{% trans 'Funding Status' %}:</strong> <span class="text-success">{% trans 'Funded' %} - {{ job.funded_amount }} ILP</span></p>
+                {% elif job.funded_amount > 0 %}
+                    <p><strong>{% trans 'Funding Status' %}:</strong> <span class="text-warning">{% trans 'Partially Funded' %} - {{ job.funded_amount }} ILP / {{ job.budget }} ILP</span></p>
+                {% else %}
+                    <p><strong>{% trans 'Funding Status' %}:</strong> <span class="text-muted">{% trans 'Not Funded' %}</span></p>
+                {% endif %}
                 <p><strong>{% trans 'Submissions' %}:</strong> {{ job.submissions.count }}</p>
                 <a href="{% url 'jobs:detail' job.pk %}" class="btn btn-primary">{% trans 'View Details' %}</a>
             </article>
