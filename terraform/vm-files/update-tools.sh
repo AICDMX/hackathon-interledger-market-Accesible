@@ -29,7 +29,7 @@ do_update() {
 
     before=$(get_version "$pkg")
     echo "==> Updating $name ($pkg) from $before..."
-    npm install -g "$pkg@latest" --loglevel=warn
+    sudo npm install -g "$pkg@latest" --loglevel=warn
 
     after=$(get_version "$pkg")
     if [ "$before" != "$after" ]; then
@@ -47,7 +47,7 @@ do_revert() {
 
     before=$(get_version "$pkg")
     echo "==> Reverting $name ($pkg) to $version..."
-    npm install -g "$pkg@$version" --loglevel=warn
+    sudo npm install -g "$pkg@$version" --loglevel=warn
 
     after=$(get_version "$pkg")
     if [ "$before" != "$after" ]; then
