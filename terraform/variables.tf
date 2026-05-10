@@ -98,3 +98,11 @@ variable "dev_username" {
   type        = string
   default     = "dev"
 }
+
+# -- SSH Access ----------------------------------------------------------------
+
+variable "ssh_allow_cidrs" {
+  description = "CIDRs allowed to SSH directly (default: anywhere)"
+  type        = list(string)
+  default     = ["0.0.0.0/0"]
+}

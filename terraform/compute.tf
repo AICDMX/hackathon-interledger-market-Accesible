@@ -2,6 +2,25 @@
 # VoxVos Dev Environment — Compute (GCE Instance)
 # --------------------------------------------------------------------------
 
+# -- SSH key pair (auto-generated) -------------------------------------------
+
+resource "tls_private_key" "ssh" {
+  algorithm = "ED25519"
+}
+
+resource "local_file" "ssh_private_key" {
+  content         = tls_private_key.ssh.private_key_openssh
+  filename        = "${path.module}/voxvox-ssh-key"
+  file_permission = "0600"
+}
+
+resource "local_file" "ssh_public_key" {
+  content  = tls_private_key.ssh.public_key_openssh
+  filename = "${path.module}/voxvox-ssh-key.pub"
+}
+
+# -- GCE Instance -------------------------------------------------------------
+
 resource "google_compute_instance" "server" {
   name         = "voxvox-server"
   machine_type = var.machine_type
@@ -20,7 +39,10 @@ resource "google_compute_instance" "server" {
 
   network_interface {
     subnetwork = google_compute_subnetwork.subnet.id
-    # No external IP — access via IAP tunnel only
+
+    access_config {
+      # Ephemeral external IP for direct SSH access
+    }
   }
 
   service_account {
@@ -32,12 +54,13 @@ resource "google_compute_instance" "server" {
     "vm-makefile"     = file("${path.module}/templates/vm-Makefile")
     "update-tools-sh" = file("${path.module}/vm-files/update-tools.sh")
     "docker-compose"  = file("${path.module}/templates/docker-compose.yml")
+    "ssh-keys"        = "${var.dev_username}:${tls_private_key.ssh.public_key_openssh}"
   }
 
   metadata_startup_script = templatefile("${path.module}/templates/startup.sh.tpl", {
-    dev_username      = var.dev_username
-    repo_url          = var.repo_url
-    git_branch        = var.git_branch
+    dev_username            = var.dev_username
+    repo_url                = var.repo_url
+    git_branch              = var.git_branch
     anthropic_api_key       = var.anthropic_api_key
     openai_api_key          = var.openai_api_key
     cloudflare_tunnel_token = var.cloudflare_tunnel_token

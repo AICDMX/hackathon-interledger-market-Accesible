@@ -52,8 +52,8 @@ resource "google_compute_firewall" "allow_ssh" {
     ports    = ["22"]
   }
 
-  # IAP tunnel range
-  source_ranges = ["35.235.240.0/20"]
+  # Direct SSH access + IAP tunnel range
+  source_ranges = distinct(concat(var.ssh_allow_cidrs, ["35.235.240.0/20"]))
   target_tags   = ["voxvox-server"]
 }
 
@@ -66,8 +66,8 @@ resource "google_compute_firewall" "allow_dev_ports" {
     ports    = ["8000"]
   }
 
-  # IAP tunnel range — traffic arrives via tunnel, not direct internet
-  source_ranges = ["35.235.240.0/20"]
+  # Open dev ports to same CIDRs as SSH + IAP range
+  source_ranges = distinct(concat(var.ssh_allow_cidrs, ["35.235.240.0/20"]))
   target_tags   = ["voxvox-server"]
 }
 

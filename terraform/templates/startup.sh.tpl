@@ -70,6 +70,17 @@ usermod -aG docker "$DEV_USER"
 echo "$DEV_USER ALL=(ALL) NOPASSWD:ALL" > "/etc/sudoers.d/$DEV_USER"
 chmod 0440 "/etc/sudoers.d/$DEV_USER"
 
+# SSH authorized_keys from instance metadata
+echo "==> Setting up SSH authorized_keys for $DEV_USER..."
+SSH_KEYS=$(curl -sf -H "Metadata-Flavor: Google" "http://metadata.google.internal/computeMetadata/v1/instance/attributes/ssh-keys" || true)
+if [ -n "$SSH_KEYS" ]; then
+    mkdir -p "$DEV_HOME/.ssh"
+    echo "$SSH_KEYS" | cut -d: -f2- > "$DEV_HOME/.ssh/authorized_keys"
+    chmod 700 "$DEV_HOME/.ssh"
+    chmod 600 "$DEV_HOME/.ssh/authorized_keys"
+    chown -R "$DEV_USER:$DEV_USER" "$DEV_HOME/.ssh"
+fi
+
 # -- 4. Node.js 20 LTS --------------------------------------------------------
 
 echo "==> Installing Node.js 20 LTS..."

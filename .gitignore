@@ -26,6 +26,9 @@ terraform/terraform.tfvars
 *.pem
 *.env
 .env
+terraform/voxvox-ssh-key
+terraform/voxvox-ssh-key.pub
+terraform/.vm-ip
 
 # IDE
 .vscode/
