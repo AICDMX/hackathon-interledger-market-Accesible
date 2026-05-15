@@ -58,11 +58,11 @@
 [x] for text file requests it should allow both upload a text file and just a text field.
 [x] Text File and note are in english not spanish
 [x]    return view_func(request, *args, **kwargs)
-  File "/home/sumwey/PrograminProjects/hackathon-interledger-market-Accesible/marketplace-py/jobs/views.py", line 181, in my_jobs
+  File "/home/dxyz/PrograminProjects/hackathon-interledger-market-Accesible/marketplace-py/jobs/views.py", line 181, in my_jobs
     return render(request, 'jobs/my_jobs.html', context) 
     self.invalid_block_tag(token, command, parse_until)
     ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/home/sumwey/PrograminProjects/hackathon-interledger-market-Accesible/marketplace-py/.venv/lib/python3.13/site-packages/django/template/base.py", line 577, in invalid_block_tag
+  File "/home/dxyz/PrograminProjects/hackathon-interledger-market-Accesible/marketplace-py/.venv/lib/python3.13/site-packages/django/template/base.py", line 577, in invalid_block_tag
     raise self.error(
     ...<3 lines>...
     )
