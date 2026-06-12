@@ -76,6 +76,10 @@ createsuperuser:
 demo: load-users load-jobs
 	@echo "Demo data loaded successfully!"
 
+full-demo:
+	docker compose exec web uv run python manage.py load_full_demo --reset
+	@echo "Full demo loaded! See output above for login credentials."
+
 load-users:
 	docker compose exec web uv run python manage.py load_demo_users
 

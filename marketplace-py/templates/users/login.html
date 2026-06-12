@@ -3,39 +3,102 @@
 
 {% block title %}{% trans 'Login' %} - {{ block.super }}{% endblock %}
 
-{% block content %}
-<h1>{% trans 'Login' %}</h1>
+{% block extra_css %}
+<style>
+    .login-wrapper {
+        max-width: 420px;
+        margin: 3rem auto;
+    }
+    .login-wrapper h1 {
+        text-align: center;
+        color: #1a365d;
+        font-size: 1.75rem;
+        margin-bottom: 0.5rem;
+    }
+    .login-subtitle {
+        text-align: center;
+        color: #64748b;
+        margin-bottom: 2rem;
+        font-size: 0.95rem;
+    }
+    .login-wrapper .card {
+        padding: 2rem;
+    }
+    .login-wrapper .btn {
+        width: 100%;
+        padding: 0.85rem;
+        font-size: 1.05rem;
+        margin-top: 0.5rem;
+    }
+    .register-links {
+        text-align: center;
+        margin-top: 1.5rem;
+        padding-top: 1.5rem;
+        border-top: 1px solid #e7e5e4;
+        color: #64748b;
+        font-size: 0.9rem;
+    }
+    .register-links a {
+        color: #c2410c;
+        font-weight: 600;
+        text-decoration: none;
+    }
+    .register-links a:hover {
+        text-decoration: underline;
+    }
+    .register-options {
+        display: flex;
+        gap: 1rem;
+        justify-content: center;
+        margin-top: 0.75rem;
+        flex-wrap: wrap;
+    }
+    .register-option {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.25rem;
+    }
+</style>
+{% endblock %}
 
-<div class="card">
-    <form method="post">
-        {% csrf_token %}
-        
-        <div class="form-group">
-            {% include 'components/form_label_with_audio.html' with label_text="Username" slug="form_username" field_id="username" %}
-            <input type="text" id="username" name="username" required aria-required="true" autofocus>
+{% block content %}
+<div class="login-wrapper">
+    <h1>{% trans 'Login' %}</h1>
+    <p class="login-subtitle">{% trans 'Welcome back to the marketplace' %}</p>
+
+    <div class="card">
+        <form method="post">
+            {% csrf_token %}
+
+            <div class="form-group">
+                {% include 'components/form_label_with_audio.html' with label_text="Username" slug="form_username" field_id="username" %}
+                <input type="text" id="username" name="username" required aria-required="true" autofocus placeholder="{% trans 'Enter your username' %}">
+            </div>
+
+            <div class="form-group">
+                {% include 'components/form_label_with_audio.html' with label_text="Password" slug="form_password" field_id="password" %}
+                <input type="password" id="password" name="password" required aria-required="true" placeholder="{% trans 'Enter your password' %}">
+            </div>
+
+            <div style="display: flex; align-items: center; gap: 0.5rem;">
+                <button type="submit" class="btn btn-primary">{% trans 'Login' %}</button>
+                {% audio_player_static_ui "button_login" "label" %}
+            </div>
+        </form>
+
+        <div class="register-links">
+            <p>{% trans "Don't have an account?" %}</p>
+            <div class="register-options">
+                <span class="register-option">
+                    <a href="{% url 'users:register_creator' %}">{% trans 'Register as Creator' %}</a>
+                    {% audio_player_static_ui "button_register_job_creator" "label" %}
+                </span>
+                <span class="register-option">
+                    <a href="{% url 'users:register_doer' %}">{% trans 'Register as Doer' %}</a>
+                    {% audio_player_static_ui "button_register_job_doer" "label" %}
+                </span>
+            </div>
         </div>
-        
-        <div class="form-group">
-            {% include 'components/form_label_with_audio.html' with label_text="Password" slug="form_password" field_id="password" %}
-            <input type="password" id="password" name="password" required aria-required="true">
-        </div>
-        
-        <div style="display: flex; align-items: center; gap: 0.5rem;">
-            <button type="submit" class="btn btn-primary">{% trans 'Login' %}</button>
-            {% audio_player_static_ui "button_login" "label" %}
-        </div>
-        <p>
-            {% trans 'Don\'t have an account?' %}<br>
-            <span style="display: inline-flex; align-items: center; gap: 0.25rem;">
-                <a href="{% url 'users:register_creator' %}">{% trans 'Register as Job Creator' %}</a>
-                {% audio_player_static_ui "button_register_job_creator" "label" %}
-            </span>
-            | 
-            <span style="display: inline-flex; align-items: center; gap: 0.25rem;">
-                <a href="{% url 'users:register_doer' %}">{% trans 'Register as Job Doer' %}</a>
-                {% audio_player_static_ui "button_register_job_doer" "label" %}
-            </span>
-        </p>
-    </form>
+    </div>
 </div>
 {% endblock %}

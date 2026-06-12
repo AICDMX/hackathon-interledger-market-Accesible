@@ -1,0 +1,248 @@
+{% extends 'base.html' %}
+{% load i18n static %}
+
+{% block title %}{% trans 'Native Language Market' %}{% endblock %}
+
+{% block extra_css %}
+<style>
+    .hero {
+        background: linear-gradient(135deg, #1a365d 0%, #2d3748 50%, #1a365d 100%);
+        color: #fff;
+        padding: 4rem 1.5rem;
+        text-align: center;
+        margin: -2rem -1rem 2rem;
+        border-radius: 0 0 24px 24px;
+    }
+    .hero h1 {
+        font-size: 2.5rem;
+        font-weight: 300;
+        margin-bottom: 0.5rem;
+        line-height: 1.2;
+    }
+    .hero h1 strong {
+        font-weight: 700;
+        color: #fb923c;
+    }
+    .hero .subtitle {
+        font-size: 1.15rem;
+        color: #cbd5e1;
+        max-width: 600px;
+        margin: 0 auto 2.5rem;
+        line-height: 1.6;
+    }
+    .hero-actions {
+        display: flex;
+        gap: 1rem;
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+    .hero-actions .btn {
+        padding: 0.85rem 2rem;
+        font-size: 1.05rem;
+        border-radius: 10px;
+    }
+    .btn-hero-primary {
+        background: #c2410c;
+        color: #fff;
+    }
+    .btn-hero-primary:hover {
+        background: #9a3412;
+        box-shadow: 0 6px 16px rgba(194, 65, 12, 0.4);
+    }
+    .btn-hero-secondary {
+        background: rgba(255,255,255,0.12);
+        color: #fff;
+        border: 1px solid rgba(255,255,255,0.25);
+    }
+    .btn-hero-secondary:hover {
+        background: rgba(255,255,255,0.2);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    }
+    .stats-bar {
+        display: flex;
+        justify-content: center;
+        gap: 3rem;
+        margin-top: 2.5rem;
+        flex-wrap: wrap;
+    }
+    .stat-item {
+        text-align: center;
+    }
+    .stat-number {
+        font-size: 2rem;
+        font-weight: 700;
+        color: #fb923c;
+        display: block;
+    }
+    .stat-label {
+        font-size: 0.8rem;
+        color: #94a3b8;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+    }
+    .features {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 1.5rem;
+        margin: 2rem 0;
+    }
+    .feature-card {
+        background: #fff;
+        border: 1px solid #e7e5e4;
+        border-radius: 12px;
+        padding: 2rem 1.5rem;
+        text-align: center;
+    }
+    .feature-icon {
+        font-size: 2.5rem;
+        margin-bottom: 1rem;
+    }
+    .feature-card h3 {
+        color: #1a365d;
+        margin-bottom: 0.5rem;
+        font-size: 1.1rem;
+    }
+    .feature-card p {
+        color: #64748b;
+        font-size: 0.95rem;
+        margin: 0;
+    }
+    .how-it-works {
+        margin: 3rem 0;
+    }
+    .how-it-works h2 {
+        text-align: center;
+        color: #1a365d;
+        font-size: 1.5rem;
+        margin-bottom: 2rem;
+    }
+    .steps {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1.5rem;
+    }
+    .step {
+        text-align: center;
+        padding: 1.5rem 1rem;
+    }
+    .step-number {
+        width: 40px;
+        height: 40px;
+        background: #c2410c;
+        color: #fff;
+        border-radius: 50%;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 700;
+        font-size: 1.1rem;
+        margin-bottom: 1rem;
+    }
+    .step h4 {
+        color: #1a365d;
+        margin-bottom: 0.5rem;
+    }
+    .step p {
+        color: #64748b;
+        font-size: 0.9rem;
+        margin: 0;
+    }
+    .cta-bottom {
+        text-align: center;
+        padding: 3rem 1rem;
+        background: #fef7ed;
+        border-radius: 16px;
+        margin: 2rem 0;
+        border: 1px solid #fed7aa;
+    }
+    .cta-bottom h2 {
+        color: #1a365d;
+        margin-bottom: 0.5rem;
+    }
+    .cta-bottom p {
+        color: #64748b;
+        margin-bottom: 1.5rem;
+    }
+    @media (max-width: 640px) {
+        .hero { padding: 2.5rem 1rem; }
+        .hero h1 { font-size: 1.75rem; }
+        .stats-bar { gap: 1.5rem; }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="hero">
+    <h1>{% trans 'Work in Your' %} <strong>{% trans 'Native Language' %}</strong></h1>
+    <p class="subtitle">{% trans 'A marketplace connecting communities with translators, narrators, and creators who speak indigenous languages. Voice-first design for accessibility.' %}</p>
+    <div class="hero-actions">
+        <a href="{% url 'jobs:list' %}" class="btn btn-hero-primary">{% trans 'Browse Jobs' %}</a>
+        <a href="{% url 'users:register_doer' %}" class="btn btn-hero-secondary">{% trans 'Join as Creator' %}</a>
+        <a href="{% url 'users:register_creator' %}" class="btn btn-hero-secondary">{% trans 'Post a Job' %}</a>
+    </div>
+    <div class="stats-bar">
+        <div class="stat-item">
+            <span class="stat-number">{{ active_jobs }}</span>
+            <span class="stat-label">{% trans 'Active Jobs' %}</span>
+        </div>
+        <div class="stat-item">
+            <span class="stat-number">{{ total_languages }}</span>
+            <span class="stat-label">{% trans 'Languages' %}</span>
+        </div>
+        <div class="stat-item">
+            <span class="stat-number">{{ total_creators }}</span>
+            <span class="stat-label">{% trans 'Creators' %}</span>
+        </div>
+    </div>
+</div>
+
+<div class="features">
+    <div class="feature-card">
+        <div class="feature-icon">&#127911;</div>
+        <h3>{% trans 'Voice-First Design' %}</h3>
+        <p>{% trans 'Audio narration throughout the interface. Designed for users with limited written language ability.' %}</p>
+    </div>
+    <div class="feature-card">
+        <div class="feature-icon">&#127757;</div>
+        <h3>{% trans '16+ Indigenous Languages' %}</h3>
+        <p>{% trans 'Náhuatl, Otomí, Quechua, Tsotsil, Maya, Zapoteco, Kaqchikel, Aymara, and many more.' %}</p>
+    </div>
+    <div class="feature-card">
+        <div class="feature-icon">&#128176;</div>
+        <h3>{% trans 'Fair Pay via Interledger' %}</h3>
+        <p>{% trans 'Escrowed payments through Interledger wallets. Creators get paid when work is accepted.' %}</p>
+    </div>
+</div>
+
+<div class="how-it-works">
+    <h2>{% trans 'How It Works' %}</h2>
+    <div class="steps">
+        <div class="step">
+            <div class="step-number">1</div>
+            <h4>{% trans 'Browse' %}</h4>
+            <p>{% trans 'Find translation, narration, and creative jobs in your language.' %}</p>
+        </div>
+        <div class="step">
+            <div class="step-number">2</div>
+            <h4>{% trans 'Apply' %}</h4>
+            <p>{% trans 'Show your skills with a profile note or audio introduction.' %}</p>
+        </div>
+        <div class="step">
+            <div class="step-number">3</div>
+            <h4>{% trans 'Deliver' %}</h4>
+            <p>{% trans 'Submit text, audio, video, or images. Work in whatever format fits.' %}</p>
+        </div>
+        <div class="step">
+            <div class="step-number">4</div>
+            <h4>{% trans 'Get Paid' %}</h4>
+            <p>{% trans 'Receive payment directly to your Interledger wallet.' %}</p>
+        </div>
+    </div>
+</div>
+
+<div class="cta-bottom">
+    <h2>{% trans 'Ready to get started?' %}</h2>
+    <p>{% trans 'Join a growing community of indigenous language creators and organizations.' %}</p>
+    <a href="{% url 'jobs:list' %}" class="btn btn-hero-primary">{% trans 'Browse Available Jobs' %}</a>
+</div>
+{% endblock %}

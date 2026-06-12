@@ -21,14 +21,9 @@ class Command(BaseCommand):
         # Determine JSON file path
         json_file = options.get('json_file')
         if json_file is None:
-            # Default to data/demo_users.json at project root
-            # Get project root (parent of marketplace-py)
-            current_file = os.path.abspath(__file__)
-            # Go up: commands -> management -> users -> marketplace-py -> project root
-            # __file__ is at: marketplace-py/users/management/commands/load_demo_users.py
-            # Need 5 dirname calls to get to project root
-            project_root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(current_file)))))
-            json_file = os.path.join(project_root, 'data', 'demo_users.json')
+            # Default to data/demo_users.json relative to BASE_DIR
+            from django.conf import settings
+            json_file = os.path.join(settings.BASE_DIR, 'data', 'demo_users.json')
 
         # Load users from JSON file
         try:

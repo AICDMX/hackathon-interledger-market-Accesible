@@ -198,9 +198,10 @@ class AudioSnippetViewSet(viewsets.ModelViewSet):
                 getattr(settings, 'LANGUAGE_COOKIE_NAME', 'django_language')
             )
         
-        # If still no preferred language, use request language
+        # If still no preferred language, honor the explicitly requested audio language
+        # before falling back to the request language.
         if not preferred_audio:
-            preferred_audio = getattr(request, 'LANGUAGE_CODE', None)
+            preferred_audio = language_code or getattr(request, 'LANGUAGE_CODE', None)
         
         # Use fallback chain: prioritize user's preferred language
         # The function will try: preferred -> fallback_text_language -> language_code

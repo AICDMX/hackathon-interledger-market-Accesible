@@ -4,6 +4,7 @@ services:
       context: marketplace-py
       dockerfile: Dockerfile
     container_name: hackathon-interledger-market
+    restart: always
     ports:
       - "8000:8000"
     volumes:
@@ -20,6 +21,7 @@ services:
       sh -c "
         uv run python manage.py migrate --noinput &&
         uv run python manage.py collectstatic --noinput &&
+        uv run python manage.py load_demo_users &&
         uv run python manage.py load_default_jobs &&
         uv run python manage.py runserver 0.0.0.0:8000
       "

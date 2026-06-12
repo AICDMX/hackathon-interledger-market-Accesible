@@ -1,0 +1,136 @@
+{% extends 'demo/base.html' %}
+{% block title %}The Problem We're Solving{% endblock %}
+
+{% block content %}
+<div class="hero">
+    <h1>Preserving the world's languages,<br><strong>one job at a time</strong></h1>
+    <p class="subtitle">An Interledger-powered marketplace that connects indigenous language speakers with organizations that need their skills — designed voice-first for communities with limited written language.</p>
+</div>
+
+<!-- The Problem -->
+<div class="section">
+    <div class="section-label">The Problem</div>
+    <div class="section-title">Half of the world's 7,000 languages will disappear this century</div>
+    <p class="section-subtitle">Indigenous communities are cut off from digital work, healthcare information, and civic participation because content isn't available in their languages.</p>
+
+    <div class="card-grid">
+        <div class="demo-card">
+            <div class="icon">&#127466;&#127481;</div>
+            <h3>68 indigenous languages in Mexico</h3>
+            <p>Many with fewer than 1,000 speakers remaining. The speakers exist — but there's no economic infrastructure to pay them for their language skills.</p>
+        </div>
+        <div class="demo-card">
+            <div class="icon">&#128680;</div>
+            <h3>Health information doesn't arrive</h3>
+            <p>Diabetes prevention pamphlets, vaccination campaigns, patient rights — all in Spanish. Monolingually indigenous patients can't access basic health information.</p>
+        </div>
+        <div class="demo-card">
+            <div class="icon">&#9999;&#65039;</div>
+            <h3>Literacy barriers block digital work</h3>
+            <p>Many indigenous language speakers have limited written literacy — not because they lack intelligence, but because their languages were historically oral. Traditional freelance platforms exclude them.</p>
+        </div>
+    </div>
+</div>
+
+<!-- Our Solution -->
+<div class="section">
+    <div class="section-label">Our Solution</div>
+    <div class="section-title">A marketplace built for how people actually communicate</div>
+    <p class="section-subtitle">Voice-first design. Fair payments through Interledger. Real work that preserves languages while paying speakers fairly.</p>
+
+    <div class="card-grid">
+        <div class="demo-card demo-card-accent">
+            <div class="icon">&#127911;</div>
+            <h3>Voice-First Interface</h3>
+            <p>Every button, label, and instruction can be narrated in the user's language. Users can apply for jobs and submit work through audio recordings — no writing required. We already have Otomi (Hñähñu) narration throughout the UI.</p>
+        </div>
+        <div class="demo-card demo-card-accent">
+            <div class="icon">&#128176;</div>
+            <h3>Interledger Payments</h3>
+            <p>Escrowed payments via Open Payments protocol. Funders authorize payment when posting a job. Creators receive funds directly to their Interledger wallet when work is accepted. No intermediary takes a cut.</p>
+        </div>
+        <div class="demo-card demo-card-accent">
+            <div class="icon">&#127757;</div>
+            <h3>Real-World Jobs</h3>
+            <p>Not charity — real paid work. Translate health pamphlets. Record election radio spots. Transcribe grandmother's recipes. Create art from cultural traditions. Every job completed is a language act preserved.</p>
+        </div>
+    </div>
+</div>
+
+<!-- Impact / Current State -->
+<div class="section">
+    <div class="section-label">Platform Status</div>
+    <div class="section-title">What's live right now</div>
+    <div class="stats" style="margin-top: 1rem;">
+        <div class="stat"><span class="number">{{ creator_count }}</span><span class="label">Language Creators</span></div>
+        <div class="stat"><span class="number">{{ funder_count }}</span><span class="label">Organizations</span></div>
+        <div class="stat"><span class="number">{{ job_language_count }}</span><span class="label">Languages</span></div>
+        <div class="stat"><span class="number">{{ job_count }}</span><span class="label">Jobs Posted</span></div>
+        <div class="stat"><span class="number">{{ sub_count }}</span><span class="label">Deliverables</span></div>
+        <div class="stat"><span class="number">{{ audio_snippet_count }}</span><span class="label">Audio Clips</span></div>
+    </div>
+</div>
+
+<!-- Who Uses It -->
+<div class="section">
+    <div class="section-label">Who Uses This</div>
+    <div class="section-title">Organizations and creators who are already here</div>
+    <p class="section-subtitle">The marketplace connects two sides: organizations that need native-language content, and speakers who can create it.</p>
+
+    <div class="card-grid">
+        <div class="demo-card">
+            <h3>Funders</h3>
+            <p><strong>NGOs</strong> — Translate health campaigns and rights materials<br>
+            <strong>Health clinics</strong> — Patient information in local languages<br>
+            <strong>Cooperatives</strong> — Product labels and training materials<br>
+            <strong>Government</strong> — Electoral information, civil protection alerts<br>
+            <strong>Researchers</strong> — Linguistic documentation and archives</p>
+        </div>
+        <div class="demo-card">
+            <h3>Creators</h3>
+            <p><strong>Community interpreters</strong> who work in clinics and courts<br>
+            <strong>Bilingual teachers</strong> who know how to explain complex ideas simply<br>
+            <strong>Radio broadcasters</strong> with professional voice and recording equipment<br>
+            <strong>Artisan-translators</strong> who weave textiles and translate documents<br>
+            <strong>Linguists</strong> who do phonetic transcription and language documentation</p>
+        </div>
+    </div>
+</div>
+
+<div class="callout">
+    <p><strong>What makes this different from Fiverr or Upwork?</strong> Those platforms require written literacy, bank accounts, and English. Our marketplace works through voice, pays through Interledger wallets, and serves communities where Spanish is a second language — if it's spoken at all.</p>
+</div>
+
+<!-- Languages Served -->
+<div class="section">
+    <div class="section-label">Languages on the Platform</div>
+    <div class="section-title">{{ creator_language_count }} indigenous languages represented</div>
+    <p class="section-subtitle" style="max-width: 100%;">
+        Nahuatl (Huasteca, Sierra Norte) &bull;
+        Otomi / Hnahnu &bull;
+        Quechua (Ayacucho) &bull;
+        Tsotsil &bull;
+        Tseltal &bull;
+        Maya Yucateco &bull;
+        Mixteco &bull;
+        Purepecha &bull;
+        Zapoteco (Istmo, Sierra) &bull;
+        Kaqchikel &bull;
+        Aymara &bull;
+        Guarani &bull;
+        Mazateco &bull;
+        Triqui &bull;
+        Totonaco &bull;
+        Chinanteco &bull;
+        Mam &bull;
+        Wixarika (Huichol)
+    </p>
+</div>
+
+<div style="text-align: center; margin-top: 3rem;">
+    <a href="/demo/walkthrough/" class="btn-demo" style="font-size: 1.1rem; padding: 0.85rem 2.5rem;">See the Walkthrough &rarr;</a>
+    <div style="margin-top: 0.75rem;">
+        <a href="/demo/" class="btn-demo btn-outline">&larr; Back to Directory</a>
+    </div>
+</div>
+{% endblock %}

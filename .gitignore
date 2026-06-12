@@ -12,6 +12,9 @@ db.sqlite3
 db.sqlite3-journal
 marketplace-py/staticfiles/
 marketplace-py/media/snippets/
+marketplace-py/media/audio/snippets/2026/
+marketplace-py/media/audio/contributions/
+cookies.txt
 
 # Terraform
 terraform/.terraform/
@@ -19,7 +22,6 @@ terraform/*.tfstate
 terraform/*.tfstate.backup
 terraform/*.tfplan
 terraform/.terraform.lock.hcl
-terraform/terraform.tfvars
 
 # Secrets / keys
 *.key

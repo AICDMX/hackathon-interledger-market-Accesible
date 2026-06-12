@@ -1,0 +1,156 @@
+[
+  {
+    "title": "Traducir folleto de prevención de diabetes",
+    "description": "Para nuestra campaña de salud en comunidades nahuas de la Sierra Norte de Puebla, necesitamos traducir un folleto informativo con consejos para prevenir la diabetes tipo 2. El lenguaje debe ser simple, directo y motivador.\n\nTexto a traducir:\n\"La diabetes se puede prevenir.\n• Come más verduras y frutas de tu milpa.\n• Camina 30 minutos al día.\n• Bebe agua en lugar de refrescos.\n• Revisa tu nivel de azúcar en la clínica.\n• Tu salud está en tus manos.\n\nSi sientes mucha sed, cansancio o ves borroso, acude a tu centro de salud.\"\n\nIMPORTANTE: El texto debe sentirse natural en náhuatl, no como una traducción literal del español. Si hay conceptos que se expresan mejor de otra forma en náhuatl, haz la adaptación.",
+    "funder_username": "clinica_esperanza",
+    "target_language_code": "nah",
+    "target_dialect": "Sierra Norte de Puebla",
+    "deliverable_types": "text",
+    "amount_per_person": 120,
+    "max_responses": 2,
+    "status": "recruiting"
+  },
+  {
+    "title": "Grabar mensaje de bienvenida para centro ecoturístico",
+    "description": "Nuestro centro ecoturístico en la selva de Chiapas recibe visitantes nacionales e internacionales. Queremos un mensaje de bienvenida grabado en tsotsil que se reproduzca al llegar y que también usaremos en nuestro video promocional.\n\nTexto base (adaptar culturalmente, no traducir literal):\n\"Bienvenidos a nuestra casa, la casa del bosque. Aquí la tierra nos da de comer y nosotros la cuidamos. Caminen con respeto, escuchen el agua y los pájaros. Esta selva es nuestra farmacia, nuestra escuela y nuestro templo. Cuiden de ella como nosotros lo hacemos.\"\n\nNecesitamos:\n1. Traducción escrita del texto adaptado\n2. Grabación de audio clara (mínimo 30 segundos)\n\nLa voz debe sonar cálida y acogedora, como si le hablaras a un invitado en tu casa.",
+    "funder_username": "demo_funder",
+    "target_language_code": "tzo",
+    "target_dialect": "Altos de Chiapas",
+    "deliverable_types": "text,audio",
+    "amount_per_person": 300,
+    "max_responses": 1,
+    "status": "recruiting"
+  },
+  {
+    "title": "Traducir etiquetas para empaque de café orgánico",
+    "description": "Nuestra cooperativa de 47 familias productoras de café necesita traducir las etiquetas de nuestro empaque al tsotsil. La mayoría de nuestros socios hablan tsotsil como primera lengua y queremos que se sientan representados en nuestro producto.\n\nTextos a traducir:\n• \"Café de Altura — Cosechado a mano por familias de nuestra comunidad\"\n• \"Notas de sabor: chocolate y cítricos. Tostado medio.\"\n• \"Hecho con orgullo en la sierra de Chiapas\"\n• \"Cooperativa Café de la Sierra — 47 familias, una misión\"\n• \"Cada taza cuenta la historia de nuestras manos y nuestra tierra\"\n\nEl tono debe ser orgulloso pero accesible. Las traducciones se imprimirán en las bolsas junto al texto en español.",
+    "funder_username": "cafe_sierra",
+    "target_language_code": "tzo",
+    "target_dialect": "Tsotsil de los Altos",
+    "deliverable_types": "text",
+    "amount_per_person": 250,
+    "max_responses": 1,
+    "status": "recruiting"
+  },
+  {
+    "title": "Grabar spot de radio para promover la participación electoral",
+    "description": "Para las próximas elecciones municipales, necesitamos un spot de radio de 30 segundos en kaqchikel que motive a la comunidad a votar. El spot se transmitirá en 12 radios comunitarias de Sololá y Chimaltenango.\n\nTexto base a traducir y grabar:\n\"Este domingo son las elecciones. Tu voto es libre y secreto — nadie puede saber por quién votaste. Participa para decidir el futuro de tu comunidad. Acude a tu casilla con tu credencial de elector. No dejes que otros decidan por ti. ¡Tu voz cuenta!\"\n\nRequisitos:\n- Traducción escrita\n- Grabación limpia de 25-35 segundos\n- Voz convincente que transmita urgencia y deber cívico\n- Sin música de fondo (nosotros la agregamos después)",
+    "funder_username": "instituto_electoral",
+    "target_language_code": "cak",
+    "target_dialect": "Sololá",
+    "deliverable_types": "text,audio",
+    "amount_per_person": 200,
+    "max_responses": 1,
+    "status": "recruiting"
+  },
+  {
+    "title": "Crear arte digital: \"El colibrí y la flor de cempasúchil\"",
+    "description": "Buscamos una ilustración digital que represente la leyenda náhuatl del colibrí y la flor de cempasúchil para usar en nuestras redes sociales durante el Día de Muertos.\n\nConcepto:\nSegún la leyenda, los colibríes son mensajeros entre los vivos y los muertos. La flor de cempasúchil guía a los difuntos de regreso a casa. Queremos una imagen que capture esta conexión espiritual.\n\nRequisitos:\n- Formato cuadrado (1080x1080 px mínimo)\n- Estilo vibrante, lleno de vida — puede ser tradicional o moderno\n- Colores dominantes: naranja cempasúchil, verde jade, turquesa\n- No debe verse \"clip art\" — queremos arte con alma\n- Archivo PNG con fondo transparente + versión con fondo\n\nSe dará crédito al artista en todas las publicaciones.",
+    "funder_username": "demo_funder",
+    "target_language_code": "nah",
+    "target_dialect": "",
+    "deliverable_types": "image",
+    "amount_per_person": 700,
+    "max_responses": 1,
+    "status": "selecting"
+  },
+  {
+    "title": "Traducir derechos del paciente para clínica comunitaria",
+    "description": "Necesitamos traducir al náhuatl la carta de derechos del paciente que se coloca en la sala de espera de nuestra clínica. Muchos pacientes son monolingües en náhuatl y tienen derecho a entender esta información.\n\nTexto a traducir:\n\"Derechos del Paciente:\n1. Tiene derecho a recibir atención médica sin importar su origen o lengua.\n2. Tiene derecho a un intérprete si no habla español.\n3. Tiene derecho a que le expliquen su diagnóstico y tratamiento en palabras que entienda.\n4. Tiene derecho a decir 'no' a cualquier procedimiento.\n5. Su información médica es privada y confidencial.\n6. Tiene derecho a una segunda opinión.\n7. Si no está satisfecho con la atención, puede presentar una queja.\"\n\nDebe sonar formal pero comprensible para cualquier persona.",
+    "funder_username": "clinica_esperanza",
+    "target_language_code": "nah",
+    "target_dialect": "Sierra Norte de Puebla",
+    "deliverable_types": "text",
+    "amount_per_person": 150,
+    "max_responses": 1,
+    "status": "selecting"
+  },
+  {
+    "title": "Transcribir receta de mole ceremonial narrada por abuela otomí",
+    "description": "Mi abuela de 87 años nos contó cómo prepara el mole ceremonial que hace para las fiestas del pueblo. Lo grabamos en un audio de 4 minutos. Necesitamos una transcripción fiel en hñähñu (otomí del Valle del Mezquital).\n\nEsto es un tesoro familiar — mi abuela ya no puede cocinar y queremos preservar sus palabras exactas.\n\nRequisitos:\n- Transcripción literal de todo lo que dice (incluyendo pausas y risas si las hay)\n- Usar la ortografía estándar del hñähñu del Valle del Mezquital\n- Si dice alguna palabra en español, marcarla en cursiva\n- Entregar como texto plano\n\nNota: El audio se compartirá con el creador seleccionado. Es un audio casero, grabado en la cocina — hay ruido de fondo pero la voz es clara.",
+    "funder_username": "demo_funder",
+    "target_language_code": "oto",
+    "target_dialect": "Valle del Mezquital",
+    "deliverable_types": "text",
+    "amount_per_person": 350,
+    "max_responses": 1,
+    "status": "submitting"
+  },
+  {
+    "title": "Grabar derechos de personas detenidas en quechua",
+    "description": "Para una organización de derechos humanos en Perú, necesitamos una grabación de audio clara y seria con los derechos básicos de las personas detenidas. Este audio se reproducirá en comisarías y centros de detención de Ayacucho.\n\nTexto a traducir y grabar:\n\"Usted tiene derecho a:\n- Guardar silencio. Lo que diga puede usarse en su contra.\n- Saber por qué lo están deteniendo.\n- Llamar a un familiar o abogado.\n- Un traductor en su idioma si no habla español.\n- Recibir atención médica si la necesita.\n- No ser golpeado ni maltratado.\n- No firme ningún documento que no entienda.\n\nEstos derechos no se los puede quitar nadie.\"\n\nLa voz debe ser clara, firme y seria. Imagina que le estás hablando a alguien asustado que necesita saber que tiene derechos.",
+    "funder_username": "voces_vivas",
+    "target_language_code": "que",
+    "target_dialect": "Ayacucho",
+    "deliverable_types": "text,audio",
+    "amount_per_person": 200,
+    "max_responses": 1,
+    "status": "submitting"
+  },
+  {
+    "title": "Traducir y grabar cuento infantil para app educativa",
+    "description": "Estamos desarrollando una app educativa para niños de 3-6 años y necesitamos la traducción y grabación de un cuento corto en aymara. La voz debe ser suave y calmada, como si le contaras a un niño para dormir.\n\nTexto a traducir y grabar:\n\"El pequeño conejo miró la luna grande y redonda.\n'Algún día llegaré hasta ti', le susurró.\nSu mamá sonrió y le dijo:\n'Tus sueños son tan grandes como el cielo, mi pequeño.'\nEl conejo cerró los ojos y soñó que volaba entre las estrellas.\nY la luna, desde arriba, lo cuidó toda la noche.\"\n\nRequisitos:\n- Traducción escrita que suene natural para niños\n- Grabación con voz suave, pausada, expresiva\n- Duración estimada: 45-60 segundos\n- Audio limpio sin ruido de fondo",
+    "funder_username": "voces_vivas",
+    "target_language_code": "aym",
+    "target_dialect": "Central",
+    "deliverable_types": "text,audio",
+    "amount_per_person": 180,
+    "max_responses": 1,
+    "status": "submitting"
+  },
+  {
+    "title": "Traducir letreros para reserva ecológica comunitaria",
+    "description": "La reserva ecológica comunitaria de San Juan Lachao necesita traducir sus letreros al zapoteco de la Sierra Sur. Los letreros se imprimirán en madera tallada junto al texto en español.\n\nTextos a traducir (3 letreros):\n\nLetrero 1 — Entrada:\n\"Bienvenido a nuestra reserva. Este bosque es sagrado para nuestra comunidad. Camina con respeto.\"\n\nLetrero 2 — Sendero:\n\"Por favor, no dejes basura. Llévate contigo lo que trajiste. Prohibido hacer fogatas.\"\n\nLetrero 3 — Cascada:\n\"Sendero de la cascada. Respeta la vida silvestre. No extraigas plantas ni animales. Este lugar nos da agua limpia.\"\n\nEl tono debe ser respetuoso pero firme. Si hay una forma más natural de expresar estas ideas en zapoteco, se prefiere la adaptación sobre la traducción literal.",
+    "funder_username": "miguel_both",
+    "target_language_code": "zai",
+    "target_dialect": "Sierra Sur",
+    "deliverable_types": "text",
+    "amount_per_person": 200,
+    "max_responses": 1,
+    "status": "reviewing"
+  },
+  {
+    "title": "Grabar mensaje para contestadora de clínica comunitaria",
+    "description": "Nuestra clínica necesita un mensaje profesional para la contestadora telefónica en mazateco de Huautla. Muchos de nuestros pacientes llaman y no entienden el mensaje actual que está solo en español.\n\nTexto a traducir y grabar:\n\"Gracias por llamar a la Clínica Comunitaria Esperanza.\nEn este momento no podemos atender su llamada.\nNuestro horario es de lunes a viernes, de 8 de la mañana a 4 de la tarde.\nPor favor, deje su nombre y número de teléfono después del tono y le devolveremos la llamada.\nSi es una emergencia, acuda directamente a la clínica o llame al 911.\nQue tenga un buen día.\"\n\nRequisitos:\n- Voz profesional, clara y tranquilizadora\n- Grabación limpia (sin eco, sin ruido)\n- Duración: 20-30 segundos\n- Entregar en MP3 a 128kbps mínimo",
+    "funder_username": "clinica_esperanza",
+    "target_language_code": "maz",
+    "target_dialect": "Huautla",
+    "deliverable_types": "text,audio",
+    "amount_per_person": 300,
+    "max_responses": 1,
+    "status": "reviewing"
+  },
+  {
+    "title": "Transcripción de conversación en mercado para archivo lingüístico",
+    "description": "Este proyecto es parte de un archivo lingüístico del triqui de Chicahuaxtla. Tenemos un audio de 5 minutos de una conversación natural entre dos vendedoras en el mercado de Tlaxiaco.\n\nNecesitamos:\n- Transcripción literal y fiel al audio\n- Usar la ortografía práctica del triqui de Chicahuaxtla\n- Marcar los tonos según la convención establecida\n- Identificar a las hablantes (Hablante A, Hablante B)\n- Marcar pausas largas con [...]\n- Si hay palabras en español, transcribirlas en cursiva\n\nEste material se usará para investigación lingüística y será publicado con crédito al transcriptor. El audio se compartirá con el creador seleccionado.",
+    "funder_username": "sofia_both",
+    "target_language_code": "trs",
+    "target_dialect": "Chicahuaxtla",
+    "deliverable_types": "text",
+    "amount_per_person": 400,
+    "max_responses": 1,
+    "status": "complete"
+  },
+  {
+    "title": "Traducir requisitos de programa de apoyo para artesanas",
+    "description": "Para un programa de desarrollo social, necesitamos traducir la convocatoria para mujeres artesanas al chinanteco de Ojitlán. La información debe ser exacta para evitar confusiones.\n\nTexto a traducir:\n\"Convocatoria para Mujeres Artesanas\n\nRequisitos:\n• Ser mujer mayor de 18 años\n• Presentar identificación oficial (INE o acta de nacimiento)\n• Mostrar ejemplos de su trabajo (textiles, barro, madera u otros)\n• Vivir en la comunidad\n\nBeneficios:\n• Capacitación gratuita en ventas y diseño\n• Apoyo económico de $3,000 pesos mensuales durante 6 meses\n• Espacio en feria artesanal regional\n\nFecha límite para registrarse: 30 de noviembre\nRegistro en la casa ejidal de 9am a 2pm\"\n\nIMPORTANTE: Las cantidades en pesos y las fechas deben quedar claras. Si hay conceptos que necesitan explicación adicional en chinanteco, agrégala.",
+    "funder_username": "voces_vivas",
+    "target_language_code": "chj",
+    "target_dialect": "Ojitlán",
+    "deliverable_types": "text",
+    "amount_per_person": 300,
+    "max_responses": 1,
+    "status": "complete"
+  },
+  {
+    "title": "Traducir botones de interfaz para app móvil",
+    "description": "Estamos desarrollando una aplicación móvil para conectar a comunidades indígenas con servicios de salud. Necesitamos traducir los botones e etiquetas de la interfaz al náhuatl de la Huasteca.\n\nTextos a traducir:\n• Inicio\n• Mis Mensajes\n• Notificaciones\n• Cerrar Sesión\n• Siguiente / Anterior / Regresar\n• Buscar\n• Guardar\n• Enviar\n• Cancelar\n• Mi Perfil\n• Configuración\n• Ayuda\n• Publicar un nuevo trabajo\n• Ver todos los trabajos\n• Mis trabajos\n• Estado: Abierto / Cerrado / En progreso / Completado\n\nIMPORTANTE: Los botones deben ser concisos (máximo 3-4 palabras). Si una traducción literal es demasiado larga, busca una forma natural y corta de decirlo.",
+    "funder_username": "demo_funder",
+    "target_language_code": "nah",
+    "target_dialect": "Huasteca Veracruzana",
+    "deliverable_types": "text",
+    "amount_per_person": 200,
+    "max_responses": 1,
+    "status": "complete"
+  }
+]

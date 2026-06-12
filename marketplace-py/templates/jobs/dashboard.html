@@ -30,15 +30,15 @@
         padding: 2rem 1rem;
         text-align: center;
         text-decoration: none;
-        color: #333;
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        transition: all 0.3s ease;
+        color: #1e293b;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.04);
+        border: 1px solid #e7e5e4;
+        transition: all 0.25s ease;
         display: flex;
         flex-direction: column;
         align-items: center;
         justify-content: center;
         min-height: 160px;
-        border: 2px solid transparent;
         box-sizing: border-box;
         width: 100%;
         overflow: hidden;
@@ -46,9 +46,9 @@
 
     .dashboard-icon-card:hover,
     .dashboard-icon-card:focus {
-        transform: translateY(-4px);
-        box-shadow: 0 8px 12px rgba(0, 0, 0, 0.15);
-        border-color: #3498db;
+        transform: translateY(-3px);
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+        border-color: #c2410c;
         outline: none;
     }
 
@@ -75,7 +75,7 @@
         .dashboard-label {
             font-size: 1rem;
             font-weight: 600;
-            color: #2c3e50;
+            color: #1a365d;
             margin: 0;
             display: flex;
             align-items: center;
@@ -159,7 +159,7 @@
         bottom: 1.5rem;
         left: 50%;
         transform: translate(-50%, 20px);
-        background: rgba(44, 62, 80, 0.95);
+        background: rgba(26, 54, 93, 0.95);
         color: #fff;
         padding: 0.5rem 1.25rem;
         border-radius: 999px;
@@ -235,10 +235,10 @@
         #dashboard-title {
             text-align: center;
             margin-bottom: 2rem;
-            color: #2c3e50;
+            color: #1a365d;
         }
     </style>
-    
+
     <div class="dashboard-grid" role="grid" aria-label="{% trans 'Main navigation' %}">
         {% if user.is_funder %}
         <a href="{% url 'jobs:create' %}" class="dashboard-icon-card" role="gridcell" aria-label="{% trans 'Post Job' %}">

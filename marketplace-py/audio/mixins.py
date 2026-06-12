@@ -8,6 +8,8 @@ from django.core.cache import cache
 from django.conf import settings
 from .models import AudioSnippet, AudioRequest, StaticUIElement
 
+_CACHE_MISS = object()
+
 
 class AudioMixin:
     """
@@ -39,8 +41,8 @@ class AudioMixin:
         """
         if use_cache:
             cache_key = f'audio_snippet:{self._meta.label}:{self.pk}:{target_field}:{language_code}:{status}'
-            cached = cache.get(cache_key)
-            if cached is not None:
+            cached = cache.get(cache_key, _CACHE_MISS)
+            if cached is not _CACHE_MISS:
                 return cached
         
         content_type = ContentType.objects.get_for_model(self)
@@ -188,8 +190,8 @@ def get_audio_for_content(content_object, target_field, language_code, status='r
     
     if use_cache:
         cache_key = f'audio_snippet:{content_object._meta.label}:{content_object.pk}:{target_field}:{language_code}:{status}'
-        cached = cache.get(cache_key)
-        if cached is not None:
+        cached = cache.get(cache_key, _CACHE_MISS)
+        if cached is not _CACHE_MISS:
             return cached
     
     content_type = ContentType.objects.get_for_model(content_object.__class__)

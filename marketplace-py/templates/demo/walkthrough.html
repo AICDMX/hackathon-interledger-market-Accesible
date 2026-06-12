@@ -1,0 +1,101 @@
+{% extends 'demo/base.html' %}
+{% block title %}Guided Walkthrough{% endblock %}
+
+{% block content %}
+<div class="section" style="margin-top: 2rem;">
+    <div class="section-label">Interactive Demo</div>
+    <div class="section-title">See it in action</div>
+    <p class="section-subtitle">Follow these steps to experience the full marketplace workflow. Each step opens in a new tab so you can come back here.</p>
+</div>
+
+<div class="steps">
+    <div class="step">
+        <strong>Browse as a visitor</strong>
+        <p>See the public marketplace with real jobs from real organizations. Notice the language names, funder organizations, and status badges.</p>
+        <p style="margin-top: 0.75rem;">
+            <a href="/browse/" target="_blank" class="btn-demo">Open Browse Page</a>
+        </p>
+    </div>
+
+    <div class="step">
+        <strong>Log in as a creator: <code>carlos_otomi</code></strong>
+        <p>Carlos is an Otomí interpreter from the Valle del Mezquital. His profile has an audio introduction. He's applied to several jobs and submitted work with actual Otomí audio recordings.</p>
+        <p><strong>What to see:</strong> Dashboard with active work. Click his submitted jobs to see/hear the election radio spot he recorded in Otomí.</p>
+        <p style="margin-top: 0.75rem;">
+            <a href="/users/login/" target="_blank" class="btn-demo">Log in as carlos_otomi</a>
+            <span style="color: #64748b; font-size: 0.85rem; margin-left: 0.75rem;">password: <code>demo123</code></span>
+        </p>
+    </div>
+
+    <div class="step">
+        <strong>Log in as a funder: <code>demo_funder</code></strong>
+        <p>Roberto Martinez runs Lenguas Vivas A.C., an NGO dedicated to indigenous language preservation. He's posted 4 jobs and has submissions waiting for review.</p>
+        <p><strong>What to see:</strong> Go to "My Job Dashboard" to see jobs at every stage. Open a reviewing job to see the submitted translation with translator's notes. Accept or reject a submission.</p>
+        <p style="margin-top: 0.75rem;">
+            <a href="/users/login/" target="_blank" class="btn-demo">Log in as demo_funder</a>
+            <span style="color: #64748b; font-size: 0.85rem; margin-left: 0.75rem;">password: <code>demo123</code></span>
+        </p>
+    </div>
+
+    <div class="step">
+        <strong>Log in as a health clinic: <code>clinica_esperanza</code></strong>
+        <p>A rural clinic in the Sierra Norte de Puebla that serves Nahuatl-speaking patients. They need health materials translated so patients understand their rights and treatment options.</p>
+        <p><strong>What to see:</strong> A different perspective — same platform, different mission. Their jobs are about diabetes prevention and patient rights.</p>
+        <p style="margin-top: 0.75rem;">
+            <a href="/users/login/" target="_blank" class="btn-demo">Log in as clinica_esperanza</a>
+            <span style="color: #64748b; font-size: 0.85rem; margin-left: 0.75rem;">password: <code>demo123</code></span>
+        </p>
+    </div>
+
+    <div class="step">
+        <strong>See a draft in progress: <code>diego_aymara</code></strong>
+        <p>Diego is an Aymara teacher from Puno, Peru. He's working on translating a children's bedtime story — his draft is in progress, showing the work-in-progress state.</p>
+        <p style="margin-top: 0.75rem;">
+            <a href="/users/login/" target="_blank" class="btn-demo">Log in as diego_aymara</a>
+            <span style="color: #64748b; font-size: 0.85rem; margin-left: 0.75rem;">password: <code>demo123</code></span>
+        </p>
+    </div>
+
+    <div class="step">
+        <strong>Switch the language to Otomí</strong>
+        <p>Use the language selector in the top right corner and switch to Otomí. The UI text stays in Spanish (because we don't have UI translations yet), but audio narration buttons throughout the interface will play <strong>real Otomí recordings</strong> — demonstrating the voice-first accessibility feature that makes this platform unique.</p>
+    </div>
+</div>
+
+<!-- Key Flows -->
+<div class="section">
+    <div class="section-label">What Grant Reviewers Should Notice</div>
+    <div class="section-title">Key differentiators in the demo</div>
+
+    <div class="card-grid">
+        <div class="demo-card demo-card-accent">
+            <h3>Voice Throughout</h3>
+            <p>Audio player icons appear next to navigation items, form labels, and buttons. Each can play a narration in the user's selected language. This isn't text-to-speech — these are real recordings by native speakers.</p>
+        </div>
+        <div class="demo-card demo-card-accent">
+            <h3>Real Translation Content</h3>
+            <p>The completed jobs contain actual translations — Otomí, Quechua, Zapoteco, Chinanteco, Triqui, Nahuatl. These aren't lorem ipsum. Review a submission to see a translator's cultural notes explaining why they adapted certain phrases.</p>
+        </div>
+        <div class="demo-card demo-card-accent">
+            <h3>Multi-Stakeholder Design</h3>
+            <p>5 different funder organizations (NGO, clinic, cooperative, government, research) show this isn't a single-use tool. Each has different needs but the same platform serves them all.</p>
+        </div>
+        <div class="demo-card demo-card-accent">
+            <h3>Full Job Lifecycle</h3>
+            <p>Jobs exist at every stage: recruiting (accepting applications), selecting (choosing workers), submitting (work in progress), reviewing (deliverables ready), and complete (accepted and paid). The entire pipeline works.</p>
+        </div>
+        <div class="demo-card demo-card-accent">
+            <h3>Audio Submissions</h3>
+            <p>Some jobs require audio deliverables — a radio spot, a clinic voicemail. The submitted work includes actual Otomí audio recordings that a funder can listen to before accepting.</p>
+        </div>
+        <div class="demo-card demo-card-accent">
+            <h3>Cultural Adaptation Notes</h3>
+            <p>Translators don't just translate literally — they explain their choices. "I adapted 'sacred' because in Zapoteco we express that concept differently." This shows the human expertise that machines can't replicate.</p>
+        </div>
+    </div>
+</div>
+
+<div style="text-align: center; margin-top: 3rem;">
+    <a href="/demo/logins/" class="btn-demo" style="font-size: 1.1rem; padding: 0.85rem 2.5rem;">All Login Credentials &rarr;</a>
+</div>
+{% endblock %}

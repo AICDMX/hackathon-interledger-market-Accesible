@@ -1,0 +1,155 @@
+{% extends 'demo/base.html' %}
+{% block title %}Demo Directory{% endblock %}
+
+{% block extra_css %}
+    .dir-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 1.5rem;
+        margin-top: 2rem;
+    }
+    .dir-card {
+        background: #fff;
+        border: 1px solid #e7e5e4;
+        border-radius: 16px;
+        padding: 2rem;
+        text-decoration: none;
+        color: inherit;
+        display: block;
+        transition: all 0.2s ease;
+        position: relative;
+        overflow: hidden;
+    }
+    .dir-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+        border-color: #c2410c;
+    }
+    .dir-card .card-num {
+        position: absolute;
+        top: 1.5rem;
+        right: 1.5rem;
+        font-size: 3rem;
+        font-weight: 800;
+        color: #f5f5f4;
+        line-height: 1;
+    }
+    .dir-card:hover .card-num { color: #fef7ed; }
+    .dir-card .icon { font-size: 2rem; margin-bottom: 1rem; }
+    .dir-card h3 {
+        color: #1a365d;
+        font-size: 1.2rem;
+        margin-bottom: 0.5rem;
+    }
+    .dir-card:hover h3 { color: #c2410c; }
+    .dir-card p {
+        color: #64748b;
+        font-size: 0.95rem;
+        margin: 0;
+        position: relative;
+    }
+    .dir-card .arrow {
+        display: inline-block;
+        margin-top: 1rem;
+        color: #c2410c;
+        font-weight: 600;
+        font-size: 0.9rem;
+    }
+    .quick-links {
+        display: flex;
+        gap: 1rem;
+        flex-wrap: wrap;
+        margin-top: 2rem;
+    }
+    .quick-link {
+        background: #fff;
+        border: 1px solid #e7e5e4;
+        border-radius: 10px;
+        padding: 0.85rem 1.25rem;
+        text-decoration: none;
+        color: #1a365d;
+        font-weight: 600;
+        font-size: 0.9rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        transition: all 0.15s;
+    }
+    .quick-link:hover {
+        border-color: #c2410c;
+        color: #c2410c;
+        background: #fef7ed;
+    }
+    .quick-link .ql-icon { font-size: 1.1rem; }
+{% endblock %}
+
+{% block content %}
+<div class="hero">
+    <h1><strong>Native Language Market</strong></h1>
+    <p class="subtitle">Interledger-powered marketplace for indigenous language work. Voice-first, fair-pay, community-driven.</p>
+</div>
+
+<div class="stats">
+    <div class="stat"><span class="number">{{ creator_count }}</span><span class="label">Creators</span></div>
+    <div class="stat"><span class="number">{{ funder_count }}</span><span class="label">Organizations</span></div>
+    <div class="stat"><span class="number">{{ job_language_count }}</span><span class="label">Languages</span></div>
+    <div class="stat"><span class="number">{{ job_count }}</span><span class="label">Jobs</span></div>
+    <div class="stat"><span class="number">{{ sub_count }}</span><span class="label">Deliverables</span></div>
+    <div class="stat"><span class="number">{{ audio_snippet_count }}</span><span class="label">Audio Clips</span></div>
+</div>
+
+<div class="dir-grid">
+    <a href="/demo/story/" class="dir-card">
+        <span class="card-num">1</span>
+        <div class="icon">&#127758;</div>
+        <h3>The Problem &amp; Solution</h3>
+        <p>Why indigenous languages are disappearing, how our marketplace solves it, and who benefits. The case for why this matters.</p>
+        <span class="arrow">Read the story &rarr;</span>
+    </a>
+
+    <a href="/demo/walkthrough/" class="dir-card">
+        <span class="card-num">2</span>
+        <div class="icon">&#128065;</div>
+        <h3>Interactive Walkthrough</h3>
+        <p>6-step guided tour through the live marketplace. Log in as different users, see real translations, hear audio submissions.</p>
+        <span class="arrow">Start the tour &rarr;</span>
+    </a>
+
+    <a href="/demo/logins/" class="dir-card">
+        <span class="card-num">3</span>
+        <div class="icon">&#128273;</div>
+        <h3>All Logins &amp; Technical</h3>
+        <p>Every demo account with credentials. 26 users across 5 funders, 19 creators, and 2 dual-role accounts. Plus the tech stack.</p>
+        <span class="arrow">View credentials &rarr;</span>
+    </a>
+</div>
+
+<!-- Quick Links -->
+<div class="section">
+    <div class="section-label">Quick Links</div>
+    <div class="section-title">Jump directly into the marketplace</div>
+    <p class="section-subtitle">Open these in a new tab to explore the live platform alongside the demo guide.</p>
+
+    <div class="quick-links">
+        <a href="/" target="_blank" class="quick-link">
+            <span class="ql-icon">&#127968;</span> Landing Page
+        </a>
+        <a href="/browse/" target="_blank" class="quick-link">
+            <span class="ql-icon">&#128270;</span> Browse Jobs
+        </a>
+        <a href="/users/login/" target="_blank" class="quick-link">
+            <span class="ql-icon">&#128100;</span> Login Page
+        </a>
+        <a href="/admin/" target="_blank" class="quick-link">
+            <span class="ql-icon">&#9881;&#65039;</span> Django Admin
+        </a>
+        <a href="https://github.com/AIDataForXYZ/hackathon-interledger-market-Accesible" target="_blank" class="quick-link">
+            <span class="ql-icon">&#128187;</span> GitHub Repo
+        </a>
+    </div>
+</div>
+
+<div class="callout" style="margin-top: 2.5rem;">
+    <p><strong>For grant reviewers:</strong> Start with <a href="/demo/story/" style="color: #c2410c; font-weight: 600;">The Problem &amp; Solution</a> to understand the mission, then follow the <a href="/demo/walkthrough/" style="color: #c2410c; font-weight: 600;">Interactive Walkthrough</a> to see the platform in action. All demo accounts use password <code style="background: #fff7ed; padding: 0.1rem 0.4rem; border-radius: 4px;">demo123</code>.</p>
+</div>
+{% endblock %}

@@ -1,29 +1,29 @@
 {% extends 'base.html' %}
-{% load i18n %}
+{% load i18n job_tags %}
 
 {% block title %}{% trans 'Browse Jobs' %} - {{ block.super }}{% endblock %}
 
 {% block extra_css %}
 <style>
     .filter-options {
-        border: 1px solid #ddd;
-        border-radius: 4px;
+        border: 1px solid #e7e5e4;
+        border-radius: 8px;
         padding: 1rem;
         margin: 0;
     }
-    
+
     .filter-options legend {
         font-weight: 600;
         padding: 0 0.5rem;
         margin-bottom: 0.5rem;
     }
-    
+
     .checkbox-group {
         display: flex;
         flex-direction: column;
         gap: 0.75rem;
     }
-    
+
     .checkbox-group label {
         display: flex;
         align-items: center;
@@ -32,46 +32,76 @@
         margin-bottom: 0;
         cursor: pointer;
     }
-    
+
     .checkbox-group input[type="checkbox"] {
         width: auto;
         margin: 0;
         cursor: pointer;
         flex-shrink: 0;
     }
-    
+
     .job-tags {
         display: flex;
         flex-wrap: wrap;
         gap: 0.5rem;
         margin-bottom: 0.75rem;
     }
-    
+
     .job-tag {
         display: inline-block;
-        padding: 0.25rem 0.75rem;
-        border-radius: 12px;
-        font-size: 0.875rem;
+        padding: 0.2rem 0.65rem;
+        border-radius: 6px;
+        font-size: 0.75rem;
         font-weight: 600;
         text-transform: uppercase;
+        letter-spacing: 0.03em;
     }
-    
+
     .job-tag.applied {
         background-color: #dbeafe;
         color: #1e40af;
     }
-    
+
     .job-tag.deadline-soon {
         background-color: #fef3c7;
         color: #92400e;
     }
-    
+
     .job-count-info {
         margin-top: 0.5rem;
-        padding: 0.5rem;
-        background-color: #f3f4f6;
-        border-radius: 4px;
+        padding: 0.5rem 0.75rem;
+        background-color: #fef7ed;
+        border-radius: 8px;
         font-size: 0.9rem;
+        border: 1px solid #fed7aa;
+    }
+
+    .job-meta {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.4rem 1.25rem;
+        margin: 0.75rem 0;
+        font-size: 0.9rem;
+        color: #475569;
+    }
+
+    .job-meta strong {
+        color: #1e293b;
+    }
+
+    .job-funder {
+        font-size: 0.85rem;
+        color: #64748b;
+        margin-top: 0.25rem;
+    }
+
+    .job-card-footer {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 0.75rem;
+        margin-top: 1rem;
+        flex-wrap: wrap;
     }
 </style>
 {% endblock %}
@@ -82,7 +112,6 @@
 
 {% if user.is_authenticated and waiting_for_submission %}
     <div class="card" style="border-left: 4px solid #f59e0b; margin-bottom: 1.5rem;">
-        {% load audio_tags %}
         {% include 'components/static_title_with_audio.html' with title_text="Jobs Waiting for Your Submission" slug="section_waiting_for_submission" heading_tag="h2" %}
         <style>
             #section_waiting_for_submission {
@@ -95,9 +124,11 @@
             {% for job in waiting_for_submission %}
                 <article class="card" role="listitem" style="margin-top: 1rem;">
                     {% include 'components/title_with_audio.html' with title=job.title content_object=job field_name="title" heading_tag="h3" link_url_name="jobs:detail" link_url_arg=job.pk %}
-                    <p><strong>{% trans 'Language' %}:</strong> {{ job.target_language }}</p>
-                    <p><strong>{% trans 'Amount Per Person' %}:</strong> {{ job.amount_per_person }} pesos</p>
-                    <p>{{ job.description|truncatewords:30 }}</p>
+                    <div class="job-meta">
+                        <span><strong>{% trans 'Language' %}:</strong> {{ job.target_language|language_name }}</span>
+                        <span><strong>{% trans 'Pay' %}:</strong> ${{ job.amount_per_person }} pesos</span>
+                    </div>
+                    <p style="color: #475569;">{{ job.description|truncatewords:20 }}</p>
                     <div style="display: flex; align-items: center; gap: 0.5rem;">
                         <a href="{% url 'jobs:submit' job.pk %}" class="btn btn-primary">{% trans 'Submit Work Now' %}</a>
                         {% audio_player_static_ui "button_submit_work_now" "label" %}
@@ -110,53 +141,45 @@
 
 <div class="card">
     <form method="get" action="{% url 'jobs:list' %}" role="search">
-        <div class="form-group">
-            {% include 'components/form_label_with_audio.html' with label_text="Search Jobs" slug="form_search_jobs" field_id="search" %}
-            <input type="text" id="search" name="search" value="{{ search_query }}" placeholder="{% trans 'Search by title or description...' %}">
-        </div>
-        <div class="form-group">
-            {% include 'components/form_label_with_audio.html' with label_text="Filter by Language" slug="form_filter_language" field_id="language" %}
-            <select id="language" name="language">
-                <option value="">{% trans 'All Languages' %}</option>
-                <option value="en" {% if language_filter == 'en' %}selected{% endif %}>English</option>
-                <option value="es" {% if language_filter == 'es' %}selected{% endif %}>Spanish</option>
-                <option value="nah" {% if language_filter == 'nah' %}selected{% endif %}>Nahuatl</option>
-                <option value="oto" {% if language_filter == 'oto' %}selected{% endif %}>Otomi</option>
-                <option value="maz" {% if language_filter == 'maz' %}selected{% endif %}>Mazahua</option>
-                <option value="que" {% if language_filter == 'que' %}selected{% endif %}>Quechua</option>
-            </select>
+        <div style="display: flex; gap: 1rem; flex-wrap: wrap; align-items: flex-end;">
+            <div class="form-group" style="flex: 2; min-width: 200px; margin-bottom: 0.75rem;">
+                {% include 'components/form_label_with_audio.html' with label_text="Search Jobs" slug="form_search_jobs" field_id="search" %}
+                <input type="text" id="search" name="search" value="{{ search_query }}" placeholder="{% trans 'Search by title or description...' %}">
+            </div>
+            <div class="form-group" style="flex: 1; min-width: 160px; margin-bottom: 0.75rem;">
+                {% include 'components/form_label_with_audio.html' with label_text="Filter by Language" slug="form_filter_language" field_id="language" %}
+                <select id="language" name="language">
+                    <option value="">{% trans 'All Languages' %}</option>
+                    <option value="nah" {% if language_filter == 'nah' %}selected{% endif %}>Náhuatl</option>
+                    <option value="oto" {% if language_filter == 'oto' %}selected{% endif %}>Otomí (Hñähñu)</option>
+                    <option value="tzo" {% if language_filter == 'tzo' %}selected{% endif %}>Tsotsil</option>
+                    <option value="que" {% if language_filter == 'que' %}selected{% endif %}>Quechua</option>
+                    <option value="zai" {% if language_filter == 'zai' %}selected{% endif %}>Zapoteco</option>
+                    <option value="cak" {% if language_filter == 'cak' %}selected{% endif %}>Kaqchikel</option>
+                    <option value="aym" {% if language_filter == 'aym' %}selected{% endif %}>Aymara</option>
+                    <option value="maz" {% if language_filter == 'maz' %}selected{% endif %}>Mazateco</option>
+                    <option value="trs" {% if language_filter == 'trs' %}selected{% endif %}>Triqui</option>
+                    <option value="chj" {% if language_filter == 'chj' %}selected{% endif %}>Chinanteco</option>
+                    <option value="mxt" {% if language_filter == 'mxt' %}selected{% endif %}>Mixteco</option>
+                    <option value="yua" {% if language_filter == 'yua' %}selected{% endif %}>Maya Yucateco</option>
+                    <option value="pua" {% if language_filter == 'pua' %}selected{% endif %}>Purépecha</option>
+                    <option value="gn" {% if language_filter == 'gn' %}selected{% endif %}>Guaraní</option>
+                    <option value="es" {% if language_filter == 'es' %}selected{% endif %}>Español</option>
+                    <option value="en" {% if language_filter == 'en' %}selected{% endif %}>English</option>
+                </select>
+            </div>
+            <div style="margin-bottom: 0.75rem;">
+                <button type="submit" class="btn btn-primary">{% trans 'Filter' %}</button>
+            </div>
         </div>
         {% if user.is_authenticated %}
-        <div class="form-group">
-            <fieldset class="filter-options">
-                <legend style="display: flex; align-items: center; gap: 0.125rem; flex-wrap: wrap;">
-                    {% trans 'Filter Options' %}
-                    {% audio_player_static_ui "section_filter_options" "label" %}
-                </legend>
-                <style>
-                .filter-options legend .audio-player-wrapper {
-                    margin-left: 0 !important;
-                }
-                </style>
-                <div class="checkbox-group">
-                    <label style="display: flex; align-items: center; gap: 0.125rem; flex-wrap: wrap;">
-                        <input type="checkbox" name="hide_applied" {% if hide_applied %}checked{% endif %}>
-                        <span>{% trans 'Hide jobs I\'ve applied to' %}</span>
-                        {% audio_player_static_ui "checkbox_hide_applied" "label" %}
-                    </label>
-                    <style>
-                    .checkbox-group label .audio-player-wrapper {
-                        margin-left: 0 !important;
-                    }
-                    </style>
-                </div>
-            </fieldset>
+        <div class="form-group" style="margin-top: 0.5rem; margin-bottom: 0;">
+            <label style="display: flex; align-items: center; gap: 0.5rem; font-weight: normal; cursor: pointer; font-size: 0.9rem; color: #64748b;">
+                <input type="checkbox" name="hide_applied" {% if hide_applied %}checked{% endif %} style="width: auto;" onchange="this.form.submit()">
+                <span>{% trans 'Hide jobs I\'ve already applied to' %}</span>
+            </label>
         </div>
         {% endif %}
-        <div style="display: flex; align-items: center; gap: 0.5rem;">
-            <button type="submit" class="btn btn-primary">{% trans 'Filter' %}</button>
-            {% audio_player_static_ui "button_filter" "label" %}
-        </div>
     </form>
 </div>
 
@@ -166,38 +189,41 @@
             {% with job=job_item.job %}
             <article class="card" role="listitem">
                 <div class="job-tags">
+                    {{ job.status|status_badge }}
                     {% if job_item.has_applied %}
                         <span class="job-tag applied">{% trans 'Applied' %}</span>
                     {% endif %}
                     {% if job_item.deadline_soon %}
-                        <span class="job-tag deadline-soon">{% trans 'About to Start' %}</span>
+                        <span class="job-tag deadline-soon">{% trans 'Closing Soon' %}</span>
                     {% endif %}
                 </div>
-                
+
                 {% include 'components/title_with_audio.html' with title=job.title content_object=job field_name="title" heading_tag="h2" link_url_name="jobs:detail" link_url_arg=job.pk %}
-                <p><strong>{% trans 'Language' %}:</strong> {{ job.target_language }}</p>
-                {% if job.target_dialect %}
-                    <p><strong>{% trans 'Dialect' %}:</strong> {{ job.target_dialect }}</p>
-                {% endif %}
-                <p><strong>{% trans 'Amount Per Person' %}:</strong> {{ job.amount_per_person }} pesos</p>
-                <p><strong>{% trans 'Total Budget' %}:</strong> {{ job.budget }} pesos</p>
-                <p><strong>{% trans 'Status' %}:</strong> {{ job.get_status_display }}</p>
-                
+                <p class="job-funder">{% trans 'Posted by' %} <strong>{{ job.funder.get_display_name }}</strong></p>
+                <div class="job-meta">
+                    <span><strong>{% trans 'Language' %}:</strong> {{ job.target_language|language_name }}{% if job.target_dialect %} ({{ job.target_dialect }}){% endif %}</span>
+                    <span><strong>{% trans 'Pay' %}:</strong> ${{ job.amount_per_person }} pesos</span>
+                    <span><strong>{% trans 'Deliverables' %}:</strong> {{ job.get_deliverable_types_display }}</span>
+                </div>
+
                 {% if job.status == 'recruiting' or job.status == 'open' %}
                     <div class="job-count-info">
-                        <strong>{% trans 'Applications' %}:</strong> {{ job.applications_count }} / {{ job.recruit_limit }} {% trans 'needed' %}
+                        <strong>{% trans 'Applications' %}:</strong> {{ job.applications_count }} / {{ job.recruit_limit }}
                     </div>
                 {% elif job.status == 'submitting' %}
                     <div class="job-count-info">
-                        <strong>{% trans 'Workers Submitted' %}:</strong> {{ job.submissions_count }} / {{ job.max_responses }} {% trans 'needed' %}
+                        <strong>{% trans 'Submissions' %}:</strong> {{ job.submissions_count }} / {{ job.max_responses }}
                     </div>
                 {% endif %}
-                
-                <p><strong>{% trans 'Deliverables' %}:</strong> {{ job.get_deliverable_types_display }}</p>
-                <p>{{ job.description|truncatewords:30 }}</p>
-                <div style="display: flex; align-items: center; gap: 0.5rem;">
-                    <a href="{% url 'jobs:detail' job.pk %}" class="btn btn-primary">{% trans 'View Details' %}</a>
-                    {% audio_player_static_ui "button_view_details" "label" %}
+
+                <p style="color: #475569; margin: 0.75rem 0 0;">{{ job.description|truncatewords:30 }}</p>
+
+                <div class="job-card-footer">
+                    <div style="display: flex; align-items: center; gap: 0.5rem;">
+                        <a href="{% url 'jobs:detail' job.pk %}" class="btn btn-primary">{% trans 'View Details' %}</a>
+                        {% audio_player_static_ui "button_view_details" "label" %}
+                    </div>
+                    <span style="font-size: 0.8rem; color: #94a3b8;">{% trans 'Budget' %}: ${{ job.budget }} pesos</span>
                 </div>
             </article>
             {% endwith %}

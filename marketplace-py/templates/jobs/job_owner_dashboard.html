@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-{% load i18n %}
+{% load i18n job_tags %}
 
 {% block title %}{% trans 'Job Owner Dashboard' %} - {{ block.super }}{% endblock %}
 
@@ -12,7 +12,7 @@
     }
 
     .job-owner-card {
-        border-left: 4px solid #d1d5db;
+        border-left: 4px solid #c2410c;
     }
 
     .job-owner-header {
@@ -41,10 +41,10 @@
     }
 
     .submission-card {
-        padding: 0.75rem;
-        border: 1px solid #e5e7eb;
-        border-radius: 0.5rem;
-        background-color: #f9fafb;
+        padding: 1rem;
+        border: 1px solid #e7e5e4;
+        border-radius: 10px;
+        background-color: #fafaf9;
     }
 
     .submission-card.accepted {
@@ -71,18 +71,21 @@
 
     .download-chip {
         font-size: 0.85rem;
-        border-radius: 999px;
-        border: 1px solid #d1d5db;
-        padding: 0.25rem 0.75rem;
+        border-radius: 8px;
+        border: 1px solid #e7e5e4;
+        padding: 0.35rem 0.85rem;
         background-color: #fff;
         text-decoration: none;
-        color: #1f2937;
+        color: #1e293b;
+        font-weight: 500;
+        transition: all 0.15s;
     }
 
     .download-chip:hover,
     .download-chip:focus {
-        border-color: #9ca3af;
-        color: #111827;
+        border-color: #c2410c;
+        color: #c2410c;
+        background: #fef7ed;
     }
 
 .job-actions {
@@ -136,9 +139,7 @@
                             {% include 'components/title_with_audio.html' with title=job.title content_object=job field_name="title" heading_tag="h2" %}
                             <p class="text-muted" style="margin: 0;">{% trans 'Created' %}: {{ job.created_at|date:"F d, Y" }}</p>
                         </div>
-                        <span class="status-pill status-{{ job.status }}">
-                            {{ job.get_status_display }}
-                        </span>
+                        {{ job.status|status_badge }}
                     </div>
 
                     <div class="job-grid">
@@ -173,9 +174,7 @@
                             {% include 'components/title_with_audio.html' with title=job.title content_object=job field_name="title" heading_tag="h2" heading_id="job-"|add:job.pk link_url_name="jobs:detail" link_url_arg=job.pk %}
                             <p class="text-muted" style="margin: 0;">{% trans 'Created' %}: {{ job.created_at|date:"F d, Y" }}</p>
                         </div>
-                        <span class="status-pill status-{{ job.status }}">
-                            {{ job.get_status_display }}
-                        </span>
+                        {{ job.status|status_badge }}
                     </div>
 
                     <div class="job-grid">
@@ -225,9 +224,7 @@
                                             <strong>{{ submission.creator.get_display_name }}</strong>
                                             <p class="text-muted" style="margin:0;">{{ submission.created_at|date:"F d, Y H:i" }}</p>
                                         </div>
-                                        <span class="status-pill status-{{ submission.status }}">
-                                            {{ submission.get_status_display }}
-                                        </span>
+                                        {{ submission.status|status_badge }}
                                     </div>
                                     {% if submission.status == 'pending' %}
                                         <div style="display: inline-flex; align-items: center; gap: 0.5rem; margin-top: 0.5rem;">

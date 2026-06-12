@@ -1,0 +1,177 @@
+{% extends 'demo/base.html' %}
+{% block title %}Demo Logins{% endblock %}
+
+{% block content %}
+<div class="section" style="margin-top: 2rem;">
+    <div class="section-label">Credentials</div>
+    <div class="section-title">Demo login accounts</div>
+    <p class="section-subtitle">Every account has the same password. Each login shows a different perspective of the marketplace.</p>
+</div>
+
+<div class="password-box">
+    <span style="color: #cbd5e1; font-size: 0.9rem;">All accounts use password:</span>
+    <code>demo123</code>
+</div>
+
+<!-- Funders -->
+<div class="section" style="margin-top: 1rem;">
+    <h2 style="color: #1a365d; font-size: 1.25rem; margin-bottom: 0.25rem;">Funders</h2>
+    <p style="color: #64748b; font-size: 0.9rem; margin-bottom: 1rem;">Organizations that post and fund jobs. Log in to see posted jobs, review applications, accept/reject submitted work.</p>
+    <table class="login-table">
+        <thead><tr><th>Username</th><th>Organization</th><th>What You'll See</th></tr></thead>
+        <tbody>
+            <tr>
+                <td class="username">demo_funder</td>
+                <td>Roberto Martinez — Lenguas Vivas A.C.</td>
+                <td>4 jobs, submissions with audio to review</td>
+            </tr>
+            <tr>
+                <td class="username">voces_vivas</td>
+                <td>Fundacion Voces Vivas (Latin America NGO)</td>
+                <td>3 jobs across submitting, reviewing, complete</td>
+            </tr>
+            <tr>
+                <td class="username">clinica_esperanza</td>
+                <td>Clinica Comunitaria Esperanza (rural health)</td>
+                <td>2 jobs — diabetes prevention + patient rights</td>
+            </tr>
+            <tr>
+                <td class="username">cafe_sierra</td>
+                <td>Cooperativa Cafe de la Sierra (Chiapas coffee)</td>
+                <td>1 job — coffee label translation</td>
+            </tr>
+            <tr>
+                <td class="username">instituto_electoral</td>
+                <td>Instituto Electoral Regional</td>
+                <td>1 job — election radio spot</td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+<!-- Active Creators -->
+<div class="section">
+    <h2 style="color: #1a365d; font-size: 1.25rem; margin-bottom: 0.25rem;">Creators — Active</h2>
+    <p style="color: #64748b; font-size: 0.9rem; margin-bottom: 1rem;">Language speakers with active applications and submitted work. Log in to see the creator experience.</p>
+    <table class="login-table">
+        <thead><tr><th>Username</th><th>Who</th><th>Highlights</th></tr></thead>
+        <tbody>
+            <tr>
+                <td class="username">carlos_otomi</td>
+                <td>Carlos Hernandez — Otomi</td>
+                <td>
+                    <span class="badge badge-audio">profile audio</span>
+                    <span class="badge badge-sub">2 audio submissions</span>
+                </td>
+            </tr>
+            <tr>
+                <td class="username">maria_nahuatl</td>
+                <td>Maria Santos — Nahuatl</td>
+                <td>Applied to 3 jobs <span class="badge badge-done">completed UI translation</span></td>
+            </tr>
+            <tr>
+                <td class="username">ana_quechua</td>
+                <td>Ana Quispe — Quechua (Peru)</td>
+                <td><span class="badge badge-sub">submitted detainee rights</span></td>
+            </tr>
+            <tr>
+                <td class="username">pedro_zapoteco</td>
+                <td>Pedro Ruiz — Zapoteco</td>
+                <td>Selected for art job <span class="badge badge-sub">submitted eco signs</span></td>
+            </tr>
+            <tr>
+                <td class="username">luis_tsotsil</td>
+                <td>Luis Gomez — Tsotsil</td>
+                <td><span class="badge badge-audio">profile audio</span> Applied to ecoturismo</td>
+            </tr>
+            <tr>
+                <td class="username">diego_aymara</td>
+                <td>Diego Mamani — Aymara (Peru)</td>
+                <td><span class="badge badge-sub">draft in progress</span> Children's story</td>
+            </tr>
+            <tr>
+                <td class="username">elena_triqui</td>
+                <td>Elena de Jesus — Triqui</td>
+                <td><span class="badge badge-done">completed transcription</span></td>
+            </tr>
+            <tr>
+                <td class="username">carmen_chinanteca</td>
+                <td>Carmen Flores — Chinanteco</td>
+                <td><span class="badge badge-done">completed artisan program</span></td>
+            </tr>
+            <tr>
+                <td class="username">raul_mazateco</td>
+                <td>Raul Garcia — Mazateco</td>
+                <td><span class="badge badge-sub">submitted clinic voicemail</span></td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+<!-- More Creators -->
+<div class="section">
+    <h2 style="color: #1a365d; font-size: 1.25rem; margin-bottom: 0.25rem;">Creators — Profiles Ready</h2>
+    <p style="color: #64748b; font-size: 0.9rem; margin-bottom: 1rem;">Full profiles with bios, no active jobs yet — good for showing the application flow from scratch.</p>
+    <table class="login-table">
+        <thead><tr><th>Username</th><th>Who</th><th>Language</th></tr></thead>
+        <tbody>
+            <tr><td class="username">ernesto_nahuatl</td><td>Ernesto Cuautle</td><td>Nahuatl (Puebla)</td></tr>
+            <tr><td class="username">soledad_kaqchikel</td><td>Soledad Ixchop</td><td>Kaqchikel (Guatemala)</td></tr>
+            <tr><td class="username">valentina_tseltal</td><td>Valentina Mendez</td><td>Tseltal (Chiapas)</td></tr>
+            <tr><td class="username">guadalupe_purepecha</td><td>Guadalupe Morales</td><td>Purepecha (Michoacan)</td></tr>
+            <tr><td class="username">rosa_maya</td><td>Rosa Chan Poot</td><td>Maya Yucateco</td></tr>
+            <tr><td class="username">juan_mixteco</td><td>Juan Lopez</td><td>Mixteco (Oaxaca)</td></tr>
+            <tr><td class="username">isadora_guarani</td><td>Isadora Benitez</td><td>Guarani (Paraguay)</td></tr>
+            <tr><td class="username">tomas_totonaco</td><td>Tomas Espinosa</td><td>Totonaco (Veracruz)</td></tr>
+            <tr><td class="username">yolanda_huichol</td><td>Yolanda Carrillo</td><td>Wixarika (Jalisco)</td></tr>
+            <tr><td class="username">andres_mam</td><td>Andres Pablo</td><td>Mam (Guatemala)</td></tr>
+        </tbody>
+    </table>
+</div>
+
+<!-- Both Roles -->
+<div class="section">
+    <h2 style="color: #1a365d; font-size: 1.25rem; margin-bottom: 0.25rem;">Both Roles</h2>
+    <p style="color: #64748b; font-size: 0.9rem; margin-bottom: 1rem;">Can post jobs AND do translation work — showing the community-driven nature of the platform.</p>
+    <table class="login-table">
+        <thead><tr><th>Username</th><th>Who</th><th>Role</th></tr></thead>
+        <tbody>
+            <tr><td class="username">miguel_both</td><td>Miguel Torres — Zapoteco</td><td>Museum director, posts jobs + translates</td></tr>
+            <tr><td class="username">sofia_both</td><td>Sofia Morales — UNAM linguist</td><td>Funds research + does translations</td></tr>
+        </tbody>
+    </table>
+</div>
+
+<!-- Technical -->
+<div class="section">
+    <div class="section-label">Technical</div>
+    <div class="section-title">Stack and deployment</div>
+    <div class="card-grid" style="margin-top: 1rem;">
+        <div class="demo-card">
+            <h3>Backend</h3>
+            <p>Django 5.2, Django REST Framework, SQLite (dev). Custom user model with roles, job lifecycle state machine with auto-transitions, Open Payments SDK for Interledger.</p>
+        </div>
+        <div class="demo-card">
+            <h3>Frontend</h3>
+            <p>Server-rendered templates with HTMX. WCAG-accessible with semantic HTML, ARIA labels, and skip links. Custom audio player system with language fallback chain.</p>
+        </div>
+        <div class="demo-card">
+            <h3>Audio System</h3>
+            <p>Generic audio snippet model (attaches to any content via ContentType). Community contribution workflow. Language fallback chain with Otomi-specific fallback audio.</p>
+        </div>
+        <div class="demo-card">
+            <h3>Payments</h3>
+            <p>Open Payments protocol with GNAP authorization. Contract lifecycle: create incoming payment, get quote, authorize via wallet redirect, complete outgoing payment.</p>
+        </div>
+    </div>
+</div>
+
+<div class="section">
+    <div class="demo-card" style="font-family: 'SF Mono', 'Consolas', monospace; font-size: 0.85rem; color: #475569; line-height: 2.2;">
+        <span style="color: #94a3b8;">Reload demo:</span> <code style="background:#f1f5f9;padding:0.2rem 0.5rem;border-radius:4px;color:#c2410c;">make full-demo</code><br>
+        <span style="color: #94a3b8;">Start app:</span> <code style="background:#f1f5f9;padding:0.2rem 0.5rem;border-radius:4px;color:#c2410c;">docker compose up -d</code><br>
+        <span style="color: #94a3b8;">Run tests:</span> <code style="background:#f1f5f9;padding:0.2rem 0.5rem;border-radius:4px;color:#c2410c;">make test</code> <span style="color: #94a3b8;">(212 tests passing)</span><br>
+        <span style="color: #94a3b8;">Source:</span> <a href="https://github.com/AIDataForXYZ/hackathon-interledger-market-Accesible" style="color: #c2410c;">github.com/AIDataForXYZ/hackathon-interledger-market-Accesible</a>
+    </div>
+</div>
+{% endblock %}

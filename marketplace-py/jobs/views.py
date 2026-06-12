@@ -35,10 +35,19 @@ def _build_audio_targets():
 
 
 def home(request):
-    """Home page - redirects logged-in users to dashboard, others to job list."""
+    """Home page - redirects logged-in users to dashboard, others to landing."""
     if request.user.is_authenticated:
         return redirect('jobs:dashboard')
-    return redirect('jobs:list')
+    # Show landing page with stats
+    from jobs.models import Job
+    active_jobs = Job.objects.filter(status__in=['recruiting', 'submitting']).count()
+    total_languages = Job.objects.values('target_language').distinct().count()
+    total_creators = User.objects.filter(role__in=['creator', 'both']).count()
+    return render(request, 'jobs/landing.html', {
+        'active_jobs': active_jobs,
+        'total_languages': total_languages,
+        'total_creators': total_creators,
+    })
 
 
 def job_list(request):

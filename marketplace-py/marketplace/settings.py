@@ -25,6 +25,12 @@ DEBUG = os.environ.get('DEBUG', 'True').lower() in ('1', 'true', 'yes')
 # In Docker, set ALLOWED_HOSTS environment variable (e.g., ALLOWED_HOSTS=* or ALLOWED_HOSTS=localhost,127.0.0.1)
 ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', '*').split(',')
 
+# Trust origins for CSRF (Cloudflare tunnel and localhost)
+CSRF_TRUSTED_ORIGINS = os.environ.get(
+    'CSRF_TRUSTED_ORIGINS',
+    'https://voxvox.hablandodeia.com,http://localhost:8000,http://127.0.0.1:8000'
+).split(',')
+
 
 # Application definition
 
@@ -128,10 +134,37 @@ LANGUAGES = [
     ('en', 'English'),
     ('es', 'Spanish'),
     ('nah', 'Nahuatl'),
-    ('oto', 'Otomi (?uhu)'),
+    ('oto', 'Otomí (Hñähñu)'),
     ('maz', 'Mazahua'),
     ('que', 'Quechua'),
 ]
+
+# Full map of all language codes used in jobs to display names
+LANGUAGE_DISPLAY_NAMES = {
+    'en': 'English',
+    'es': 'Español',
+    'nah': 'Náhuatl',
+    'oto': 'Otomí (Hñähñu)',
+    'maz': 'Mazahua',
+    'que': 'Quechua',
+    'tzo': 'Tsotsil',
+    'trs': 'Triqui',
+    'zai': 'Zapoteco',
+    'cak': 'Kaqchikel',
+    'aym': 'Aymara',
+    'miq': 'Miskito',
+    'gn': 'Guaraní',
+    'arn': 'Mapudungun',
+    'yua': 'Maya Yucateco',
+    'ppl': 'Nawat',
+    'pua': 'Purépecha',
+    'shp': 'Shipibo-Konibo',
+    'cni': 'Asháninka',
+    'quc': "K'iche'",
+    'chj': 'Chinanteco',
+    'cuk': 'Guna',
+    'mxt': 'Mixteco',
+}
 
 # UI language rules
 SUPPORTED_UI_LANGUAGES = ('en', 'es')

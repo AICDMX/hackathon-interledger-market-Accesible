@@ -1,21 +1,21 @@
 {% extends 'base.html' %}
-{% load i18n audio_tags %}
+{% load i18n audio_tags job_tags %}
 
 {% block title %}{{ job.title }} - {{ block.super }}{% endblock %}
 
 {% block content %}
 <article class="card">
     {% include 'components/title_with_audio.html' with title=job.title content_object=job field_name="title" heading_tag="h1" %}
-    
+
     <div>
-        <p><strong>{% trans 'Funder' %}:</strong> {{ job.funder.get_display_name }}</p>
-        <p><strong>{% trans 'Status' %}:</strong> {{ job.get_status_display }}</p>
-        <p><strong>{% trans 'Target Language' %}:</strong> {{ job.target_language }}</p>
+        <p><strong>{% trans 'Posted by' %}:</strong> {{ job.funder.get_display_name }}</p>
+        <p><strong>{% trans 'Status' %}:</strong> {{ job.status|status_badge }}</p>
+        <p><strong>{% trans 'Target Language' %}:</strong> {{ job.target_language|language_name }}</p>
         {% if job.target_dialect %}
             <p><strong>{% trans 'Dialect' %}:</strong> {{ job.target_dialect }}</p>
         {% endif %}
-        <p><strong>{% trans 'Amount Per Person' %}:</strong> {{ job.amount_per_person }} pesos</p>
-        <p><strong>{% trans 'Total Budget' %}:</strong> {{ job.budget }} pesos ({{ job.amount_per_person }} ? {{ job.max_responses }})</p>
+        <p><strong>{% trans 'Amount Per Person' %}:</strong> ${{ job.amount_per_person }} pesos</p>
+        <p><strong>{% trans 'Total Budget' %}:</strong> ${{ job.budget }} pesos ({{ job.amount_per_person }} x {{ job.max_responses }})</p>
         
         <p><strong>{% trans 'Responses Needed' %}:</strong> 
             {{ job.get_accepted_submissions_count }} / {{ job.max_responses }} {% trans 'accepted' %}
